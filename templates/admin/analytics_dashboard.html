@@ -383,81 +383,67 @@
     </div>
 
 
-    <!-- 2. Retention Grid -->
-    <div class="section-title">
-        <span class="section-icon text-purple"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                <circle cx="9" cy="7" r="4"></circle>
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-            </svg></span>
-        User Retention
-    </div>
-    <div class="analytics-grid">
-        <div class="stat-card">
-            <div class="stat-label">New Users</div>
-            <div class="stat-value text-green">{{ auth_stats.new_users }}</div>
-            <div class="stat-subtext">Joined recently</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">Returning Users</div>
-            <div class="stat-value text-blue">{{ auth_stats.returning_users }}</div>
-            <div class="stat-subtext">Came back</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">Repeat Customers</div>
-            <div class="stat-value text-purple">{{ auth_stats.repeat_customers }}</div>
-            <div class="stat-subtext">>1 Order placed</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">Auth Flow</div>
-            <div class="stat-value" style="font-size: 20px;">
-                <span class="text-green">{{ auth_stats.logins }}</span> <span
-                    style="font-size:12px; color:#94a3b8;">Logins</span>
-                <span style="color:#cbd5e1; margin:0 5px;">|</span>
-                <span class="text-blue">{{ auth_stats.signups }}</span> <span
-                    style="font-size:12px; color:#94a3b8;">Signups</span>
+    <!-- Compact Row: Retention & Store Health -->
+    <div
+        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-bottom: 30px;">
+
+        <!-- User Retention -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+            <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center">
+                <svg class="w-5 h-5 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
+                    </path>
+                </svg>
+                User Retention
+            </h2>
+            <div class="space-y-4">
+                <div class="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+                    <span class="text-slate-600">New Users</span>
+                    <span class="font-bold text-slate-900">{{ auth_stats.new_users }}</span>
+                </div>
+                <div class="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+                    <span class="text-slate-600">Returning Users</span>
+                    <span class="font-bold text-slate-900">{{ auth_stats.returning_users }}</span>
+                </div>
+                <div class="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+                    <span class="text-slate-600">Repeat Customers</span>
+                    <span class="font-bold text-emerald-600">{{ auth_stats.repeat_customers }}</span>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- 3. Store Health Grid -->
-    <div class="section-title">
-        <span class="section-icon text-red"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-            </svg></span>
-        Store Health
-    </div>
-    <div class="analytics-grid">
-        <div class="stat-card" style="background: #fef2f2; border: 1px solid #fee2e2;">
-            <div class="stat-label text-red">Abandoned Carts</div>
-            <div class="stat-value text-red">{{ ecommerce.abandoned_carts }}</div>
-            <div class="stat-subtext text-red">Potential lost revenue</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">Wishlist Adds</div>
-            <div class="stat-value text-pink">{{ ecommerce.wishlist_adds }}</div>
-            <div class="stat-subtext">Customer intent</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">Coupons Used</div>
-            <div class="stat-value">{{ ecommerce.coupons }}</div>
-            <div class="stat-subtext">Discounts applied</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">Payment Issues</div>
-            <div class="stat-value text-red">{{ ecommerce.payment_failed }}</div>
-            <div class="stat-subtext">Failed transactions</div>
+        <!-- Store Health -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+            <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center">
+                <svg class="w-5 h-5 mr-2 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                    </path>
+                </svg>
+                Store Health
+            </h2>
+            <div class="space-y-4">
+                <div class="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+                    <span class="text-slate-600">Abandoned Carts</span>
+                    <span class="font-bold text-amber-600">{{ ecommerce.abandoned_carts }}</span>
+                </div>
+                <div class="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+                    <span class="text-slate-600">Payment Issues</span>
+                    <span class="font-bold text-red-600">{{ ecommerce.payment_failed }}</span>
+                </div>
+                <div class="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+                    <span class="text-slate-600">Out of Stock Hits</span>
+                    <span class="font-bold text-slate-900">{{ ecommerce.out_of_stock }}</span>
+                </div>
+            </div>
         </div>
     </div>
 
 
     <!-- 4. Charts Section -->
-    <div class="charts-grid">
+    <div
+        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; margin-bottom: 30px;">
         <div class="chart-box">
             <div class="chart-header">
                 <div class="chart-title">Conversion Funnel</div>

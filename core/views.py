@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.core.cache import cache
 from django.http import JsonResponse
 from django.contrib.admin.views.decorators import staff_member_required
 from django.utils import timezone
@@ -16,6 +17,13 @@ from django.contrib.auth import get_user_model
 def analytics_dashboard(request):
     # Time Range (Default 30 days)
     days = int(request.GET.get('days', 30))
+    
+    # Cache Key based on days (5 min expiry)
+    cache_key = f"analytics_dashboard_v2_{days}"
+    cached_context = cache.get(cache_key)
+    if cached_context:
+        return render(request, 'admin/analytics_dashboard.html', cached_context)
+
     start_date = timezone.now() - timedelta(days=days)
     
     # 1. Traffic Metrics
@@ -119,6 +127,7 @@ def analytics_dashboard(request):
     user_conversion_rate = (payments / total_visitors * 100) if total_visitors > 0 else 0
 
     context = {
+        'days': days,
         'total_sessions': total_sessions,
         'total_visitors': total_visitors, 
         'bounce_rate': round(bounce_rate, 1),
@@ -128,10 +137,9 @@ def analytics_dashboard(request):
         'browser_data': browser_data,
         'funnel': {
             'adds': adds,
-            'removes': removes_from_cart,
             'starts': starts,
             'sales': payments,
-            'rate': round(user_conversion_rate, 2) if total_users > 0 else 0, # Note: user_conversion_rate needs calc
+            'rate': round(user_conversion_rate, 2) if total_users > 0 else 0,
             'drop_off': round(drop_off_rate, 1)
         },
         'auth_stats': {
@@ -152,8 +160,10 @@ def analytics_dashboard(request):
         'top_searches': top_searches,
         'top_products': top_products,
         'errors_404': errors_404,
-        'days': days
     }
+    
+    # Save to cache (5 minutes)
+    cache.set(cache_key, context, 300)
     
     return render(request, 'admin/analytics_dashboard.html', context)
 

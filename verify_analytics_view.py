@@ -55,6 +55,22 @@ try:
         
         if not missing:
             print("SUCCESS: All new UI elements and sections found in rendered HTML.")
+            
+            # Verify Chart Data Presence (Looking for JSON scripts or numbers)
+            if "id=\"device-data\" type=\"application/json\">" in content:
+                print("SUCCESS: Device data JSON found.")
+            else:
+                 print("WARNING: Device data JSON missing.")
+                 
+            # Check for funnel numbers
+            if "datasets: [{" in content and "data: [" in content:
+                 print("SUCCESS: Chart datasets found.")
+
+            # Check for Optimization (Compact Grid)
+            if "md:grid-cols-2" in content:
+                print("SUCCESS: Compact 2-column layout found.")
+            else:
+                print("WARNING: Compact layout class 'md:grid-cols-2' missing.")
         else:
             print(f"WARNING: The following UI elements were missing: {missing}")
             
