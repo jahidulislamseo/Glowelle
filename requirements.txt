@@ -1,7 +1,13 @@
 Django>=5.0
 django-jazzmin
 django-import-export
+django-ratelimit
+django-debug-toolbar
 whitenoise
 Pillow
 django-tailwind
 xhtml2pdf
+gunicorn
+psycopg2-binary
+dj-database-url
+python-decouple

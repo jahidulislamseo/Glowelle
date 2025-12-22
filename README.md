@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Al Barakah Mart - Django E-commerce Platform
 
 A modern, feature-rich e-commerce platform built with Django for selling organic groceries and daily essentials in Dhaka, Bangladesh.
@@ -183,3 +184,6 @@ For inquiries: jahidulislamseo@gmail.com
 
 **Version**: 1.0.0  
 **Last Updated**: December 2025
+=======
+# shop
+>>>>>>> 908ec4bedce9082ecb604d50e6ebcb2bbb2584ac
