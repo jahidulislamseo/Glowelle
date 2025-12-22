@@ -27,12 +27,12 @@ class Brand(models.Model):
         return self.name
 
 class Product(SEOModel):
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=500)
     slug = models.SlugField(unique=True)
     description = models.TextField(null=True, blank=True)
     price = models.FloatField(db_index=True)
     original_price = models.FloatField(null=True, blank=True)
-    image = models.ImageField(upload_to='products/main/', blank=True, null=True)
+    image = models.ImageField(upload_to='products/main/', max_length=255, blank=True, null=True)
     # images field replaced by ProductImage model 
     rating = models.FloatField(default=0)
     reviews_count = models.IntegerField(default=0)

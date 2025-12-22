@@ -4,7 +4,7 @@ class SEOModel(models.Model):
     meta_title = models.CharField(max_length=255, blank=True, null=True)
     meta_description = models.TextField(blank=True, null=True)
     meta_keywords = models.CharField(max_length=255, blank=True, null=True, help_text="Comma-separated keywords for SEO")
-    og_image = models.ImageField(upload_to='seo/', blank=True, null=True, help_text="Image for social media sharing")
+    og_image = models.ImageField(upload_to='seo/', max_length=255, blank=True, null=True, help_text="Image for social media sharing")
     
     class Meta:
         abstract = True

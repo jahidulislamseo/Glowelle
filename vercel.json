@@ -1,4 +1,5 @@
 {
+    "version": 2,
     "builds": [
         {
             "src": "config/wsgi.py",
@@ -6,6 +7,13 @@
             "config": {
                 "maxLambdaSize": "15mb",
                 "runtime": "python3.9"
+            }
+        },
+        {
+            "src": "build.sh",
+            "use": "@vercel/static-build",
+            "config": {
+                "distDir": "staticfiles"
             }
         }
     ],
@@ -15,8 +23,15 @@
             "dest": "/static/$1"
         },
         {
+            "src": "/media/(.*)",
+            "dest": "/media/$1"
+        },
+        {
             "src": "/(.*)",
             "dest": "config/wsgi.py"
         }
-    ]
+    ],
+    "env": {
+        "PYTHONUNBUFFERED": "1"
+    }
 }

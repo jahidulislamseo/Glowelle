@@ -46,23 +46,19 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
-    'tailwind',
-    'theme',
     'import_export',
     'core',
     'users',
     'products',
     'orders',
-    'analytics', # New Analytics App
+    'analytics',
     'whitenoise.runserver_nostatic',
     'marketing',
     'django.contrib.sites',
     'django.contrib.sitemaps',
-    'debug_toolbar',
 ]
 
 MIDDLEWARE = [
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware', # Add Whitenoise Middleware
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -100,11 +96,25 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+# Database
+# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
+
+import dj_database_url
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db_v2.sqlite3',
+#     }
+# }
+DB_URL = config('DATABASE_URL', default='sqlite:///' + str(BASE_DIR / 'db_v2.sqlite3'))
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db_v2.sqlite3',
-    }
+    'default': dj_database_url.parse(
+        DB_URL,
+        conn_max_age=600,
+        ssl_require=(not 'sqlite' in DB_URL) # Only require SSL if not using SQLite
+    )
 }
 
 
