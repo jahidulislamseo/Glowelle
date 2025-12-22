@@ -42,12 +42,12 @@ try:
         
         # Check for new sections and UI elements
         checks = [
-            "User Retention",
+            "User Activity",       # Renamed from User Retention
             "Store Health",
             "Abandoned Carts",
             "dashboard-container", # New UI class
             "modern-table",        # New UI class
-            "date-badge",          # New UI class
+            "date-btn",            # Renamed from date-badge
             "analytics-grid"       # Grid layout
         ]
         
@@ -66,11 +66,14 @@ try:
             if "datasets: [{" in content and "data: [" in content:
                  print("SUCCESS: Chart datasets found.")
 
-            # Check for Optimization (Compact Grid)
-            if "md:grid-cols-2" in content:
-                print("SUCCESS: Compact 2-column layout found.")
+            # Check for Tabbed Interface
+            if "tabs-nav" in content and "switchTab" in content:
+                print("SUCCESS: Tab navigation found.")
             else:
-                print("WARNING: Compact layout class 'md:grid-cols-2' missing.")
+                print("WARNING: Tab navigation missing.")
+                
+            if "id=\"overview\" class=\"tab-content active\"" in content:
+                 print("SUCCESS: Overview tab is active by default.")
         else:
             print(f"WARNING: The following UI elements were missing: {missing}")
             
