@@ -321,11 +321,15 @@
         </div>
 
         <!-- Charts Row -->
-        <div class="compact-grid">
+        <!-- Charts Row -->
+        <div
+            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 24px; margin-bottom: 30px;">
             <!-- Funnel Chart -->
             <div class="chart-box">
                 <div class="chart-title">Conversion Funnel</div>
-                <canvas id="funnelChart" height="250"></canvas>
+                <div style="height: 200px; position: relative;">
+                    <canvas id="funnelChart"></canvas>
+                </div>
             </div>
 
             <!-- Top Products -->
@@ -340,7 +344,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for item in top_products %}
+                        {% for item in top_products|slice:":5" %}
                         <tr>
                             <td>{{ item.url|truncatechars:35 }}</td>
                             <td style="text-align:right"><span class="pill bg-green">{{ item.count }}</span></td>
