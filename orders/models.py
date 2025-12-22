@@ -233,9 +233,15 @@ class OrderItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField()
     price = models.DecimalField(max_digits=12, decimal_places=2) # Changed to Decimal
+    stock_at_order = models.IntegerField(null=True, blank=True, help_text="Stock quantity at the time of order")
     
     def get_total(self):
         return self.price * self.quantity
+
+    def save(self, *args, **kwargs):
+        if not self.pk and not self.stock_at_order and self.product:
+            self.stock_at_order = self.product.stock_quantity
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.quantity} x {self.product.title}"

@@ -257,12 +257,47 @@
                 <div class="oms-card">
                     <h2>Product Details</h2>
                     <!-- We render the 'items' inline formset here manually or simply include it -->
-                    {% for inline_admin_formset in inline_admin_formsets %}
-                    <!-- Assuming first inline is OrderItem -->
-                    {% if forloop.first %}
-                    {% include inline_admin_formset.opts.template %}
-                    {% endif %}
-                    {% endfor %}
+                    <!-- Custom Product Table -->
+                    <table class="oms-table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Qty</th>
+                                <th>Unit Price</th>
+                                <th>Stock @ Order</th>
+                                <th>Current Stock</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in original.items.all %}
+                            <tr>
+                                <td>
+                                    <div style="font-weight: 600;">{{ item.product.title }}</div>
+                                    <div style="font-size: 11px; color: var(--text-muted);">SKU: {{
+                                        item.product.slug|default:"N/A" }}</div>
+                                </td>
+                                <td>{{ item.quantity }}</td>
+                                <td>{{ item.price }}</td>
+                                <td>{{ item.stock_at_order|default:"-" }}</td>
+                                <td>
+                                    {% if item.product.stock_quantity <= 0 %} <span
+                                        style="color: #DC2626; font-weight: bold;">OUT OF STOCK</span>
+                                        {% else %}
+                                        {{ item.product.stock_quantity }}
+                                        {% endif %}
+                                </td>
+                                <td>{{ item.get_total }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <!-- Include default inline for editing if needed, but maybe hidden or minimized? 
+                         User requested 'clean', so a read-only table is better for the 'Dashboard' feel.
+                         However, to allow editing, we might keep the hidden formset or just rely on the read-only view here.
+                         For now, let's keep the custom view as it matches the "Analysis" requirement. 
+                    -->
 
                     <!-- Financial Summary -->
                     <div style="margin-top: 20px; padding-top: 20px; border-top: 1px dashed var(--border);">
@@ -317,150 +352,155 @@
                             <label class="oms-label">Tracking ID</label>
                             {{ adminform.form.tracking_id }}
                         </div>
-                        <div>
-                            <label class="oms-label">Est. Delivery Date</label>
-                            {{ adminform.form.estimated_delivery_date }}
-                        </div>
-                        <div>
-                            <label class="oms-label">Actual Delivery Date</label>
-                            {{ adminform.form.actual_delivery_date }}
-                        </div>
+                        <label class="oms-label">Est. Delivery Date</label>
+                        {{ adminform.form.estimated_delivery_date }}
                     </div>
-
-                    <div style="margin-top: 15px;">
-                        <label class="oms-label">Delivery Notes (Customer)</label>
-                        <div style="background: #f9fafb; padding: 10px; border-radius: 6px; font-size: 14px;">
-                            {{ original.delivery_note|default:"No notes provided." }}
+                    <div>
+                        <label class="oms-label">Actual Delivery Date</label>
+                        {{ adminform.form.actual_delivery_date }}
+                        {% if original.actual_delivery_date and original.estimated_delivery_date and
+                        original.actual_delivery_date.date > original.estimated_delivery_date %}
+                        <div style="color: #DC2626; font-size: 11px; margin-top: 4px; font-weight: 700;">
+                            DELAYED (Late Delivery)
                         </div>
-                    </div>
-
-                    <div style="margin-top: 15px;">
-                        <label class="oms-label">Shipping Label</label>
-                        {{ adminform.form.shipping_label }}
+                        {% endif %}
                     </div>
                 </div>
 
-                <!-- Timeline Section (Status History) -->
-                <div class="oms-card">
-                    <h2>Order Timeline</h2>
-                    {% if timeline %}
-                    {% for event in timeline %}
-                    <div class="timeline-item">
-                        <div class="timeline-dot"></div>
-                        <div class="timeline-date">{{ event.created_at|date:"M j, g:i A" }}</div>
-                        <div class="timeline-status">{{ event.get_status_display }}</div>
-                        <div class="timeline-desc">{{ event.description|default:"" }} {% if event.created_by %}(by {{
-                            event.created_by.username }}){% endif %}</div>
+                <div style="margin-top: 15px;">
+                    <label class="oms-label">Delivery Notes (Customer)</label>
+                    <div style="background: #f9fafb; padding: 10px; border-radius: 6px; font-size: 14px;">
+                        {{ original.delivery_note|default:"No notes provided." }}
                     </div>
-                    {% endfor %}
-                    {% else %}
-                    <p style="color: var(--text-muted);">No history recorded yet.</p>
-                    {% endif %}
+                </div>
+
+                <div style="margin-top: 15px;">
+                    <label class="oms-label">Shipping Label</label>
+                    {{ adminform.form.shipping_label }}
                 </div>
             </div>
 
-            <!-- RIGHT COLUMN (Sidebar) -->
-            <div class="oms-col-sidebar">
-                <!-- Customer Card -->
-                <div class="oms-card">
-                    <h2>Customer Info</h2>
-                    <div style="text-align: center; margin-bottom: 15px;">
-                        <!-- Simple Avatar placeholder -->
-                        <div
-                            style="width: 60px; height: 60px; background: #E0E7FF; color: var(--primary); border-radius: 50%; line-height: 60px; font-size: 24px; font-weight: bold; margin: 0 auto;">
-                            {{ original.full_name|first|default:"U" }}
-                        </div>
-                        <div style="margin-top: 10px; font-weight: 600;">{{ original.full_name }}</div>
-                        <div style="font-size: 13px; color: var(--text-muted);">{{ original.user.email }}</div>
-                        {% if customer_total_orders > 1 %}
-                        <div style="margin-top:5px;"><span
-                                style="background: #D1FAE5; color: #059669; font-size: 10px; padding: 2px 8px; border-radius: 10px;">Returning
-                                Customer</span></div>
-                        {% else %}
-                        <div style="margin-top:5px;"><span
-                                style="background: #E0E7FF; color: #4F46E5; font-size: 10px; padding: 2px 8px; border-radius: 10px;">New
-                                Customer</span></div>
-                        {% endif %}
-                    </div>
-                    <div class="oms-field-row">
-                        <span class="oms-label">User ID</span>
-                        <a href="{% url 'admin:users_user_change' original.user.id %}">#{{ original.user.id }}</a>
-                    </div>
-                    <div class="oms-field-row">
-                        <span class="oms-label">Phone</span>
-                        <span class="oms-value">{{ original.phone }}</span>
-                    </div>
-                    <div class="oms-field-row">
-                        <span class="oms-label">Lifetime Orders</span>
-                        <span class="oms-value">{{ customer_total_orders }}</span>
-                    </div>
-                    <div class="oms-field-row">
-                        <span class="oms-label">Lifetime Spend</span>
-                        <span class="oms-value">{{ customer_lifetime_spend }} BDT</span>
-                    </div>
+            <!-- Timeline Section (Status History) -->
+            <div class="oms-card">
+                <h2>Order Timeline</h2>
+                {% if timeline %}
+                {% for event in timeline %}
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">{{ event.created_at|date:"M j, g:i A" }}</div>
+                    <div class="timeline-status">{{ event.get_status_display }}</div>
+                    <div class="timeline-desc">{{ event.description|default:"" }} {% if event.created_by %}(by {{
+                        event.created_by.username }}){% endif %}</div>
                 </div>
-
-                <!-- Address Card -->
-                <div class="oms-card">
-                    <h2>Addresses</h2>
-                    <div class="oms-section-title" style="margin-top:0;">Shipping Address</div>
-                    <p style="font-size: 14px; line-height: 1.5;">
-                        {{ original.address }}<br>
-                        {{ original.city }}, {{ original.zip_code }}
-                    </p>
-
-                    {% if original.billing_address %}
-                    <div class="oms-section-title">Billing Address</div>
-                    <p style="font-size: 14px; line-height: 1.5;">
-                        {{ original.billing_address }}<br>
-                        {{ original.billing_city }}, {{ original.billing_zip_code }}
-                    </p>
-                    {% endif %}
-                </div>
-
-                <!-- Admin Controls -->
-                <div class="oms-card">
-                    <h2>Admin Controls</h2>
-                    <div style="margin-bottom: 15px;">
-                        <label class="oms-label">Change Status</label>
-                        {{ adminform.form.status }}
-                    </div>
-                    <div style="margin-bottom: 15px;">
-                        <label class="oms-label">Internal Note</label>
-                        {{ adminform.form.internal_admin_note }}
-                    </div>
-
-                    <div class="oms-section-title">Risk Analysis</div>
-                    <div class="oms-field-row">
-                        <span class="oms-label">IP Address</span>
-                        <span class="oms-value">{{ original.ip_address|default:"Unknown" }}</span>
-                    </div>
-                    <div class="oms-field-row">
-                        <span class="oms-label">High Risk?</span>
-                        <span class="oms-value">{{ adminform.form.is_high_risk }}</span>
-                    </div>
-                </div>
-
-                <!-- Documents -->
-                <div class="oms-card">
-                    <h2>Documents</h2>
-                    <div class="oms-field-row">
-                        <span class="oms-label">Invoice #</span>
-                        <span class="oms-value">{{ original.invoice_number }}</span>
-                    </div>
-                    <a href="{% url 'order_invoice' original.id %}" class="button"
-                        style="display: block; text-align: center; margin-top: 10px;">Download Invoice PDF</a>
-                </div>
+                {% endfor %}
+                {% else %}
+                <p style="color: var(--text-muted);">No history recorded yet.</p>
+                {% endif %}
             </div>
         </div>
 
-        {% block submit_buttons_bottom %}{% submit_row %}{% endblock %}
+        <!-- RIGHT COLUMN (Sidebar) -->
+        <div class="oms-col-sidebar">
+            <!-- Customer Card -->
+            <div class="oms-card">
+                <h2>Customer Info</h2>
+                <div style="text-align: center; margin-bottom: 15px;">
+                    <!-- Simple Avatar placeholder -->
+                    <div
+                        style="width: 60px; height: 60px; background: #E0E7FF; color: var(--primary); border-radius: 50%; line-height: 60px; font-size: 24px; font-weight: bold; margin: 0 auto;">
+                        {{ original.full_name|first|default:"U" }}
+                    </div>
+                    <div style="margin-top: 10px; font-weight: 600;">{{ original.full_name }}</div>
+                    <div style="font-size: 13px; color: var(--text-muted);">{{ original.user.email }}</div>
+                    {% if customer_total_orders > 1 %}
+                    <div style="margin-top:5px;"><span
+                            style="background: #D1FAE5; color: #059669; font-size: 10px; padding: 2px 8px; border-radius: 10px;">Returning
+                            Customer</span></div>
+                    {% else %}
+                    <div style="margin-top:5px;"><span
+                            style="background: #E0E7FF; color: #4F46E5; font-size: 10px; padding: 2px 8px; border-radius: 10px;">New
+                            Customer</span></div>
+                    {% endif %}
+                </div>
+                <div class="oms-field-row">
+                    <span class="oms-label">User ID</span>
+                    <a href="{% url 'admin:users_user_change' original.user.id %}">#{{ original.user.id }}</a>
+                </div>
+                <div class="oms-field-row">
+                    <span class="oms-label">Phone</span>
+                    <span class="oms-value">{{ original.phone }}</span>
+                </div>
+                <div class="oms-field-row">
+                    <span class="oms-label">Lifetime Orders</span>
+                    <span class="oms-value">{{ customer_total_orders }}</span>
+                </div>
+                <div class="oms-field-row">
+                    <span class="oms-label">Lifetime Spend</span>
+                    <span class="oms-value">{{ customer_lifetime_spend }} BDT</span>
+                </div>
+            </div>
 
-        <!-- Render hidden fields to ensure data integrity -->
-        {% for field in adminform.form.hidden_fields %}
-        {{ field }}
-        {% endfor %}
+            <!-- Address Card -->
+            <div class="oms-card">
+                <h2>Addresses</h2>
+                <div class="oms-section-title" style="margin-top:0;">Shipping Address</div>
+                <p style="font-size: 14px; line-height: 1.5;">
+                    {{ original.address }}<br>
+                    {{ original.city }}, {{ original.zip_code }}
+                </p>
 
-    </form>
+                {% if original.billing_address %}
+                <div class="oms-section-title">Billing Address</div>
+                <p style="font-size: 14px; line-height: 1.5;">
+                    {{ original.billing_address }}<br>
+                    {{ original.billing_city }}, {{ original.billing_zip_code }}
+                </p>
+                {% endif %}
+            </div>
+
+            <!-- Admin Controls -->
+            <div class="oms-card">
+                <h2>Admin Controls</h2>
+                <div style="margin-bottom: 15px;">
+                    <label class="oms-label">Change Status</label>
+                    {{ adminform.form.status }}
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label class="oms-label">Internal Note</label>
+                    {{ adminform.form.internal_admin_note }}
+                </div>
+
+                <div class="oms-section-title">Risk Analysis</div>
+                <div class="oms-field-row">
+                    <span class="oms-label">IP Address</span>
+                    <span class="oms-value">{{ original.ip_address|default:"Unknown" }}</span>
+                </div>
+                <div class="oms-field-row">
+                    <span class="oms-label">High Risk?</span>
+                    <span class="oms-value">{{ adminform.form.is_high_risk }}</span>
+                </div>
+            </div>
+
+            <!-- Documents -->
+            <div class="oms-card">
+                <h2>Documents</h2>
+                <div class="oms-field-row">
+                    <span class="oms-label">Invoice #</span>
+                    <span class="oms-value">{{ original.invoice_number }}</span>
+                </div>
+                <a href="{% url 'order_invoice' original.id %}" class="button"
+                    style="display: block; text-align: center; margin-top: 10px;">Download Invoice PDF</a>
+            </div>
+        </div>
+</div>
+
+{% block submit_buttons_bottom %}{% submit_row %}{% endblock %}
+
+<!-- Render hidden fields to ensure data integrity -->
+{% for field in adminform.form.hidden_fields %}
+{{ field }}
+{% endfor %}
+
+</form>
 </div>
 {% endblock %}
