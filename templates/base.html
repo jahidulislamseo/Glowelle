@@ -1,0 +1,533 @@
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- SEO & Meta Tags -->
+    <title>{% if product %}{{ product.get_meta_title }} | Al Barakah Mart{% elif category %}{{ category.get_meta_title
+        }} | Al Barakah Mart{% else %}{{ site_settings.site_title|default:"Al Barakah Mart" }} | Premium Organic
+        Grocery{% endif %}</title>
+    <meta name="description"
+        content="{% if product %}{{ product.get_meta_description }}{% elif category %}{{ category.get_meta_description }}{% else %}{{ site_settings.meta_description|default:'Your one-stop shop for fresh organic fruits, vegetables, meat, and daily essentials in Dhaka.' }}{% endif %}">
+    <link rel="canonical" href="{{ request.build_absolute_uri }}">
+
+    {% if product and product.meta_keywords %}
+    <meta name="keywords" content="{{ product.meta_keywords }}">
+    {% elif category and category.meta_keywords %}
+    <meta name="keywords" content="{{ category.meta_keywords }}">
+    {% endif %}
+
+    <!-- Open Graph -->
+    <meta property="og:site_name" content="Al Barakah Mart">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    {% if product %}
+    <meta property="og:title" content="{{ product.get_meta_title|default:product.title }}">
+    <meta property="og:description"
+        content="{{ product.get_meta_description|default:product.description|striptags|truncatewords:30 }}">
+    <meta property="og:type" content="product">
+    <meta property="og:image"
+        content="{% if product.og_image %}{{ request.scheme }}://{{ request.get_host }}{{ product.og_image.url }}{% elif product.image %}{{ product.image }}{% endif %}">
+    {% elif category %}
+    <meta property="og:title" content="{{ category.get_meta_title|default:category.name }}">
+    <meta property="og:description"
+        content="{{ category.get_meta_description|default:'Shop our best organic products.' }}">
+    <meta property="og:type" content="website">
+    {% else %}
+    <meta property="og:title" content="Al Barakah Mart | Premium Organic Grocery">
+    <meta property="og:description" content="Fresh organic groceries delivered to your doorstep in Dhaka.">
+    <meta property="og:type" content="website">
+    {% endif %}
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title"
+        content="{% if product %}{{ product.get_meta_title }}{% elif category %}{{ category.get_meta_title }}{% else %}Al Barakah Mart{% endif %}">
+    <meta name="twitter:description"
+        content="{% if product %}{{ product.get_meta_description }}{% elif category %}{{ category.get_meta_description }}{% else %}Fresh organic groceries delivered to your doorstep{% endif %}">
+    {% if product and product.image %}
+    <meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ product.image.url }}">
+    {% endif %}
+
+    <!-- Google Search Console -->
+    {% if site_settings.search_console_code %}
+    <meta name="google-site-verification" content="{{ site_settings.search_console_code }}" />
+    {% endif %}
+
+    <!-- Google Analytics -->
+    {% if site_settings.ga4_tracking_id %}
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ site_settings.ga4_tracking_id }}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', '{{ site_settings.ga4_tracking_id }}');
+    </script>
+    {% endif %}
+
+    <!-- Organization Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "{{ site_settings.site_title|default:'Al Barakah Mart' }}",
+      "url": "{{ request.scheme }}://{{ request.get_host }}",
+      "logo": "{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo.png' %}",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "{{ site_settings.support_phone|default:'+880 1234 567890' }}",
+        "contactType": "Customer Service",
+        "email": "{{ site_settings.support_email|default:'contact@albarakah.bd' }}"
+      }
+    }
+    </script>
+    <!-- Breadcrumb Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [{
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'home' %}"
+      }
+      {% if request.resolver_match.url_name == 'shop' %}
+      ,{
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Shop",
+        "item": "{{ request.build_absolute_uri }}"
+      }
+      {% elif product %}
+      ,{
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Shop",
+        "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'shop' %}"
+      },{
+        "@type": "ListItem",
+        "position": 3,
+        "name": "{{ product.title }}",
+        "item": "{{ request.build_absolute_uri }}"
+      }
+       {% elif category %}
+      ,{
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Shop",
+        "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'shop' %}"
+      },{
+        "@type": "ListItem",
+        "position": 3,
+        "name": "{{ category.name }}",
+        "item": "{{ request.build_absolute_uri }}"
+      }
+      {% endif %}
+      ]
+    }
+    </script>
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="{% static 'images/logo.png' %}" type="image/png">
+
+    <!-- Tailwind CSS (CDN for immediate Dark Mode support) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        green: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Google Translate Customization */
+        .goog-te-gadget {
+            font-family: inherit !important;
+            font-size: 0 !important;
+            /* Hide "Powered by Google" */
+            color: transparent !important;
+            display: flex !important;
+            align-items: center;
+        }
+
+        .goog-te-gadget .goog-te-combo {
+            margin: 0 !important;
+            padding: 6px 12px !important;
+            border: 1px solid #e5e7eb !important;
+            border-radius: 9999px !important;
+            /* rounded-full for sleeker look */
+            font-size: 0.875rem !important;
+            /* text-sm */
+            background-color: white !important;
+            color: #374151 !important;
+            /* text-gray-700 */
+            cursor: pointer !important;
+            outline: none !important;
+            line-height: 1.5 !important;
+            min-width: 120px;
+        }
+
+        .dark .goog-te-gadget .goog-te-combo {
+            border-color: #4b5563 !important;
+            color: #d1d5db !important;
+            background-color: #1f2937 !important;
+        }
+
+        /* Hide google logo/branding completely */
+        .goog-logo-link,
+        .goog-te-gadget>span {
+            display: none !important;
+        }
+
+        /* Hide Google Bar */
+        .goog-te-banner-frame {
+            display: none !important;
+        }
+
+        body {
+            top: 0 !important;
+        }
+
+        /* Skeleton Loading Animation */
+        @keyframes shimmer {
+            0% {
+                background-position: -468px 0;
+            }
+
+            100% {
+                background-position: 468px 0;
+            }
+        }
+
+        .skeleton {
+            background: #f6f7f8;
+            background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
+            background-repeat: no-repeat;
+            background-size: 800px 104px;
+            display: inline-block;
+            position: relative;
+            animation: shimmer 1.5s linear infinite forwards;
+        }
+
+        /* Standard Transitions */
+        .transition-standard {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Primary Button Standard */
+        .btn-primary {
+            background-color: #16a34a;
+            /* green-600 */
+            color: white;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-primary:hover {
+            background-color: #15803d;
+            /* green-700 */
+        }
+
+        .btn-primary:disabled {
+            background-color: #d1d5db;
+            /* gray-300 */
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        /* Better Typography for Prose */
+        .prose-text {
+            line-height: 1.75;
+            letter-spacing: -0.01em;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- Navbar (Matching Header.tsx) -->
+    <header
+        class="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur shadow-sm dark:bg-gray-900/95 dark:border-gray-800 transition-colors duration-200">
+        <div class="container mx-auto px-4 md:px-6">
+            <div class="flex h-16 items-center justify-between gap-4">
+
+                <!-- Logo -->
+                <div class="flex items-center gap-2">
+                    <!-- Mobile Menu Button -->
+                    <button id="mobile-menu-btn"
+                        class="md:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+                        <i data-lucide="menu" class="h-6 w-6"></i>
+                    </button>
+
+                    <!-- Mobile Menu Overlay -->
+                    <div id="mobile-menu-overlay"
+                        class="fixed inset-0 bg-black/50 z-40 hidden transition-opacity opacity-0"></div>
+
+                    <!-- Mobile Menu Drawer -->
+                    <div id="mobile-menu-drawer"
+                        class="fixed inset-y-0 left-0 w-64 bg-white z-50 transform -translate-x-full transition-transform duration-300 ease-in-out shadow-2xl">
+                        <div class="p-4 border-b flex items-center justify-between">
+                            <span class="font-bold text-lg text-green-600">Menu</span>
+                            <button id="mobile-menu-close" class="p-1 hover:bg-gray-100 rounded-full">
+                                <i data-lucide="x" class="h-5 w-5 text-gray-500"></i>
+                            </button>
+                        </div>
+                        <nav class="p-4 space-y-4">
+                            <a href="{% url 'home' %}"
+                                class="block px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-green-600 rounded-lg transition-colors flex items-center gap-3 text-lg">
+                                <i data-lucide="home" class="h-5 w-5"></i> Home
+                            </a>
+                            <a href="{% url 'shop' %}"
+                                class="block px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-green-600 rounded-lg transition-colors flex items-center gap-3 text-lg">
+                                <i data-lucide="shopping-bag" class="h-5 w-5"></i> Shop
+                            </a>
+                            <a href="{% url 'cart_detail' %}"
+                                class="block px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-green-600 rounded-lg transition-colors flex items-center gap-3 text-lg">
+                                <i data-lucide="shopping-cart" class="h-5 w-5"></i> Cart
+                            </a>
+                            <a href="{% url 'dashboard' %}"
+                                class="block px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-green-600 rounded-lg transition-colors flex items-center gap-3 text-lg">
+                                <i data-lucide="user" class="h-5 w-5"></i> Account
+                            </a>
+                            <div class="border-t my-4 pt-4">
+                                <a href="{% url 'about' %}"
+                                    class="block px-4 py-3 text-base text-gray-600 hover:text-green-600">About Us</a>
+                                <a href="{% url 'contact' %}"
+                                    class="block px-4 py-3 text-base text-gray-600 hover:text-green-600">Contact</a>
+                            </div>
+                        </nav>
+                    </div>
+
+
+                    <a href="{% url 'home' %}" class="flex items-center gap-2">
+                        <img src="{% static 'images/logo.png' %}" alt="Al Barakah Mart" class="h-12 w-auto">
+                    </a>
+                </div>
+
+                <!-- Desktop Nav -->
+                <nav class="hidden md:flex items-center gap-6 text-sm font-medium">
+                    <a href="{% url 'home' %}"
+                        class="text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">Home</a>
+                    <a href="{% url 'shop' %}"
+                        class="text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">Shop</a>
+                    <a href="{% url 'about' %}"
+                        class="text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">About</a>
+                </nav>
+
+                <!-- Search Bar -->
+                <div class="hidden sm:flex flex-1 max-w-sm items-center relative">
+                    <form action="{% url 'shop' %}" class="w-full relative">
+                        <input type="text" name="q" placeholder="Search products..."
+                            class="flex h-10 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-base md:text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 pr-10 dark:bg-gray-800 dark:border-gray-700 dark:text-white">
+                        <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2">
+                            <i data-lucide="search" class="h-4 w-4 text-gray-400"></i>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- User Actions -->
+                <div class="flex items-center gap-2 sm:gap-4">
+
+
+                    <!-- Dark Mode Toggle -->
+                    <button id="theme-toggle" type="button"
+                        class="text-gray-500 hover:text-green-600 focus:outline-none focus:ring-2 focus:ring-gray-200 rounded-lg text-sm p-1.5 dark:text-gray-400 dark:hover:text-green-400 dark:focus:ring-gray-700">
+                        <i id="theme-toggle-dark-icon" data-lucide="moon" class="hidden w-5 h-5"></i>
+                        <i id="theme-toggle-light-icon" data-lucide="sun" class="hidden w-5 h-5"></i>
+                    </button>
+
+                    <a href="{% url 'wishlist' %}"
+                        class="flex items-center justify-center h-11 w-11 text-sm font-medium bg-transparent hover:bg-gray-100 rounded-full transition-colors hidden sm:flex text-gray-500 dark:text-gray-400 dark:hover:bg-gray-800">
+                        <i data-lucide="heart" class="h-6 w-6"></i>
+                        <span class="sr-only">Wishlist</span>
+                    </a>
+
+                    <a href="{% url 'cart_detail' %}"
+                        class="relative flex items-center justify-center h-11 w-11 text-sm font-medium bg-transparent hover:bg-gray-100 rounded-full transition-colors text-gray-500 dark:text-gray-400 dark:hover:bg-gray-800">
+                        <i data-lucide="shopping-cart" class="h-6 w-6"></i>
+                        {% if request.session.cart|length > 0 %}
+                        <!-- Badge -->
+                        <span
+                            class="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold shadow-sm pointer-events-none">{{
+                            request.session.cart|length }}</span>
+                        {% endif %}
+                        <span class="sr-only">Cart</span>
+                    </a>
+
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'dashboard' %}"
+                        class="flex items-center justify-center h-11 w-11 text-sm font-medium bg-transparent hover:bg-gray-100 rounded-full transition-colors text-gray-500 overflow-hidden border border-transparent hover:border-gray-200"
+                        title="Dashboard">
+                        {% if user.image %}
+                        <img src="{{ user.image.url }}" alt="{{ user.username }}" class="h-full w-full object-cover">
+                        {% else %}
+                        <i data-lucide="user" class="h-6 w-6"></i>
+                        {% endif %}
+                        <span class="sr-only">Dashboard</span>
+                    </a>
+                    <a href="{% url 'logout' %}"
+                        class="flex items-center justify-center h-11 w-11 text-sm font-medium bg-transparent hover:bg-red-50 text-red-500 rounded-full transition-colors"
+                        title="Logout">
+                        <i data-lucide="log-out" class="h-6 w-6"></i>
+                        <span class="sr-only">Logout</span>
+                    </a>
+                    {% else %}
+                    <a href="{% url 'login' %}"
+                        class="btn-primary flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full shadow-sm">
+                        Login
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Mobile Search -->
+            <div class="sm:hidden pb-4">
+                <div class="relative">
+                    <input type="text" placeholder="Search..."
+                        class="flex h-10 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 pr-10">
+                    <i data-lucide="search" class="absolute right-3 top-3 h-4 w-4 text-gray-400"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1">
+
+        <!-- Messages -->
+        {% if messages %}
+        <div class="fixed top-20 right-4 z-50 w-full max-w-sm space-y-2 pointer-events-none">
+            {% for message in messages %}
+            <div class="p-4 rounded-lg shadow-lg pointer-events-auto transform transition-all duration-300 hover:scale-105 {% if message.tags == 'error' %}bg-red-500 text-white{% elif message.tags == 'success' %}bg-green-500 text-white{% else %}bg-blue-500 text-white{% endif %}"
+                role="alert">
+                <div class="flex items-center gap-3">
+                    {% if message.tags == 'error' %}
+                    <i data-lucide="alert-circle" class="h-5 w-5"></i>
+                    {% elif message.tags == 'success' %}
+                    <i data-lucide="check-circle" class="h-5 w-5"></i>
+                    {% else %}
+                    <i data-lucide="info" class="h-5 w-5"></i>
+                    {% endif %}
+                    <p class="font-medium">{{ message }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Footer (Matching Footer.tsx) -->
+    <footer class="bg-gray-100 border-t mt-auto">
+        <div class="container mx-auto px-4 md:px-6 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Brand Info -->
+                <div class="space-y-4">
+                    <h3 class="text-xl font-bold text-green-600">Al Barakah Mart</h3>
+                    <p class="text-sm text-gray-500">Your one-stop shop for fresh organic fruits, vegetables, meat, and
+                        daily essentials.</p>
+                    <div class="flex space-x-4">
+                        <a href="https://facebook.com" target="_blank"
+                            class="h-11 w-11 text-gray-500 hover:text-green-600 flex items-center justify-center transition-colors border border-gray-200 rounded-lg hover:border-green-200 hover:bg-green-50"><i
+                                data-lucide="facebook" class="h-5 w-5"></i></a>
+                        <a href="https://instagram.com" target="_blank"
+                            class="h-11 w-11 text-gray-500 hover:text-green-600 flex items-center justify-center transition-colors border border-gray-200 rounded-lg hover:border-green-200 hover:bg-green-50"><i
+                                data-lucide="instagram" class="h-5 w-5"></i></a>
+                        <a href="https://twitter.com" target="_blank"
+                            class="h-11 w-11 text-gray-500 hover:text-green-600 flex items-center justify-center transition-colors border border-gray-200 rounded-lg hover:border-green-200 hover:bg-green-50"><i
+                                data-lucide="twitter" class="h-5 w-5"></i></a>
+                        <a href="https://youtube.com" target="_blank"
+                            class="h-11 w-11 text-gray-500 hover:text-green-600 flex items-center justify-center transition-colors border border-gray-200 rounded-lg hover:border-green-200 hover:bg-green-50"><i
+                                data-lucide="youtube" class="h-5 w-5"></i></a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-1 text-sm text-gray-500">
+                        <li><a href="{% url 'about' %}" class="block py-2 hover:text-green-600">About Us</a></li>
+                        <li><a href="{% url 'contact' %}" class="block py-2 hover:text-green-600">Contact Us</a></li>
+                        <li><a href="{% url 'privacy' %}" class="block py-2 hover:text-green-600">Privacy Policy</a>
+                        </li>
+                        <li><a href="{% url 'terms' %}" class="block py-2 hover:text-green-600">Terms of Service</a>
+                        </li>
+                        <li><a href="{% url 'faq' %}" class="block py-2 hover:text-green-600">FAQ</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact -->
+                <div>
+                    <h4 class="font-semibold mb-4">Contact Info</h4>
+                    <ul class="space-y-2 text-sm text-gray-500">
+                        <li class="flex items-center gap-2"><i data-lucide="map-pin" class="h-4 w-4 text-green-600"></i>
+                            <span>Dhaka, Bangladesh</span>
+                        </li>
+                        <li class="flex items-center gap-2"><i data-lucide="phone" class="h-4 w-4 text-green-600"></i>
+                            <span>+880 1234 567890</span>
+                        </li>
+                        <li class="flex items-center gap-2"><i data-lucide="mail" class="h-4 w-4 text-green-600"></i>
+                            <span>contact@albarakah.bd</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Newsletter -->
+                <div>
+                    <h4 class="font-semibold mb-4">Newsletter</h4>
+                    <p class="text-sm text-gray-500 mb-4">Subscribe to our newsletter for latest updates.</p>
+                    <div class="flex gap-2">
+                        <input type="email" placeholder="Email address"
+                            class="flex h-10 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-green-600">
+                        <button
+                            class="bg-green-600 text-white h-10 px-4 py-2 rounded-md hover:bg-green-700 flex items-center justify-center">
+                            <i data-lucide="mail" class="h-4 w-4"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-12 pt-8 border-t text-center text-sm text-gray-500">
+                <p>&copy; 2025 Al Barakah Mart. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+
+        // Google Translate
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: 'en,bn',
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+            }, 'google_translate_element');
+        }
+    </script>
+    <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+
+</html>

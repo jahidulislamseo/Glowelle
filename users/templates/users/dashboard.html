@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="flex flex-col md:flex-row gap-8">
+        <!-- Sidebar -->
+        <aside class="w-full md:w-64 shrink-0">
+            <div class="bg-white border rounded-lg p-4 sticky top-24">
+                <div class="flex items-center gap-3 mb-6 pb-4 border-b">
+                    <div
+                        class="h-10 w-10 bg-green-100 rounded-full flex items-center justify-center text-green-600 font-bold">
+                        {{ user.username|make_list|first|upper }}
+                    </div>
+                    <div>
+                        <p class="font-medium">{{ user.username }}</p>
+                        <p class="text-xs text-gray-500">{{ user.email }}</p>
+                    </div>
+                </div>
+                <nav class="space-y-1">
+                    <a href="{% url 'dashboard' %}"
+                        class="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md bg-green-50 text-green-700">
+                        <i data-lucide="layout-dashboard" class="h-4 w-4"></i> Dashboard
+                    </a>
+                    <a href="#"
+                        class="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-50 hover:text-gray-900">
+                        <i data-lucide="package" class="h-4 w-4"></i> Orders
+                    </a>
+                    <a href="#"
+                        class="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-50 hover:text-gray-900">
+                        <i data-lucide="user" class="h-4 w-4"></i> Profile
+                    </a>
+                    <form action="{% url 'logout' %}" method="post" class="mt-4 pt-4 border-t">
+                        {% csrf_token %}
+                        <button type="submit"
+                            class="w-full flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md text-red-600 hover:bg-red-50">
+                            <i data-lucide="log-out" class="h-4 w-4"></i> Logout
+                        </button>
+                    </form>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 space-y-6">
+            <h1 class="text-2xl font-bold">Order History</h1>
+
+            {% if orders %}
+            <!-- Stats -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div class="bg-white p-4 rounded-lg border">
+                    <p class="text-xs text-gray-500 mb-1">Total Orders</p>
+                    <p class="text-2xl font-bold">{{ total_orders }}</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg border">
+                    <p class="text-xs text-gray-500 mb-1">Pending</p>
+                    <p class="text-2xl font-bold text-orange-500">{{ pending_orders }}</p>
+                </div>
+            </div>
+
+            <!-- Orders List -->
+            <div class="space-y-6">
+                {% for order in orders %}
+                <div class="bg-white rounded-lg border overflow-hidden">
+                    <div class="p-4 border-b bg-gray-50 flex flex-wrap items-center justify-between gap-4">
+                        <div class="space-y-1">
+                            <p class="text-xs text-gray-500">Order ID</p>
+                            <p class="font-mono text-sm font-medium">#{{ order.id }}</p>
+                        </div>
+                        <div class="space-y-1">
+                            <p class="text-xs text-gray-500">Date</p>
+                            <p class="text-sm font-medium">{{ order.created_at|date:"M d, Y" }}</p>
+                        </div>
+                        <div class="space-y-1">
+                            <p class="text-xs text-gray-500">Total Amount</p>
+                            <p class="text-sm font-medium">৳{{ order.total }}</p>
+                        </div>
+                        <div class="space-y-1">
+                            <p class="text-xs text-gray-500">Status</p>
+                            <span
+                                class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-yellow-100 text-yellow-800 capitalize">
+                                {{ order.status }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="p-4">
+                        <div class="space-y-3">
+                            {% for item in order.items.all %}
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="h-12 w-12 bg-gray-100 rounded-md flex items-center justify-center relative overflow-hidden">
+                                    <img src="{{ item.product.image }}" alt="{{ item.product.title }}"
+                                        class="object-cover w-full h-full">
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-medium text-sm">{{ item.product.title }}</p>
+                                    <p class="text-xs text-gray-500">Qty: {{ item.quantity }}</p>
+                                </div>
+                                <p class="font-medium text-sm">৳{{ item.price }}</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-12 bg-white rounded-lg border">
+                <div
+                    class="mx-auto h-12 w-12 bg-gray-100 rounded-full flex items-center justify-center text-gray-400 mb-4">
+                    <i data-lucide="package" class="h-6 w-6"></i>
+                </div>
+                <h3 class="text-lg font-medium mb-2">No orders yet</h3>
+                <p class="text-gray-500 mb-6">Looks like you haven't placed any orders yet.</p>
+                <a href="{% url 'shop' %}"
+                    class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700">
+                    Start Shopping
+                </a>
+            </div>
+            {% endif %}
+        </main>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,7 @@
+Django>=5.0
+django-jazzmin
+django-import-export
+whitenoise
+Pillow
+django-tailwind
+xhtml2pdf

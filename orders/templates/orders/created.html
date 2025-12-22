@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="bg-gray-50 min-h-screen flex items-center justify-center py-12 px-4">
+    <div class="max-w-md w-full bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden text-center p-8">
+
+        <div class="mb-6 flex justify-center">
+            <div class="h-20 w-20 bg-green-100 rounded-full flex items-center justify-center animate-bounce">
+                <i data-lucide="check" class="h-10 w-10 text-green-600 stroke-[3px]"></i>
+            </div>
+        </div>
+
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Thank You!</h1>
+        <p class="text-gray-500 mb-8">Your order has been placed successfully.</p>
+
+        <div class="bg-gray-50 rounded-lg p-6 mb-8 text-left border border-gray-100">
+            <div class="flex justify-between mb-3 border-b pb-2">
+                <span class="text-gray-600">Order ID:</span>
+                <span class="font-bold text-gray-900">#{{ order.id }}</span>
+            </div>
+            <div class="flex justify-between mb-3">
+                <span class="text-gray-600">Amount:</span>
+                <span class="font-bold text-gray-900">৳{{ order.total|add:60 }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-gray-600">Payment:</span>
+                <span class="font-medium text-gray-900 capitalize">{{ order.get_payment_method_display }}</span>
+            </div>
+        </div>
+
+        <p class="text-sm text-gray-400 mb-8">
+            We have sent a confirmation email to <strong>{{ order.email }}</strong>.
+            We will contact you shortly at <strong>{{ order.phone }}</strong>.
+        </p>
+
+        <div class="space-y-3">
+            <a href="{% url 'dashboard' %}"
+                class="block w-full bg-green-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-700 transition-colors shadow-md hover:shadow-lg">
+                View Order Status
+            </a>
+            <a href="{% url 'shop' %}"
+                class="block w-full bg-white text-gray-700 font-bold py-3 px-4 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors">
+                Continue Shopping
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

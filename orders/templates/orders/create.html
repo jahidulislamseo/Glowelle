@@ -1,0 +1,304 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="bg-gray-50 min-h-screen py-12">
+    <div class="container mx-auto px-4">
+        <div class="max-w-6xl mx-auto">
+            <h1 class="text-3xl font-bold text-gray-900 mb-8 flex items-center gap-3">
+                <span
+                    class="bg-green-600 text-white w-10 h-10 rounded-full flex items-center justify-center text-lg">2</span>
+                Checkout
+            </h1>
+
+            <div class="grid lg:grid-cols-3 gap-8">
+                <!-- Checkout Form -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 md:p-8">
+                        <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+                            <i data-lucide="truck" class="text-green-600"></i> Shipping Information
+                        </h2>
+
+                        <form method="post" id="checkout-form" class="space-y-6">
+                            {% csrf_token %}
+
+                            {% if form.non_field_errors or messages %}
+                            <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-md mb-6">
+                                <div class="flex">
+                                    <div class="flex-shrink-0">
+                                        <i data-lucide="alert-circle" class="h-5 w-5 text-red-400"></i>
+                                    </div>
+                                    <div class="ml-3">
+                                        <h3 class="text-sm font-medium text-red-800">Please correct the following:</h3>
+                                        <div class="mt-2 text-sm text-red-700">
+                                            {% for message in messages %}
+                                            <p>{{ message }}</p>
+                                            {% endfor %}
+                                            {% for error in form.non_field_errors %}
+                                            <p>{{ error }}</p>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if addresses %}
+                            <div class="mb-6 bg-green-50 p-4 rounded-lg border border-green-100">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i data-lucide="map" class="inline-block h-4 w-4 mr-1"></i> Use a saved address
+                                </label>
+                                <select id="saved-address-select"
+                                    class="block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm bg-white">
+                                    <option value="">-- Select an address --</option>
+                                    {% for addr in addresses %}
+                                    <option value="{{ addr.id }}" data-street="{{ addr.street }}"
+                                        data-city="{{ addr.city }}" data-phone="{{ addr.phone }}">
+                                        {{ addr.street }} - {{ addr.city }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <script>
+                                document.getElementById('saved-address-select').addEventListener('change', function () {
+                                    const selectedOption = this.options[this.selectedIndex];
+                                    if (selectedOption.value) {
+                                        const street = selectedOption.getAttribute('data-street');
+                                        const city = selectedOption.getAttribute('data-city');
+                                        const phone = selectedOption.getAttribute('data-phone');
+
+                                        document.getElementById('{{ form.address.id_for_label }}').value = street;
+                                        document.getElementById('{{ form.city.id_for_label }}').value = city;
+                                        document.getElementById('{{ form.phone.id_for_label }}').value = phone;
+                                    }
+                                });
+                            </script>
+                            {% endif %}
+
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="{{ form.full_name.id_for_label }}"
+                                        class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                                    <div class="relative">
+                                        <div
+                                            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <i data-lucide="user" class="h-5 w-5 text-gray-400"></i>
+                                        </div>
+                                        {{ form.full_name }}
+                                        {% if form.full_name.errors %}
+                                        {% for error in form.full_name.errors %}
+                                        <p class="mt-1 text-xs text-red-500">{{ error }}</p>
+                                        {% endfor %}
+                                        {% endif %}
+                                    </div>
+
+                                    <div>
+                                        <label for="{{ form.phone.id_for_label }}"
+                                            class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                                        <div class="relative">
+                                            <div
+                                                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <i data-lucide="phone" class="h-5 w-5 text-gray-400"></i>
+                                            </div>
+                                            {{ form.phone }}
+                                        </div>
+                                        {% if form.phone.errors %}
+                                        {% for error in form.phone.errors %}
+                                        <p class="mt-1 text-xs text-red-500">{{ error }}</p>
+                                        {% endfor %}
+                                        {% endif %}
+                                        <p class="mt-1 text-xs text-gray-500">Format: 01xxxxxxxxx</p>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label for="{{ form.email.id_for_label }}"
+                                        class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                                    <div class="relative">
+                                        <div
+                                            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <i data-lucide="mail" class="h-5 w-5 text-gray-400"></i>
+                                        </div>
+                                        {{ form.email }}
+                                    </div>
+                                    {% if form.email.errors %}
+                                    {% for error in form.email.errors %}
+                                    <p class="mt-1 text-xs text-red-500">{{ error }}</p>
+                                    {% endfor %}
+                                    {% endif %}
+                                </div>
+
+                                <div>
+                                    <label for="{{ form.address.id_for_label }}"
+                                        class="block text-sm font-medium text-gray-700 mb-1">Delivery Address</label>
+                                    <div class="relative">
+                                        <div class="absolute top-3 left-3 pointer-events-none">
+                                            <i data-lucide="map-pin" class="h-5 w-5 text-gray-400"></i>
+                                        </div>
+                                        {{ form.address }}
+                                    </div>
+                                    {% if form.address.errors %}
+                                    {% for error in form.address.errors %}
+                                    <p class="mt-1 text-xs text-red-500">{{ error }}</p>
+                                    {% endfor %}
+                                    {% endif %}
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-6">
+                                    <div>
+                                        <label for="{{ form.city.id_for_label }}"
+                                            class="block text-sm font-medium text-gray-700 mb-1">City</label>
+                                        {{ form.city }}
+                                        {% if form.city.errors %}
+                                        {% for error in form.city.errors %}
+                                        <p class="mt-1 text-xs text-red-500">{{ error }}</p>
+                                        {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                    <label for="{{ form.zip_code.id_for_label }}"
+                                        class="block text-sm font-medium text-gray-700 mb-1">Zip Code</label>
+                                    {{ form.zip_code }}
+                                    {% if form.zip_code.errors %}
+                                    {% for error in form.zip_code.errors %}
+                                    <p class="mt-1 text-xs text-red-500">{{ error }}</p>
+                                    {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- City Autocomplete & Auto-Zip Logic -->
+                            <datalist id="cities">
+                                <option value="Dhaka">
+                                <option value="Chittagong">
+                                <option value="Sylhet">
+                                <option value="Khulna">
+                                <option value="Rajshahi">
+                                <option value="Barisal">
+                                <option value="Rangpur">
+                                <option value="Mymensingh">
+                                <option value="Comilla">
+                                <option value="Narayanganj">
+                            </datalist>
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function () {
+                                    const cityInput = document.getElementById('{{ form.city.id_for_label }}');
+                                    const zipInput = document.getElementById('{{ form.zip_code.id_for_label }}');
+
+                                    if (cityInput) {
+                                        cityInput.setAttribute('list', 'cities');
+                                        cityInput.setAttribute('placeholder', 'Type or select city...');
+                                        cityInput.setAttribute('autocomplete', 'address-level2');
+
+                                        const nameInput = document.getElementById('{{ form.full_name.id_for_label }}');
+                                        const emailInput = document.getElementById('{{ form.email.id_for_label }}');
+                                        const phoneInput = document.getElementById('{{ form.phone.id_for_label }}');
+                                        const addressInput = document.getElementById('{{ form.address.id_for_label }}');
+                                        const zipInputField = document.getElementById('{{ form.zip_code.id_for_label }}');
+
+                                        if (nameInput) nameInput.setAttribute('autocomplete', 'name');
+                                        if (emailInput) emailInput.setAttribute('autocomplete', 'email');
+                                        if (phoneInput) phoneInput.setAttribute('autocomplete', 'tel');
+                                        if (addressInput) addressInput.setAttribute('autocomplete', 'address-line1');
+                                        if (zipInputField) zipInputField.setAttribute('autocomplete', 'postal-code');
+
+                                        cityInput.addEventListener('change', function () {
+                                            const val = this.value.toLowerCase();
+                                            // Simple auto-fill map
+                                            const zips = {
+                                                'dhaka': '1000',
+                                                'chittagong': '4000',
+                                                'sylhet': '3100',
+                                                'khulna': '9100',
+                                                'rajshahi': '6000',
+                                                'barisal': '8200',
+                                                'rangpur': '5400',
+                                                'mymensingh': '2200',
+                                                'comilla': '3500',
+                                                'narayanganj': '1400'
+                                            };
+                                            if (zips[val]) {
+                                                zipInput.value = zips[val];
+                                                // visual feedback
+                                                zipInput.classList.add('bg-green-50');
+                                                setTimeout(() => zipInput.classList.remove('bg-green-50'), 1000);
+                                            }
+                                        });
+                                    }
+                                });
+                            </script>
+
+                            <div class="pt-6 border-t">
+                                <h3 class="text-lg font-medium text-gray-900 mb-4">Payment Method</h3>
+                                <div class="space-y-4">
+                                    {{ form.payment_method }}
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Order Summary -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-6 sticky top-24">
+                        <h2 class="text-xl font-bold text-gray-800 mb-6">Order Summary</h2>
+
+                        <div class="flow-root mb-6">
+                            <ul role="list" class="-my-4 divide-y divide-gray-200">
+                                {% for item in cart %}
+                                <li class="flex py-4">
+                                    <div
+                                        class="h-16 w-16 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
+                                        <img src="{{ item.product.image.url }}" alt="{{ item.product.title }}"
+                                            class="h-full w-full object-cover object-center">
+                                    </div>
+                                    <div class="ml-4 flex flex-1 flex-col">
+                                        <div>
+                                            <div class="flex justify-between text-base font-medium text-gray-900">
+                                                <h3 class="line-clamp-1"><a href="#">{{ item.product.title }}</a></h3>
+                                                <p class="ml-4">৳{{ item.total_price }}</p>
+                                            </div>
+                                            <p class="mt-1 text-sm text-gray-500">{{ item.quantity }} x ৳{{ item.price
+                                                }}</p>
+                                        </div>
+                                    </div>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+
+                        <div class="border-t border-gray-200 py-6 space-y-4">
+                            <div class="flex justify-between text-sm text-gray-600">
+                                <p>Subtotal</p>
+                                <p class="font-medium">৳{{ cart.get_total_price }}</p>
+                            </div>
+                            <div class="flex justify-between text-sm text-gray-600">
+                                <p>Shipping</p>
+                                <p class="font-medium">৳60</p>
+                            </div>
+                            {% if cart.get_discount %}
+                            <div class="flex justify-between text-sm text-green-600">
+                                <p>Discount</p>
+                                <p class="font-medium">-৳{{ cart.get_discount }}</p>
+                            </div>
+                            {% endif %}
+                            <div class="flex justify-between text-base font-bold text-gray-900 pt-4 border-t">
+                                <p>Total</p>
+                                <p>৳{{ cart.get_total_price_after_discount|add:60 }}</p>
+                            </div>
+                        </div>
+
+                        <button type="submit" form="checkout-form"
+                            class="w-full mt-6 bg-green-600 border border-transparent rounded-lg shadow-sm py-4 px-4 text-center text-lg font-bold text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all transform hover:-translate-y-0.5">
+                            Confirm Order
+                        </button>
+
+                        <p class="mt-4 text-center text-xs text-gray-500 flex items-center justify-center gap-1">
+                            <i data-lucide="shield-check" class="h-4 w-4"></i> Secure Checkout
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

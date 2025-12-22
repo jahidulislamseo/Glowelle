@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="bg-gray-50 min-h-screen py-12">
+    <div class="container mx-auto px-4">
+        <div class="max-w-3xl mx-auto bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+            <div class="bg-green-600 px-6 py-4">
+                <h1 class="text-2xl font-bold text-white flex items-center gap-2">
+                    <i data-lucide="credit-card" class="h-6 w-6"></i> Secure Payment
+                </h1>
+            </div>
+
+            <div class="p-8">
+                <div class="mb-8 text-center">
+                    <p class="text-gray-500 mb-1">Total Amount to Pay</p>
+                    <p class="text-4xl font-bold text-gray-900">৳{{ order.total|add:60 }}</p>
+                    <p class="text-sm text-gray-400 mt-2">Order #{{ order.id }}</p>
+                </div>
+
+                {% if gateways %}
+                <form method="post" action="{% url 'payment_success' order.id %}" class="space-y-6">
+                    {% csrf_token %}
+
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Select Payment Method</h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                        {% for gateway in gateways %}
+                        <label class="relative cursor-pointer group">
+                            <input type="radio" name="gateway" value="{{ gateway.id }}" class="peer sr-only" required>
+                            <div
+                                class="p-4 rounded-lg border-2 border-gray-200 peer-checked:border-green-500 peer-checked:bg-green-50 transition-all hover:border-green-200 flex items-center gap-3 h-full">
+                                {% if gateway.logo %}
+                                <img src="{{ gateway.logo.url }}" alt="{{ gateway.name }}"
+                                    class="h-10 w-10 object-contain rounded-full bg-white border">
+                                {% else %}
+                                <div class="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center">
+                                    <i data-lucide="wallet" class="text-gray-500"></i>
+                                </div>
+                                {% endif %}
+                                <div>
+                                    <p class="font-bold text-gray-800">{{ gateway.name }}</p>
+                                    <p class="text-xs text-gray-500">{{ gateway.account_number }}</p>
+                                </div>
+                                <div class="ml-auto opacity-0 peer-checked:opacity-100 text-green-600">
+                                    <i data-lucide="check-circle-2" class="h-5 w-5"></i>
+                                </div>
+                            </div>
+                        </label>
+                        {% endfor %}
+                    </div>
+
+                    <div class="bg-blue-50 border border-blue-100 rounded-lg p-4 mb-6">
+                        <h4 class="font-semibold text-blue-800 mb-2 flex items-center gap-2">
+                            <i data-lucide="info" class="h-4 w-4"></i> Payment Instructions
+                        </h4>
+                        <p class="text-sm text-blue-700">
+                            1. Go to your Mobile Banking App.<br>
+                            2. Select "Send Money" or "Payment".<br>
+                            3. Enter the number shown above.<br>
+                            4. Enter Amount: <strong>৳{{ order.total|add:60 }}</strong><br>
+                            5. Copy the Transaction ID (TrxID) and paste it below.
+                        </p>
+                    </div>
+
+                    <div>
+                        <label for="transaction_id" class="block text-sm font-medium text-gray-700 mb-1">Transaction ID
+                            (TrxID)</label>
+                        <input type="text" name="transaction_id" id="transaction_id" required
+                            placeholder="e.g. 8J7S6D5F..."
+                            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 p-3 text-lg tracking-wider">
+                    </div>
+
+                    <button type="submit"
+                        class="w-full bg-green-600 text-white font-bold py-4 px-6 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-green-200">
+                        Confirm Payment <i data-lucide="arrow-right" class="h-5 w-5"></i>
+                    </button>
+
+                </form>
+                {% else %}
+                <div class="text-center py-8">
+                    <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i data-lucide="alert-triangle" class="h-8 w-8 text-yellow-600"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900 mb-2">No Payment Methods Available</h3>
+                    <p class="text-gray-500 mb-6">Please contact support or choose Cash on Delivery.</p>
+                    <a href="{% url 'cart_detail' %}" class="text-green-600 font-bold hover:underline">Return to
+                        Cart</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <p class="text-center text-gray-400 text-sm mt-8">
+            <i data-lucide="lock" class="h-3 w-3 inline mr-1"></i> 256-bit SSL Encrypted Payment
+        </p>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-top: 5px solid #16a34a;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #16a34a;
+            margin: 0;
+        }
+
+        .order-details {
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #16a34a;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Al Barakah Mart</h1>
+            <p>Order Confirmation</p>
+        </div>
+
+        <p>Dear {{ user.first_name|default:user.username }},</p>
+        <p>Thank you for shopping with us! Your order <strong>#{{ order.id }}</strong> has been received and is now {{
+            order.get_status_display }}.</p>
+
+        <div class="order-details">
+            <p><strong>Order ID:</strong> #{{ order.id }}</p>
+            <p><strong>Date:</strong> {{ order.created_at|date:"F j, Y" }}</p>
+            <p><strong>Total Amount:</strong> ৳ {{ order.total }}</p>
+            <p><strong>Payment Method:</strong> {{ order.get_payment_method_display }}</p>
+        </div>
+
+        <p>We will notify you once your order is shipped.</p>
+
+        <div style="text-align: center;">
+            <a href="{{ site_url }}{% url 'dashboard' %}" class="btn">View Order Details</a>
+        </div>
+
+        <div class="footer">
+            <p>&copy; {% now "Y" %} Al Barakah Mart. All rights reserved.</p>
+            <p>If you have any questions, please reply to this email.</p>
+        </div>
+    </div>
+</body>
+
+</html>

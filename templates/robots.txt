@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /cart/
+Disallow: /checkout/
+Allow: /
+
+Sitemap: https://albarakah.bd/sitemap.xml

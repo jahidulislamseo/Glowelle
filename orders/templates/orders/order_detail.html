@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+
+{% block title %}Order #{{ order.id }} - Al Barakah Mart{% endblock %}
+
+{% block extra_css %}
+<style>
+    @media print {
+
+        header,
+        footer,
+        .no-print {
+            display: none !important;
+        }
+
+        body {
+            background: white !important;
+        }
+
+        .print-container {
+            box-shadow: none !important;
+            border: none !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-12">
+    <div class="max-w-4xl mx-auto">
+        <!-- Action Buttons -->
+        <div class="flex justify-between items-center mb-6 no-print">
+            <a href="{% url 'dashboard' %}"
+                class="text-gray-600 hover:text-green-600 font-medium flex items-center gap-2">
+                <i data-lucide="arrow-left" class="h-4 w-4"></i> Back to Dashboard
+            </a>
+            <button onclick="window.print()"
+                class="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 flex items-center gap-2">
+                <i data-lucide="printer" class="h-4 w-4"></i> Print Invoice
+            </button>
+        </div>
+
+        <!-- Invoice Card -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden print-container">
+            <!-- Header -->
+            <div class="p-8 border-b border-gray-100 bg-gray-50/50">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900">Order #{{ order.id }}</h1>
+                        <p class="text-sm text-gray-500 mt-1">Placed on {{ order.created_at|date:"F j, Y, g:i a" }}</p>
+                        <div class="mt-4">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                {% if order.status == 'pending' %}bg-yellow-100 text-yellow-800
+                                {% elif order.status == 'processing' %}bg-blue-100 text-blue-800
+                                {% elif order.status == 'shipped' %}bg-purple-100 text-purple-800
+                                {% elif order.status == 'delivered' %}bg-green-100 text-green-800
+                                {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                {{ order.get_status_display }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <h2 class="text-xl font-bold text-green-600">Al Barakah Mart</h2>
+                        <p class="text-sm text-gray-500">123 Green Road, Dhaka</p>
+                        <p class="text-sm text-gray-500">support@albarakahmart.com</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Addresses & Info -->
+            <div class="grid md:grid-cols-2 gap-8 p-8 border-b border-gray-100">
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">Shipping To</h3>
+                    <p class="font-medium text-gray-900">{{ order.full_name }}</p>
+                    <p class="text-gray-600">{{ order.address }}</p>
+                    <p class="text-gray-600">{{ order.city }} {{ order.zip_code }}</p>
+                    <p class="text-gray-600 mt-2">{{ order.phone }}</p>
+                    <p class="text-gray-600">{{ order.email }}</p>
+                </div>
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">Payment Info</h3>
+                    <p class="text-gray-600">Method: <span class="font-medium text-gray-900">{{
+                            order.get_payment_method_display }}</span></p>
+                    {% if order.transaction_id %}
+                    <p class="text-gray-600">Transaction ID: <span class="font-family-mono text-gray-900">{{
+                            order.transaction_id }}</span></p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Items -->
+            <div class="p-8">
+                <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wider mb-4">Order Items</h3>
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead>
+                        <tr>
+                            <th scope="col"
+                                class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Product</th>
+                            <th scope="col"
+                                class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Price</th>
+                            <th scope="col"
+                                class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Qty</th>
+                            <th scope="col"
+                                class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Total</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        {% for item in order.items.all %}
+                        <tr>
+                            <td class="px-3 py-4 text-sm text-gray-900">{{ item.product.title }}</td>
+                            <td class="px-3 py-4 text-sm text-gray-500">৳{{ item.price }}</td>
+                            <td class="px-3 py-4 text-sm text-gray-500">{{ item.quantity }}</td>
+                            <td class="px-3 py-4 text-sm font-medium text-gray-900 text-right">৳{{ item.get_cost }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Summary -->
+            <div class="bg-gray-50 p-8">
+                <div class="flex flex-col gap-2 max-w-xs ml-auto">
+                    <div class="flex justify-between text-gray-600">
+                        <span>Subtotal:</span>
+                        <span>৳{{ order.get_total_cost_before_discount|default:order.total }}</span>
+                    </div>
+                    <!-- Assuming shipping is fixed logic just for display, normally stored on order model -->
+                    <div class="flex justify-between text-gray-600">
+                        <span>Shipping:</span>
+                        <span>৳60.00</span>
+                    </div>
+                    {% if order.discount_amount %}
+                    <div class="flex justify-between text-green-600">
+                        <span>Discount:</span>
+                        <span>-৳{{ order.discount_amount }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="flex justify-between font-bold text-lg text-gray-900 border-t pt-2 mt-2">
+                        <span>Total:</span>
+                        <!-- Simplified total logic -->
+                        <span>৳{{ order.total|add:60 }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

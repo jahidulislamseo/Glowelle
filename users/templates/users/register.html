@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="min-h-[80vh] flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="w-full max-w-md space-y-8 bg-white p-8 rounded-2xl shadow-lg border border-gray-100">
+        <!-- Header -->
+        <div class="text-center">
+            <div class="flex justify-center mb-4">
+                <div class="h-12 w-12 bg-green-100 rounded-full flex items-center justify-center text-green-600">
+                    <i data-lucide="user-plus" class="h-6 w-6"></i>
+                </div>
+            </div>
+            <h2 class="text-3xl font-bold text-gray-900 tracking-tight">Create Account</h2>
+            <p class="mt-2 text-sm text-gray-600">
+                Join us for fresh organic products
+            </p>
+        </div>
+
+        {% if messages %}
+        <div class="space-y-2">
+            {% for message in messages %}
+            <div
+                class="p-3 rounded-lg text-sm font-medium {% if message.tags == 'error' %}bg-red-50 text-red-700{% else %}bg-green-50 text-green-700{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if form.errors %}
+        <div class="bg-red-50 text-red-700 p-4 rounded-lg text-sm">
+            <p class="font-bold">Please correct the following errors:</p>
+            <ul class="list-disc pl-5 mt-1">
+                {% for field in form %}
+                {% for error in field.errors %}
+                <li>{{ field.label }}: {{ error }}</li>
+                {% endfor %}
+                {% endfor %}
+                {% for error in form.non_field_errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <form class="mt-8 space-y-6" method="POST" action="{% url 'register' %}">
+            {% csrf_token %}
+
+            <div class="space-y-4">
+                {% for field in form %}
+                <div>
+                    <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ field.label
+                        }}</label>
+                    <div class="mt-1">
+                        <input type="{{ field.field.widget.input_type }}" name="{{ field.name }}"
+                            id="{{ field.id_for_label }}"
+                            class="block w-full px-4 py-3 border rounded-lg sm:text-sm transition-shadow shadow-sm {% if field.errors %}border-red-500 focus:ring-red-500 focus:border-red-500{% else %}border-gray-300 focus:ring-green-500 focus:border-green-500{% endif %}"
+                            {% if field.field.required %}required{% endif %}>
+                    </div>
+                    {% if field.errors %}
+                    {% for error in field.errors %}
+                    <p class="mt-1 text-xs text-red-600 font-medium">{{ error }}</p>
+                    {% endfor %}
+                    {% elif field.help_text %}
+                    <p class="mt-1 text-xs text-gray-500">{{ field.help_text|safe }}</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Password Strength Meter (Only shows when password field is focused) -->
+            <div id="password-strength-container" class="hidden space-y-2 transition-all duration-300">
+                <div class="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
+                    <div id="strength-bar" class="h-full bg-red-500 w-0 transition-all duration-300"></div>
+                </div>
+                <p id="strength-text" class="text-xs text-gray-500 font-medium text-right">Weak</p>
+            </div>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const inputs = document.querySelectorAll("input[type='password']");
+                    if (inputs.length > 0) {
+                        const passwordInput = inputs[0]; // First password field
+                        const container = document.getElementById('password-strength-container');
+                        const bar = document.getElementById('strength-bar');
+                        const text = document.getElementById('strength-text');
+
+                        passwordInput.addEventListener('focus', () => container.classList.remove('hidden'));
+                        passwordInput.addEventListener('input', function () {
+                            const val = this.value;
+                            let strength = 0;
+                            if (val.length > 5) strength += 20;
+                            if (val.length > 8) strength += 20;
+                            if (/[A-Z]/.test(val)) strength += 20;
+                            if (/[0-9]/.test(val)) strength += 20;
+                            if (/[^A-Za-z0-9]/.test(val)) strength += 20;
+
+                            bar.style.width = strength + '%';
+
+                            if (strength < 40) {
+                                bar.className = 'h-full bg-red-500 w-0 transition-all duration-300';
+                                text.textContent = 'Weak';
+                                text.className = 'text-xs text-red-500 font-medium text-right';
+                            } else if (strength < 80) {
+                                bar.className = 'h-full bg-yellow-500 w-0 transition-all duration-300';
+                                text.textContent = 'Medium';
+                                text.className = 'text-xs text-yellow-600 font-medium text-right';
+                            } else {
+                                bar.className = 'h-full bg-green-500 w-0 transition-all duration-300';
+                                text.textContent = 'Strong';
+                                text.className = 'text-xs text-green-600 font-medium text-right';
+                            }
+                        });
+                    }
+                });
+            </script>
+
+            <button type="submit"
+                class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 shadow-md transition-all hover:shadow-lg transform active:scale-[0.98]">
+                Sign Up
+            </button>
+        </form>
+
+        <div class="text-center mt-4">
+            <p class="text-sm text-gray-600">
+                Already have an account?
+                <a href="{% url 'login' %}" class="font-medium text-green-600 hover:text-green-500 hover:underline">
+                    Sign in here
+                </a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

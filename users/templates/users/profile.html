@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="flex flex-col md:flex-row gap-8">
+        <!-- Sidebar -->
+        <aside class="w-full md:w-64 shrink-0">
+            <div class="bg-white border rounded-lg p-4 sticky top-24">
+                <div class="flex items-center gap-3 mb-6 pb-4 border-b">
+                    <div
+                        class="h-10 w-10 bg-green-100 rounded-full flex items-center justify-center text-green-600 font-bold">
+                        {{ user.username|make_list|first|upper }}
+                    </div>
+                    <div>
+                        <p class="font-medium">{{ user.username }}</p>
+                        <p class="text-xs text-gray-500">{{ user.email }}</p>
+                    </div>
+                </div>
+                <nav class="space-y-1">
+                    <a href="{% url 'dashboard' %}"
+                        class="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-50 hover:text-gray-900">
+                        <i data-lucide="layout-dashboard" class="h-4 w-4"></i> Dashboard
+                    </a>
+                    <a href="#"
+                        class="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-50 hover:text-gray-900">
+                        <i data-lucide="package" class="h-4 w-4"></i> Orders
+                    </a>
+                    <a href="{% url 'profile' %}"
+                        class="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md bg-green-50 text-green-700">
+                        <i data-lucide="user" class="h-4 w-4"></i> Profile
+                    </a>
+                    <form action="{% url 'logout' %}" method="post" class="mt-4 pt-4 border-t">
+                        {% csrf_token %}
+                        <button type="submit"
+                            class="w-full flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md text-red-600 hover:bg-red-50">
+                            <i data-lucide="log-out" class="h-4 w-4"></i> Logout
+                        </button>
+                    </form>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 space-y-6">
+            <h1 class="text-2xl font-bold">Edit Profile</h1>
+
+            <div class="bg-white rounded-lg border overflow-hidden p-6">
+                {% if messages %}
+                <div class="mb-6 space-y-2">
+                    {% for message in messages %}
+                    <div
+                        class="p-4 rounded-md {% if message.tags == 'success' %}bg-green-50 text-green-700{% else %}bg-red-50 text-red-700{% endif %}">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <form method="POST" class="space-y-6 max-w-lg">
+                    {% csrf_token %}
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                        <input type="text" value="{{ user.username }}" disabled
+                            class="w-full bg-gray-100 border-gray-300 rounded-md shadow-sm opacity-60 cursor-not-allowed">
+                        <p class="mt-1 text-xs text-gray-500">Username cannot be changed.</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                        <input type="text" name="first_name" value="{{ form.first_name.value|default:'' }}"
+                            class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring-green-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                        <input type="text" name="last_name" value="{{ form.last_name.value|default:'' }}"
+                            class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring-green-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                        <input type="email" name="email" value="{{ form.email.value }}"
+                            class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring-green-500">
+                    </div>
+
+                    <div class="pt-4">
+                        <button type="submit"
+                            class="bg-green-600 text-white px-6 py-2 rounded-md font-bold hover:bg-green-700 transition-colors">
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8">Shopping Cart</h1>
+
+    {% if cart|length > 0 %}
+    <div class="grid lg:grid-cols-3 gap-8">
+        <!-- Cart Items -->
+        <div class="lg:col-span-2 space-y-4">
+            {% for item in cart %}
+            <div class="flex items-center gap-4 p-4 border rounded-lg bg-white">
+                <div
+                    class="h-24 w-24 bg-gray-100 rounded-md flex items-center justify-center shrink-0 relative overflow-hidden">
+                    <img src="{{ item.product.image }}" alt="{{ item.product.title }}"
+                        class="object-cover w-full h-full">
+                </div>
+
+                <div class="flex-1 min-w-0">
+                    <a href="{% url 'product_detail' item.product.slug %}"
+                        class="font-semibold hover:text-green-600 truncate block">
+                        {{ item.product.title }}
+                    </a>
+                    <div class="text-gray-500 text-sm">{{ item.product.category.name }}</div>
+                    <div class="font-bold text-green-600 mt-1">৳{{ item.price }}</div>
+                </div>
+
+                <div class="flex flex-col items-end gap-2">
+                    <!-- Quantity Control (Simplification: Just display for now, update needs form/ajax) -->
+                    <div class="flex items-center border rounded-md">
+                        <span class="px-3 py-1 font-medium">{{ item.quantity }}</span>
+                    </div>
+
+                    <form action="{% url 'cart_remove' item.product.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" onclick="return confirm('Are you sure you want to remove this item?');"
+                            class="text-red-500 text-sm hover:underline flex items-center gap-1 p-2 -mr-2">
+                            <i data-lucide="trash-2" class="h-4 w-4"></i> Remove
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Order Summary -->
+        <div class="lg:col-span-1">
+            <div class="border rounded-lg p-6 bg-white sticky top-24">
+                <h2 class="text-xl font-bold mb-4">Order Summary</h2>
+
+                <div class="space-y-2 text-sm mb-4 border-b pb-4">
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Subtotal</span>
+                        <span>৳{{ cart.get_total_price }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Shipping</span>
+                        <span>৳60 (Estimated)</span>
+                    </div>
+                </div>
+                {% with discount=cart.get_discount %}
+                {% if discount > 0 %}
+                <div class="flex justify-between text-green-600 font-medium">
+                    <span>Discount</span>
+                    <span>-৳{{ discount|floatformat:2 }}</span>
+                </div>
+                <div class="flex justify-between font-bold text-lg pt-2 mt-2 border-t">
+                    <span>Total</span>
+                    <span>৳{{ cart.get_total_price_after_discount|add:60|floatformat:2 }}</span>
+                </div>
+                {% else %}
+                <div class="flex justify-between font-bold text-lg mb-6 pt-2 border-t">
+                    <span>Total</span>
+                    <span>৳{{ cart.get_total_price|add:60 }}</span>
+                </div>
+                {% endif %}
+                {% endwith %}
+            </div>
+
+            <!-- Coupon Form -->
+            <form action="{% url 'coupon_apply' %}" method="post" class="mb-6">
+                {% csrf_token %}
+                <div class="flex gap-2">
+                    <input type="text" name="code" placeholder="Coupon Code"
+                        class="flex-1 border rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-green-500">
+                    <button type="submit"
+                        class="bg-gray-800 text-white px-4 py-2 rounded text-sm hover:bg-gray-700">Apply</button>
+                </div>
+            </form>
+
+
+            <a href="{% url 'order_create' %}"
+                class="btn-primary block w-full text-center font-bold py-3 px-4 rounded-md shadow-md">
+                Proceed to Checkout
+            </a>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="container mx-auto px-4 py-24 text-center">
+    <div class="inline-flex items-center justify-center w-24 h-24 rounded-full bg-green-50 mb-6">
+        <i data-lucide="shopping-cart" class="w-10 h-10 text-green-500"></i>
+    </div>
+    <h1 class="text-3xl font-bold mb-4">Your cart is empty</h1>
+    <p class="text-gray-500 mb-8 max-w-md mx-auto">Looks like you haven't added anything to your cart yet. Browse our
+        products and find something you love.</p>
+    <a href="{% url 'shop' %}"
+        class="btn-primary inline-block font-bold py-3 px-8 rounded-full shadow-lg transform hover:-translate-y-1">
+        Start Shopping
+    </a>
+</div>
+{% endif %}
+</div>
+{% endblock %}
