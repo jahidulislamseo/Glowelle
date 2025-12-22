@@ -33,34 +33,124 @@ class Order(models.Model):
         ('cod', 'Cash on Delivery'),
         ('online', 'Online Payment'),
     )
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='orders')
+    SOURCE_CHOICES = (
+        ('website', 'Website'),
+        ('mobile_web', 'Mobile Web'),
+        ('app', 'Mobile App'),
+        ('admin', 'Admin Manual Entry'),
+    )
+    PAYMENT_STATUS_CHOICES = (
+        ('unpaid', 'Unpaid'),
+        ('paid', 'Paid'),
+        ('partial', 'Partially Paid'),
+        ('refunded', 'Refunded'),
+    )
+
+    # 1. Order Identity
+    # id is auto-created
+    order_reference = models.CharField(max_length=50, unique=True, blank=True, null=True, help_text="Unique reference number")
+    source = models.CharField(max_length=20, choices=SOURCE_CHOICES, default='website')
+    
+    # 2. Order Status & Timeline (Status is already there)
+    estimated_delivery_date = models.DateField(null=True, blank=True)
+    actual_delivery_date = models.DateTimeField(null=True, blank=True)
+    
+    # 3. Customer Information (User link is there)
+    # Storing snapshot of address at time of order is better than just reference
     full_name = models.CharField(max_length=100, default="")
     email = models.EmailField(default="user@example.com")
     phone = models.CharField(max_length=20)
-    address = models.TextField()
+    
+    # Delivery Address
+    address = models.TextField(help_text="Delivery Address")
     city = models.CharField(max_length=100, default="")
     zip_code = models.CharField(max_length=20, default="")
     
-    total = models.FloatField()
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending', db_index=True)
-    payment_method = models.CharField(max_length=50, choices=PAYMENT_METHOD_CHOICES, default='cod')
+    # Billing Address
+    billing_address = models.TextField(blank=True, null=True)
+    billing_city = models.CharField(max_length=100, blank=True, null=True)
+    billing_zip_code = models.CharField(max_length=20, blank=True, null=True)
     
-    # Payment Details
+    # 5. Pricing & Calculation
+    subtotal = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    tax_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    delivery_charge = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    extra_charge = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, help_text="Any extra fees")
+    total = models.DecimalField(max_digits=12, decimal_places=2, default=0.00) # Changed to Decimal for accuracy
+    
+    coupon = models.ForeignKey('marketing.Coupon', on_delete=models.SET_NULL, null=True, blank=True)
+    
+    # 6. Payment Information
+    payment_method = models.CharField(max_length=50, choices=PAYMENT_METHOD_CHOICES, default='cod')
+    payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='unpaid')
     payment_gateway = models.ForeignKey(PaymentGateway, on_delete=models.SET_NULL, null=True, blank=True)
     transaction_id = models.CharField(max_length=100, null=True, blank=True)
-
+    payment_date = models.DateTimeField(null=True, blank=True)
+    payment_attempt_count = models.IntegerField(default=0)
+    
+    # 7. Delivery & Courier
     courier = models.ForeignKey(Courier, on_delete=models.SET_NULL, null=True, blank=True, related_name='orders')
     tracking_id = models.CharField(max_length=100, null=True, blank=True)
-    coupon = models.ForeignKey('marketing.Coupon', on_delete=models.SET_NULL, null=True, blank=True)
-    discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    shipping_label = models.FileField(upload_to='shipping_labels/', null=True, blank=True)
+    delivery_note = models.TextField(blank=True, null=True, help_text="Note from customer for delivery")
+    
+    # 8. Cancellation, Return, Refund
+    cancellation_reason = models.TextField(blank=True, null=True)
+    return_reason = models.TextField(blank=True, null=True)
+    refund_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    refund_date = models.DateTimeField(null=True, blank=True)
+    
+    # 9. Documents
+    invoice_number = models.CharField(max_length=50, unique=True, blank=True, null=True)
+    invoice_download_count = models.IntegerField(default=0)
+    
+    # 10. Admin Controls
+    internal_admin_note = models.TextField(blank=True, null=True, help_text="Private note for admins")
+    
+    # 13. Support & Communication
+    support_ticket = models.ForeignKey('users.SupportTicket', on_delete=models.SET_NULL, null=True, blank=True, related_name='orders')
+    
+    # 11. Admin Logs & Security
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='created_orders')
+    updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='updated_orders')
+    
+    # 12. Analytics & Flags
+    is_high_risk = models.BooleanField(default=False)
+    risk_score = models.IntegerField(default=0)
+    is_repeat_order = models.BooleanField(default=False)
+    profit_estimate = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+
+    # 15. Final System States
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending', db_index=True)
+    is_archived = models.BooleanField(default=False)
+    
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='orders')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._original_status = self.status
 
     def save(self, *args, **kwargs):
+        is_new = self.pk is None
+        
+        # Generate Reference & Invoice if missing
+        if not self.order_reference:
+            import uuid
+            self.order_reference = str(uuid.uuid4())[:8].upper()
+            
+        if not self.invoice_number:
+            self.invoice_number = f"INV-{self.order_reference}"
+
+        # Check if status changed
+        status_changed = False
+        if not is_new and self.status != self._original_status:
+            status_changed = True
+            
         # Check if status changed to 'cancelled' or 'returned' from a non-refunded state
         if self.pk and self.status in ['cancelled', 'returned'] and self._original_status not in ['cancelled', 'returned']:
             from products.models import StockLog
@@ -92,28 +182,60 @@ class Order(models.Model):
                 from decimal import Decimal
                 
                 wallet, _ = Wallet.objects.get_or_create(user=self.user)
-                refund_amount = Decimal(str(self.total))
-                wallet.balance += refund_amount
-                wallet.save()
-                
-                WalletTransaction.objects.create(
-                    wallet=wallet,
-                    amount=refund_amount,
-                    transaction_type='credit',
-                    description=f"Refund for Order #{self.id} ({self.get_status_display()})"
-                )
+                try:
+                    # refund_amount = Decimal(str(self.total)) # self.total is now Decimal
+                    refund_amount = self.total
+                    wallet.balance += refund_amount
+                    wallet.save()
+                    
+                    WalletTransaction.objects.create(
+                        wallet=wallet,
+                        amount=refund_amount,
+                        transaction_type='credit',
+                        description=f"Refund for Order #{self.id} ({self.get_status_display()})"
+                    )
+                    self.refund_amount = refund_amount
+                    self.payment_status = 'refunded'
+                except Exception as e:
+                    print(f"Refund error: {e}")
                 
         super().save(*args, **kwargs)
+        
+        # Log Status Change
+        if is_new or status_changed:
+            OrderStatusHistory.objects.create(
+                order=self,
+                status=self.status,
+                created_by=self.updated_by, # Assuming updated_by is set in view/admin
+                description=f"Order marked as {self.get_status_display()}"
+            )
+            
         self._original_status = self.status
 
     def __str__(self):
-        return f"Order #{self.id} by {self.user}"
+        return f"Order #{self.id} ({self.order_reference})"
+
+class OrderStatusHistory(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='status_history')
+    status = models.CharField(max_length=20, choices=Order.STATUS_CHOICES)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    description = models.TextField(blank=True, null=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.order.id} - {self.status}"
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField()
-    price = models.FloatField()
+    price = models.DecimalField(max_digits=12, decimal_places=2) # Changed to Decimal
+    
+    def get_total(self):
+        return self.price * self.quantity
 
     def __str__(self):
         return f"{self.quantity} x {self.product.title}"

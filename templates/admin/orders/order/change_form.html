@@ -1,0 +1,466 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block extrahead %}
+{{ block.super }}
+<style>
+    :root {
+        --primary: #4F46E5;
+        --bg-gray: #F3F4F6;
+        --card-bg: #FFFFFF;
+        --text-main: #111827;
+        --text-muted: #6B7280;
+        --border: #E5E7EB;
+    }
+
+    #content-main {
+        background: transparent !important;
+        border: none !important;
+    }
+
+    .oms-container {
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        color: var(--text-main);
+        max-width: 1400px;
+        /* Limit width on large screens */
+    }
+
+    .oms-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+
+    .oms-header h1 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--text-main);
+    }
+
+    .oms-meta {
+        font-size: 14px;
+        color: var(--text-muted);
+    }
+
+    .oms-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 24px;
+    }
+
+    @media (max-width: 1024px) {
+        .oms-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .oms-card {
+        background: var(--card-bg);
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        /* Modern subtle shadow */
+        padding: 24px;
+        margin-bottom: 24px;
+        border: 1px solid var(--border);
+    }
+
+    .oms-card h2 {
+        font-size: 18px;
+        font-weight: 600;
+        margin-top: 0;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--border);
+        color: var(--text-main);
+    }
+
+    .oms-field-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        font-size: 14px;
+    }
+
+    .oms-label {
+        color: var(--text-muted);
+        font-weight: 500;
+    }
+
+    .oms-value {
+        font-weight: 600;
+        text-align: right;
+    }
+
+    .oms-section-title {
+        text-transform: uppercase;
+        font-size: 12px;
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
+        margin-top: 20px;
+        margin-bottom: 10px;
+        font-weight: 700;
+    }
+
+    /* Status Badge */
+    .status-badge {
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 14px;
+        text-transform: capitalize;
+        display: inline-block;
+    }
+
+    .status-pending {
+        background: #FEF3C7;
+        color: #D97706;
+    }
+
+    .status-processing {
+        background: #DBEAFE;
+        color: #2563EB;
+    }
+
+    .status-shipped {
+        background: #E0E7FF;
+        color: #4F46E5;
+    }
+
+    .status-delivered {
+        background: #D1FAE5;
+        color: #059669;
+    }
+
+    .status-cancelled {
+        background: #FEE2E2;
+        color: #DC2626;
+    }
+
+    /* Timeline */
+    .timeline-item {
+        position: relative;
+        padding-left: 20px;
+        padding-bottom: 20px;
+        border-left: 2px solid var(--border);
+    }
+
+    .timeline-item:last-child {
+        border-left: none;
+    }
+
+    .timeline-dot {
+        position: absolute;
+        left: -6px;
+        top: 0;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--primary);
+    }
+
+    .timeline-date {
+        font-size: 12px;
+        color: var(--text-muted);
+    }
+
+    .timeline-status {
+        font-weight: 600;
+    }
+
+    .timeline-desc {
+        font-size: 13px;
+        margin-top: 4px;
+    }
+
+    /* Tables inside cards */
+    .oms-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+    }
+
+    .oms-table th {
+        text-align: left;
+        color: var(--text-muted);
+        font-weight: 500;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .oms-table td {
+        padding: 12px 0;
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+    .oms-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    /* Form inputs override partial */
+    .oms-card input[type="text"],
+    .oms-card input[type="number"],
+    .oms-card select,
+    .oms-card textarea {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        box-sizing: border-box;
+        /* Fix input overflow */
+        margin-top: 4px;
+    }
+
+    .submit-row {
+        background: white !important;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        margin-top: 20px;
+        padding: 15px !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="oms-container">
+    <form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="{{ form_url }}" method="post"
+        id="{{ opts.model_name }}_form" novalidate>
+        {% csrf_token %}
+        {% if is_popup %}<input type="hidden" name="{{ is_popup_var }}" value="1">{% endif %}
+
+        <!-- Custom Header -->
+        <div class="oms-header">
+            <div>
+                <h1>Order #{{ original.order_reference|default:original.id }}</h1>
+                <div class="oms-meta">
+                    Created on {{ original.created_at|date:"F j, Y g:i A" }} • via {{ original.get_source_display }}
+                </div>
+            </div>
+            <div class="status-badge status-{{ original.status }}">
+                {{ original.get_status_display }}
+            </div>
+        </div>
+
+        {% if errors %}
+        <p class="errornote">
+            {% if errors|length == 1 %}{% translate "Please correct the error below." %}{% else %}{% translate "Please
+            correct the errors below." %}{% endif %}
+        </p>
+        {{ adminform.form.non_field_errors }}
+        {% endif %}
+
+        <div class="oms-grid">
+            <!-- LEFT COLUMN (Main Content) -->
+            <div class="oms-col-main">
+                <!-- Products Section -->
+                <div class="oms-card">
+                    <h2>Product Details</h2>
+                    <!-- We render the 'items' inline formset here manually or simply include it -->
+                    {% for inline_admin_formset in inline_admin_formsets %}
+                    <!-- Assuming first inline is OrderItem -->
+                    {% if forloop.first %}
+                    {% include inline_admin_formset.opts.template %}
+                    {% endif %}
+                    {% endfor %}
+
+                    <!-- Financial Summary -->
+                    <div style="margin-top: 20px; padding-top: 20px; border-top: 1px dashed var(--border);">
+                        <div class="oms-field-row">
+                            <span class="oms-label">Subtotal</span>
+                            <span class="oms-value">{{ original.subtotal }} BDT</span>
+                        </div>
+                        {% if original.discount_amount > 0 %}
+                        <div class="oms-field-row" style="color: #059669;">
+                            <span class="oms-label">Discount</span>
+                            <span class="oms-value">- {{ original.discount_amount }} BDT</span>
+                        </div>
+                        {% endif %}
+                        <div class="oms-field-row">
+                            <span class="oms-label">Delivery Charge</span>
+                            <span class="oms-value">{{ original.delivery_charge }} BDT</span>
+                        </div>
+                        {% if original.tax_amount > 0 %}
+                        <div class="oms-field-row">
+                            <span class="oms-label">Tax</span>
+                            <span class="oms-value">{{ original.tax_amount }} BDT</span>
+                        </div>
+                        {% endif %}
+                        <div class="oms-field-row" style="font-size: 18px; margin-top: 10px;">
+                            <span class="oms-label" style="color: var(--text-main);">Total Payable</span>
+                            <span class="oms-value" style="color: var(--primary);">{{ original.total }} BDT</span>
+                        </div>
+                        <!-- Edit Fields for financials -->
+                        <div class="oms-section-title">Edit Financials</div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <div>
+                                <label class="oms-label">{{ adminform.form.total.label }}</label>
+                                {{ adminform.form.total }}
+                            </div>
+                            <div>
+                                <label class="oms-label">{{ adminform.form.delivery_charge.label }}</label>
+                                {{ adminform.form.delivery_charge }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Logistics & Delivery Section -->
+                <div class="oms-card">
+                    <h2>Delivery & Logistics</h2>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div>
+                            <label class="oms-label">Courier</label>
+                            {{ adminform.form.courier }}
+                        </div>
+                        <div>
+                            <label class="oms-label">Tracking ID</label>
+                            {{ adminform.form.tracking_id }}
+                        </div>
+                        <div>
+                            <label class="oms-label">Est. Delivery Date</label>
+                            {{ adminform.form.estimated_delivery_date }}
+                        </div>
+                        <div>
+                            <label class="oms-label">Actual Delivery Date</label>
+                            {{ adminform.form.actual_delivery_date }}
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 15px;">
+                        <label class="oms-label">Delivery Notes (Customer)</label>
+                        <div style="background: #f9fafb; padding: 10px; border-radius: 6px; font-size: 14px;">
+                            {{ original.delivery_note|default:"No notes provided." }}
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 15px;">
+                        <label class="oms-label">Shipping Label</label>
+                        {{ adminform.form.shipping_label }}
+                    </div>
+                </div>
+
+                <!-- Timeline Section (Status History) -->
+                <div class="oms-card">
+                    <h2>Order Timeline</h2>
+                    {% if timeline %}
+                    {% for event in timeline %}
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-date">{{ event.created_at|date:"M j, g:i A" }}</div>
+                        <div class="timeline-status">{{ event.get_status_display }}</div>
+                        <div class="timeline-desc">{{ event.description|default:"" }} {% if event.created_by %}(by {{
+                            event.created_by.username }}){% endif %}</div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <p style="color: var(--text-muted);">No history recorded yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN (Sidebar) -->
+            <div class="oms-col-sidebar">
+                <!-- Customer Card -->
+                <div class="oms-card">
+                    <h2>Customer Info</h2>
+                    <div style="text-align: center; margin-bottom: 15px;">
+                        <!-- Simple Avatar placeholder -->
+                        <div
+                            style="width: 60px; height: 60px; background: #E0E7FF; color: var(--primary); border-radius: 50%; line-height: 60px; font-size: 24px; font-weight: bold; margin: 0 auto;">
+                            {{ original.full_name|first|default:"U" }}
+                        </div>
+                        <div style="margin-top: 10px; font-weight: 600;">{{ original.full_name }}</div>
+                        <div style="font-size: 13px; color: var(--text-muted);">{{ original.user.email }}</div>
+                        {% if customer_total_orders > 1 %}
+                        <div style="margin-top:5px;"><span
+                                style="background: #D1FAE5; color: #059669; font-size: 10px; padding: 2px 8px; border-radius: 10px;">Returning
+                                Customer</span></div>
+                        {% else %}
+                        <div style="margin-top:5px;"><span
+                                style="background: #E0E7FF; color: #4F46E5; font-size: 10px; padding: 2px 8px; border-radius: 10px;">New
+                                Customer</span></div>
+                        {% endif %}
+                    </div>
+                    <div class="oms-field-row">
+                        <span class="oms-label">User ID</span>
+                        <a href="{% url 'admin:users_user_change' original.user.id %}">#{{ original.user.id }}</a>
+                    </div>
+                    <div class="oms-field-row">
+                        <span class="oms-label">Phone</span>
+                        <span class="oms-value">{{ original.phone }}</span>
+                    </div>
+                    <div class="oms-field-row">
+                        <span class="oms-label">Lifetime Orders</span>
+                        <span class="oms-value">{{ customer_total_orders }}</span>
+                    </div>
+                    <div class="oms-field-row">
+                        <span class="oms-label">Lifetime Spend</span>
+                        <span class="oms-value">{{ customer_lifetime_spend }} BDT</span>
+                    </div>
+                </div>
+
+                <!-- Address Card -->
+                <div class="oms-card">
+                    <h2>Addresses</h2>
+                    <div class="oms-section-title" style="margin-top:0;">Shipping Address</div>
+                    <p style="font-size: 14px; line-height: 1.5;">
+                        {{ original.address }}<br>
+                        {{ original.city }}, {{ original.zip_code }}
+                    </p>
+
+                    {% if original.billing_address %}
+                    <div class="oms-section-title">Billing Address</div>
+                    <p style="font-size: 14px; line-height: 1.5;">
+                        {{ original.billing_address }}<br>
+                        {{ original.billing_city }}, {{ original.billing_zip_code }}
+                    </p>
+                    {% endif %}
+                </div>
+
+                <!-- Admin Controls -->
+                <div class="oms-card">
+                    <h2>Admin Controls</h2>
+                    <div style="margin-bottom: 15px;">
+                        <label class="oms-label">Change Status</label>
+                        {{ adminform.form.status }}
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <label class="oms-label">Internal Note</label>
+                        {{ adminform.form.internal_admin_note }}
+                    </div>
+
+                    <div class="oms-section-title">Risk Analysis</div>
+                    <div class="oms-field-row">
+                        <span class="oms-label">IP Address</span>
+                        <span class="oms-value">{{ original.ip_address|default:"Unknown" }}</span>
+                    </div>
+                    <div class="oms-field-row">
+                        <span class="oms-label">High Risk?</span>
+                        <span class="oms-value">{{ adminform.form.is_high_risk }}</span>
+                    </div>
+                </div>
+
+                <!-- Documents -->
+                <div class="oms-card">
+                    <h2>Documents</h2>
+                    <div class="oms-field-row">
+                        <span class="oms-label">Invoice #</span>
+                        <span class="oms-value">{{ original.invoice_number }}</span>
+                    </div>
+                    <a href="{% url 'order_invoice' original.id %}" class="button"
+                        style="display: block; text-align: center; margin-top: 10px;">Download Invoice PDF</a>
+                </div>
+            </div>
+        </div>
+
+        {% block submit_buttons_bottom %}{% submit_row %}{% endblock %}
+
+        <!-- Render hidden fields to ensure data integrity -->
+        {% for field in adminform.form.hidden_fields %}
+        {{ field }}
+        {% endfor %}
+
+    </form>
+</div>
+{% endblock %}

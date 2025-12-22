@@ -13,6 +13,39 @@ from analytics.models import VisitorSession, PageView, AnalyticsEvent
 from django.contrib.auth import get_user_model
 
 
+
+# PDF Generation Imports
+from django.http import HttpResponse
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+from django.contrib.admin.views.decorators import staff_member_required
+from orders.models import Order
+
+@staff_member_required
+def admin_order_invoice(request, order_id):
+    order = Order.objects.get(pk=order_id)
+    
+    # Increment download count
+    order.invoice_download_count += 1
+    order.save(update_fields=['invoice_download_count'])
+    
+    template_path = 'pdf/invoice.html'
+    context = {'order': order}
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="invoice_{order.invoice_number}.pdf"'
+    
+    template = get_template(template_path)
+    html = template.render(context)
+
+    # Create PDF
+    pisa_status = pisa.CreatePDF(
+       html, dest=response
+    )
+    
+    if pisa_status.err:
+       return HttpResponse('We had some errors <pre>' + html + '</pre>')
+    return response
+
 @staff_member_required
 def analytics_dashboard(request):
     # Time Range (Default 30 days)

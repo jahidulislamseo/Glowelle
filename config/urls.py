@@ -21,6 +21,7 @@ urlpatterns = [
     # Admin API (Must be before admin.site.urls)
     path('admin/admin/dashboard/stats/', core_views.admin_stats_api, name='admin_stats_api'),
     path('admin/admin/analytics/', core_views.analytics_dashboard, name='analytics_dashboard'), # New Dashboard
+    path('admin/orders/invoice/<int:order_id>/', core_views.admin_order_invoice, name='order_invoice'),
     # path('accounts/', include('allauth.urls')),
     path('accounts/login/', RedirectView.as_view(pattern_name='login', permanent=True)), # Redirect legacy/default login URL
     path('admin/admin/', admin.site.urls),

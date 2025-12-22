@@ -1,0 +1,171 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+
+<head>
+    <title>Invoice {{ order.invoice_number }}</title>
+    <style type="text/css">
+        body {
+            font-family: Helvetica, sans-serif;
+            /* Standard PDF font */
+            font-size: 12px;
+            color: #333;
+        }
+
+        .header {
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4F46E5;
+        }
+
+        .invoice-title {
+            text-align: right;
+            font-size: 20px;
+            font-weight: bold;
+            color: #888;
+        }
+
+        .meta {
+            margin-top: 20px;
+        }
+
+        .bill-to {
+            float: left;
+            width: 50%;
+        }
+
+        .invoice-details {
+            float: right;
+            width: 40%;
+            text-align: right;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+        }
+
+        th {
+            background-color: #f3f4f6;
+            color: #333;
+            font-weight: bold;
+            padding: 8px;
+            text-align: left;
+            border-bottom: 2px solid #ddd;
+        }
+
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .totals {
+            margin-top: 20px;
+            float: right;
+            width: 40%;
+        }
+
+        .total-row {
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .total-row.final {
+            font-weight: bold;
+            font-size: 14px;
+            border-top: 2px solid #333;
+            border-bottom: none;
+            padding-top: 10px;
+        }
+
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 10px;
+            color: #888;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="invoice-title">INVOICE</div>
+        <div class="logo">Al Barakah Mart</div>
+    </div>
+
+    <div class="meta">
+        <div class="bill-to">
+            <strong>Bill To:</strong><br>
+            {{ order.full_name }}<br>
+            {{ order.address }}<br>
+            {{ order.city }}, {{ order.zip_code }}<br>
+            {{ order.phone }}<br>
+            {{ order.email }}
+        </div>
+        <div class="invoice-details">
+            <strong>Invoice #:</strong> {{ order.invoice_number }}<br>
+            <strong>Date:</strong> {{ order.created_at|date:"M d, Y" }}<br>
+            <strong>Order Ref:</strong> {{ order.order_reference }}<br>
+            <strong>Payment:</strong> {{ order.get_payment_method_display }}
+        </div>
+        <div style="clear: both;"></div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th width="10%">Qty</th>
+                <th width="15%">Unit Price</th>
+                <th width="15%">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in order.items.all %}
+            <tr>
+                <td>{{ item.product.title }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.price }}</td>
+                <td>{{ item.get_total }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="totals">
+        <div class="total-row">
+            Subtotal: <span style="float:right;">{{ order.subtotal }}</span>
+        </div>
+        {% if order.discount_amount > 0 %}
+        <div class="total-row">
+            Discount: <span style="float:right;">- {{ order.discount_amount }}</span>
+        </div>
+        {% endif %}
+        <div class="total-row">
+            Delivery: <span style="float:right;">{{ order.delivery_charge }}</span>
+        </div>
+        {% if order.tax_amount > 0 %}
+        <div class="total-row">
+            Tax: <span style="float:right;">{{ order.tax_amount }}</span>
+        </div>
+        {% endif %}
+        <div class="total-row final">
+            Total Payable: <span style="float:right;">{{ order.total }} BDT</span>
+        </div>
+    </div>
+
+    <div style="clear: both;"></div>
+
+    <div class="footer">
+        Thank you for shopping with Al Barakah Mart.<br>
+        For support, contact support@albarakahmart.com
+    </div>
+</body>
+
+</html>
