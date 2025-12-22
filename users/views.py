@@ -1,9 +1,9 @@
 from django.contrib import messages
 from django_ratelimit.decorators import ratelimit
 from .forms import RegisterForm, UserUpdateForm, AddressForm, SupportTicketForm
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth.forms import PasswordChangeForm, AuthenticationForm
 from django.contrib.auth import update_session_auth_hash, login, authenticate, logout
 from io import BytesIO
 from django.http import HttpResponse

@@ -3,7 +3,7 @@ URL configuration for config project.
 """
 from django.contrib import admin
 from django.urls import path, include
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, RedirectView
 from django.conf import settings
 from django.conf.urls.static import static
 from core import views as core_views
@@ -19,10 +19,11 @@ sitemaps = {
 
 urlpatterns = [
     # Admin API (Must be before admin.site.urls)
-    path('manager-portal-631/dashboard/stats/', core_views.admin_stats_api, name='admin_stats_api'),
-    path('manager-portal-631/analytics/', core_views.analytics_dashboard, name='analytics_dashboard'), # New Dashboard
+    path('admin/admin/dashboard/stats/', core_views.admin_stats_api, name='admin_stats_api'),
+    path('admin/admin/analytics/', core_views.analytics_dashboard, name='analytics_dashboard'), # New Dashboard
     # path('accounts/', include('allauth.urls')),
-    path('manager-portal-631/', admin.site.urls),
+    path('accounts/login/', RedirectView.as_view(pattern_name='login', permanent=True)), # Redirect legacy/default login URL
+    path('admin/admin/', admin.site.urls),
     path('', include('products.urls')),
     path('', include('users.urls')),
     path('', include('orders.urls')),

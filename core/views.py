@@ -22,6 +22,7 @@ def analytics_dashboard(request):
     sessions = VisitorSession.objects.filter(start_time__gte=start_date)
     total_sessions = sessions.count()
     total_users = sessions.filter(user__isnull=False).values('user').distinct().count()
+    total_visitors = sessions.values('ip_address').distinct().count()
     
     # Bounce Rate
     bounces = sessions.filter(is_bounce=True).count()
@@ -71,9 +72,55 @@ def analytics_dashboard(request):
     # 404 Errors
     errors_404 = events.filter(event_type='error_404').values('url').annotate(count=Count('id')).order_by('-count')[:5]
 
+    # 4. User Engagement
+    wishlist_adds = events.filter(event_type='wishlist_add').count()
+    removes_from_cart = events.filter(event_type='remove_from_cart').count()
+    logouts = events.filter(event_type='logout').count()
+    
+    # 5. Advanced eCommerce
+    # Abandoned Carts: Sessions with add_to_cart but NO payment_success
+    cart_sessions = sessions.filter(events__event_type='add_to_cart')
+    purchased_sessions = sessions.filter(events__event_type='payment_success')
+    abandoned_carts = cart_sessions.exclude(id__in=purchased_sessions.values('id')).distinct().count()
+    
+    # Coupons & Discounts
+    coupon_usage = events.filter(event_type='coupon_used').count()
+    # Also check orders table for redundancy
+    orders_with_coupon = Order.objects.filter(created_at__gte=start_date, coupon__isnull=False).count()
+    total_coupon_usage = max(coupon_usage, orders_with_coupon)
+    
+    # 6. Customer Retention
+    # New Users (Joined in period)
+    new_users_count = User.objects.filter(date_joined__gte=start_date).count()
+    # Returning Users (Active in period - New)
+    # Total active users in period
+    active_users_count = sessions.filter(user__isnull=False).values('user').distinct().count()
+    returning_users_count = max(0, active_users_count - new_users_count)
+    
+    # Repeat Customers (Placed > 1 order in period)
+    repeat_customers = Order.objects.filter(created_at__gte=start_date) \
+        .values('user') \
+        .annotate(order_count=Count('id')) \
+        .filter(order_count__gt=1) \
+        .count()
+        
+    # 7. Operational
+    payment_failed = events.filter(event_type='payment_failed').count()
+    out_of_stock_clicks = events.filter(event_type='out_of_stock_click').count()
+    
+    # Checkout Drop-off Rate
+    checkout_starts = starts
+    checkout_success = payments
+    drop_off_rate = 0
+    if checkout_starts > 0:
+        drop_off_rate = ((checkout_starts - checkout_success) / checkout_starts) * 100
+
+    # User Conversion Rate
+    user_conversion_rate = (payments / total_visitors * 100) if total_visitors > 0 else 0
+
     context = {
         'total_sessions': total_sessions,
-        'total_visitors': sessions.values('ip_address').distinct().count(), 
+        'total_visitors': total_visitors, 
         'bounce_rate': round(bounce_rate, 1),
         'avg_duration': round(avg_duration, 1),
         'avg_load_time': int(avg_load_time),
@@ -81,12 +128,26 @@ def analytics_dashboard(request):
         'browser_data': browser_data,
         'funnel': {
             'adds': adds,
+            'removes': removes_from_cart,
             'starts': starts,
-            'sales': payments
+            'sales': payments,
+            'rate': round(user_conversion_rate, 2) if total_users > 0 else 0, # Note: user_conversion_rate needs calc
+            'drop_off': round(drop_off_rate, 1)
         },
         'auth_stats': {
             'logins': logins,
-            'signups': signups
+            'signups': signups,
+            'logouts': logouts,
+            'new_users': new_users_count,
+            'returning_users': returning_users_count,
+            'repeat_customers': repeat_customers
+        },
+        'ecommerce': {
+            'wishlist_adds': wishlist_adds,
+            'abandoned_carts': abandoned_carts,
+            'coupons': total_coupon_usage,
+            'payment_failed': payment_failed,
+            'out_of_stock': out_of_stock_clicks,
         },
         'top_searches': top_searches,
         'top_products': top_products,
