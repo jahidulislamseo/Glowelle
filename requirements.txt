@@ -1,5 +1,5 @@
 # Core Django
-Django==6.0
+Django==5.1.4
 gunicorn==23.0.0
 
 # Database

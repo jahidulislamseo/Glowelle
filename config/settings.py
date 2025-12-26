@@ -76,6 +76,9 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# Use signed cookies for sessions to avoid DB writes on Vercel (SQLite read-only)
+SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
+
 if DEBUG:
     try:
         import debug_toolbar
