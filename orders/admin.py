@@ -1,11 +1,20 @@
 from django.contrib import admin
 from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 from django.urls import reverse
+
 from django.utils import timezone
 from .models import Order, OrderItem, Courier, PaymentGateway, OrderStatusHistory
 from import_export.admin import ImportExportModelAdmin
 
+@admin.register(PaymentGateway)
+class PaymentGatewayAdmin(admin.ModelAdmin):
+    list_display = ['name', 'is_active', 'account_number']
+    list_editable = ['is_active']
+    search_fields = ['name']
+
 class OrderItemInline(admin.TabularInline):
+
     model = OrderItem
     extra = 0
     readonly_fields = ['product', 'quantity', 'price']
@@ -55,15 +64,25 @@ class OrderAdmin(ImportExportModelAdmin):
             'fields': ('full_name', 'email', 'phone', 'address', 'city', 'zip_code', 'ip_address')
         }),
         ('Payment', {
-            'fields': ('payment_method', 'payment_status', 'total', 'subtotal', 'tax_amount', 'delivery_charge', 'discount_amount')
+            'fields': ('payment_method', 'payment_status', 'total', 'subtotal', 'tax_amount', 'delivery_charge', 'discount_amount', 'payment_gateway', 'transaction_id')
         }),
         ('Delivery', {
-            'fields': ('courier', 'tracking_id', 'shipping_label', 'estimated_delivery_date', 'actual_delivery_date')
+            'fields': ('courier', 'tracking_id', 'shipping_label', 'estimated_delivery_date', 'actual_delivery_date', 'delivery_note')
+        }),
+        ('Returns & Refunds', {
+            'fields': ('cancellation_reason', 'return_reason', 'return_status', 'refund_amount', 'refund_status', 'refund_method', 'refund_date')
+        }),
+        ('Documents', {
+            'fields': ('invoice_number', 'credit_note_number')
+        }),
+        ('Automation', {
+            'fields': ('is_confirmation_email_sent', 'is_delivery_update_sent', 'automation_logs')
         }),
         ('Admin', {
             'fields': ('internal_admin_note', 'is_high_risk', 'risk_score')
         }),
     )
+
 
     def user_link(self, obj):
         link = reverse("admin:users_user_change", args=[obj.user.id])
@@ -113,7 +132,8 @@ class OrderAdmin(ImportExportModelAdmin):
 
     def invoice_actions(self, obj):
         # Placeholder for invoice URL
-        return format_html('<a class="button" href="#" target="_blank">PDF Invoice</a>')
+        return mark_safe('<a class="button" href="#" target="_blank">PDF Invoice</a>')
+
     invoice_actions.short_description = 'Invoice'
 
     def mark_as_processing(self, request, queryset):

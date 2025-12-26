@@ -19,12 +19,12 @@ sitemaps = {
 
 urlpatterns = [
     # Admin API (Must be before admin.site.urls)
-    path('admin/admin/dashboard/stats/', core_views.admin_stats_api, name='admin_stats_api'),
-    path('admin/admin/analytics/', core_views.analytics_dashboard, name='analytics_dashboard'), # New Dashboard
+    path('admin/dashboard/stats/', core_views.admin_stats_api, name='admin_stats_api'),
+    path('admin/analytics/', core_views.analytics_dashboard, name='analytics_dashboard'), # New Dashboard
     path('admin/orders/invoice/<int:order_id>/', core_views.admin_order_invoice, name='order_invoice'),
     # path('accounts/', include('allauth.urls')),
     path('accounts/login/', RedirectView.as_view(pattern_name='login', permanent=True)), # Redirect legacy/default login URL
-    path('admin/admin/', admin.site.urls),
+    path('admin/', admin.site.urls),
     path('', include('products.urls')),
     path('', include('users.urls')),
     path('', include('orders.urls')),
@@ -43,7 +43,11 @@ urlpatterns = [
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:
-    import debug_toolbar
-    urlpatterns += [
-        path('__debug__/', include(debug_toolbar.urls)),
-    ]
+    try:
+        import debug_toolbar
+        urlpatterns += [
+            path('__debug__/', include(debug_toolbar.urls)),
+        ]
+    except ImportError:
+        pass  # debug_toolbar not installed
+

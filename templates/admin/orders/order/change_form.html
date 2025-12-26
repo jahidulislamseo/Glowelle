@@ -358,12 +358,15 @@
                     <div>
                         <label class="oms-label">Actual Delivery Date</label>
                         {{ adminform.form.actual_delivery_date }}
-                        {% if original.actual_delivery_date and original.estimated_delivery_date and
-                        original.actual_delivery_date.date > original.estimated_delivery_date %}
+                        {% if original.actual_delivery_date and original.estimated_delivery_date %}
+                        {% if original.actual_delivery_date.date > original.estimated_delivery_date %}
                         <div style="color: #DC2626; font-size: 11px; margin-top: 4px; font-weight: 700;">
                             DELAYED (Late Delivery)
                         </div>
                         {% endif %}
+                        {% endif %}
+
+
                     </div>
                 </div>
 
@@ -481,6 +484,15 @@
                 </div>
             </div>
 
+            <!-- 12. Analytics -->
+            <div class="oms-card">
+                <h2><i class="fas fa-chart-line"></i> 12. Analytics</h2>
+                <div class="oms-field-row"><span class="oms-label">Value Cat.</span><span class="oms-value">{{ original.order_value_category }}</span></div>
+                <div class="oms-field-row"><span class="oms-label">High Risk</span><span class="oms-value">{{ adminform.form.is_high_risk }}</span></div>
+                <div class="oms-field-row"><span class="oms-label">Repeat Order</span><span class="oms-value">{% if original.is_repeat_order %}Yes{% else %}No{% endif %}</span></div>
+
+            </div>
+
             <!-- Documents -->
             <div class="oms-card">
                 <h2>Documents</h2>
@@ -491,10 +503,41 @@
                 <a href="{% url 'order_invoice' original.id %}" class="button"
                     style="display: block; text-align: center; margin-top: 10px;">Download Invoice PDF</a>
             </div>
+
+            <!-- 13. Support -->
+            <div class="oms-card">
+                <h2><i class="fas fa-headset"></i> 13. Support</h2>
+                <div class="oms-field-row"><span class="oms-label">Ticket</span><span class="oms-value">{{
+                        original.support_ticket|default:"None" }}</span></div>
+            </div>
+
+            <!-- 14. Automation -->
+            <div class="oms-card">
+                <h2><i class="fas fa-robot"></i> 14. Automation</h2>
+                <div class="oms-field-row"><span class="oms-label">Email Sent</span><span class="oms-value">{{
+                        adminform.form.is_confirmation_email_sent }}</span></div>
+                <div class="oms-field-row"><span class="oms-label">SMS Sent</span><span class="oms-value">{{
+                        adminform.form.is_delivery_update_sent }}</span></div>
+                <div style="font-size:10px; color:#777; margin-top:5px;">{{ original.automation_logs|default:"No
+                    logs"|truncatechars:100 }}</div>
+            </div>
         </div>
 </div>
 
-{% block submit_buttons_bottom %}{% submit_row %}{% endblock %}
+{% block submit_buttons_bottom %}
+<div class="submit-row">
+    {% if show_save %}<input type="submit" value="{% translate 'Save' %}" class="default" name="_save">{% endif %}
+    {% if show_delete_link %}
+    {% url opts|admin_urlname:'delete' original.pk|admin_urlquote as delete_url %}
+    <p class="deletelink-box"><a href="{{ delete_url }}" class="deletelink">{% translate "Delete" %}</a></p>
+    {% endif %}
+    {% if show_save_as_new %}<input type="submit" value="{% translate 'Save as new' %}" name="_saveasnew">{% endif %}
+    {% if show_save_and_add_another %}<input type="submit" value="{% translate 'Save and add another' %}"
+        name="_addanother">{% endif %}
+    {% if show_save_and_continue %}<input type="submit" value="{% translate 'Save and continue editing' %}"
+        name="_continue">{% endif %}
+</div>
+{% endblock %}
 
 <!-- Render hidden fields to ensure data integrity -->
 {% for field in adminform.form.hidden_fields %}

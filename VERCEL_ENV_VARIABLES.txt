@@ -1,0 +1,30 @@
+# Vercel Environment Variables
+# Copy these values and paste in Vercel Dashboard → Settings → Environment Variables
+
+DATABASE_URL=postgresql://neondb_owner:npg_KAlRbsO5MLd9@ep-twilight-mountain-a1tjwysc-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require
+
+DEBUG=False
+
+SECRET_KEY=f*2fh!1=*o#%(g5=3hy)d_)5d5g4^(bmtx909hjtj@q4kzz&k
+
+ALLOWED_HOSTS=.vercel.app
+
+
+# ========================================
+# HOW TO ADD THESE IN VERCEL:
+# ========================================
+# 
+# 1. Go to: https://vercel.com/dashboard
+# 2. Select your project
+# 3. Click "Settings" tab
+# 4. Click "Environment Variables" in left sidebar
+# 5. For each variable above:
+#    - Click "Add New"
+#    - Enter the variable name (e.g., DATABASE_URL)
+#    - Enter the value (copy from above)
+#    - Select "Production" environment
+#    - Click "Save"
+# 
+# 6. After adding all variables, redeploy your project
+#
+# ========================================

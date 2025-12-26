@@ -29,6 +29,20 @@ class Order(models.Model):
         ('cancelled', 'Cancelled'),
         ('returned', 'Returned'),
     )
+    RETURN_STATUS_CHOICES = (
+        ('none', 'None'),
+        ('requested', 'Requested'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+        ('completed', 'Completed'),
+    )
+    REFUND_STATUS_CHOICES = (
+        ('none', 'None'),
+        ('pending', 'Pending'),
+        ('processed', 'Processed'),
+        ('failed', 'Failed'),
+    )
+
     PAYMENT_METHOD_CHOICES = (
         ('cod', 'Cash on Delivery'),
         ('online', 'Online Payment'),
@@ -98,12 +112,18 @@ class Order(models.Model):
     # 8. Cancellation, Return, Refund
     cancellation_reason = models.TextField(blank=True, null=True)
     return_reason = models.TextField(blank=True, null=True)
+    return_status = models.CharField(max_length=20, choices=RETURN_STATUS_CHOICES, default='none')
+    
     refund_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     refund_date = models.DateTimeField(null=True, blank=True)
+    refund_status = models.CharField(max_length=20, choices=REFUND_STATUS_CHOICES, default='none')
+    refund_method = models.CharField(max_length=50, blank=True, null=True, help_text="e.g. bKash, Bank Transfer")
     
     # 9. Documents
     invoice_number = models.CharField(max_length=50, unique=True, blank=True, null=True)
     invoice_download_count = models.IntegerField(default=0)
+    credit_note_number = models.CharField(max_length=50, blank=True, null=True)
+
     
     # 10. Admin Controls
     internal_admin_note = models.TextField(blank=True, null=True, help_text="Private note for admins")
@@ -122,6 +142,11 @@ class Order(models.Model):
     is_repeat_order = models.BooleanField(default=False)
     profit_estimate = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
+    # 14. System & Automation
+    is_confirmation_email_sent = models.BooleanField(default=False)
+    is_delivery_update_sent = models.BooleanField(default=False)
+    automation_logs = models.TextField(blank=True, null=True, help_text="JSON or text logs of automation")
+
     # 15. Final System States
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending', db_index=True)
     is_archived = models.BooleanField(default=False)
@@ -130,6 +155,15 @@ class Order(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='orders')
+
+    @property
+    def order_value_category(self):
+        if self.total > 5000:
+            return 'High'
+        elif self.total > 1000:
+            return 'Medium'
+        return 'Low'
+
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
