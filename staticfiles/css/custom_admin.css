@@ -1,0 +1,20 @@
+/* Custom Admin Login Styles */
+
+/* 
+   To change the position of the login box:
+   The login box is usually centered by default in AdminLTE/Jazzmin.
+   You can adjust margins or use flexbox properties on the body or container if needed.
+   
+   Example: Moving the login box down
+*/
+.login-box, .register-box {
+    margin-top: 10%; /* Adjust this value to move it up or down */
+}
+
+/* 
+    Example: Customizing the logo size if needed 
+*/
+.login-logo img {
+    max-height: 100px; /* Adjust as per logo size */
+    width: auto;
+}
