@@ -1,4 +1,4 @@
-from config.asgi import application
+from config.wsgi import application
 
 app = application
 handler = application
