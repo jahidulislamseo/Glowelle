@@ -138,7 +138,7 @@ def product_detail(request, slug):
     
     # Find products frequently bought together with this product
     bought_together = OrderItem.objects.filter(
-        order__orderitem__product=product
+        order__items__product=product
     ).exclude(
         product=product
     ).values('product').annotate(
