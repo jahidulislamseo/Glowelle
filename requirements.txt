@@ -30,9 +30,8 @@ sqlparse==0.5.5
 asgiref==3.11.0
 tzdata==2025.2
 
-# NOTE: PDF generation (xhtml2pdf) removed for Vercel compatibility
-# It requires pycairo which needs system-level Cairo libraries
-# not available in serverless environment
+# PDF generation (xhtml2pdf) - Enabled for Render
+xhtml2pdf==0.2.16
 
 # Frontend
 django-tailwind==3.8.0
