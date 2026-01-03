@@ -23,6 +23,11 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,.vercel.app
 
 CSRF_TRUSTED_ORIGINS = ['https://albarakahmart.vercel.app']
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "https://albarakahmart.vercel.app",
+]
+
 
 # Security Settings (Production)
 if not DEBUG:
@@ -60,6 +65,8 @@ INSTALLED_APPS = [
     'django.contrib.sitemaps',
     'tailwind',
     'theme',
+    'rest_framework', # Django Rest Framework
+    'corsheaders',    # CORS Headers
 ]
 
 TAILWIND_APP_NAME = 'theme'
@@ -69,6 +76,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware', # Add Whitenoise Middleware
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware', # CORS Middleware (Must be before CommonMiddleware)
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',

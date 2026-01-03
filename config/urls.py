@@ -11,6 +11,14 @@ from core import views as core_views
 from django.contrib.sitemaps.views import sitemap
 from products.sitemaps import ProductSitemap, CategorySitemap, StaticViewSitemap
 
+from rest_framework.routers import DefaultRouter
+from products.api_views import ProductViewSet, CategoryViewSet
+
+# API Router
+router = DefaultRouter()
+router.register(r'products', ProductViewSet)
+router.register(r'categories', CategoryViewSet)
+
 sitemaps = {
     'products': ProductSitemap,
     'categories': CategorySitemap,
@@ -18,6 +26,9 @@ sitemaps = {
 }
 
 urlpatterns = [
+    # API Routes
+    path('api/', include(router.urls)),
+
     # Admin API (Must be before admin.site.urls)
     path('admin/dashboard/stats/', core_views.admin_stats_api, name='admin_stats_api'),
     path('admin/analytics/', core_views.analytics_dashboard, name='analytics_dashboard'), # New Dashboard
@@ -25,9 +36,16 @@ urlpatterns = [
     # path('accounts/', include('allauth.urls')),
     path('accounts/login/', RedirectView.as_view(pattern_name='login', permanent=True)), # Redirect legacy/default login URL
     path('admin/', admin.site.urls),
+    # Legacy/Template URLs (Keep them for now, or comment out if we valid strictly API only)
+    # path('', include('products.urls')),
+    # path('', include('users.urls')),
+    # path('', include('orders.urls')),
+    
+    # We will keep the template URLs valid for now to not break the existing admin or any hybrid usage
     path('', include('products.urls')),
     path('', include('users.urls')),
     path('', include('orders.urls')),
+
     # Static Pages
     path('about/', TemplateView.as_view(template_name='pages/about.html'), name='about'),
     path('contact/', TemplateView.as_view(template_name='pages/contact.html'), name='contact'),

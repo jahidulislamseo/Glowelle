@@ -36,3 +36,8 @@ tzdata==2025.2
 
 # Frontend
 django-tailwind==3.8.0
+
+# API & CORS
+djangorestframework
+django-cors-headers
+django-filter
