@@ -31,6 +31,8 @@ CORS_ALLOWED_ORIGINS = [
     "https://albarakahmart.vercel.app",
 ]
 
+CORS_ALLOW_CREDENTIALS = True
+
 
 # Security Settings (Production)
 if not DEBUG:
