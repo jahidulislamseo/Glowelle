@@ -207,25 +207,41 @@
             top: 0 !important;
         }
 
-        /* Skeleton Loading Animation */
-        @keyframes shimmer {
-            0% {
-                background-position: -468px 0;
-            }
+        /* Improved Skeleton Loading */
+        .skeleton {
+            position: relative;
+            overflow: hidden;
+            background-color: #f3f4f6;
+        }
 
+        .skeleton::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            transform: translateX(-100%);
+            background-image: linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 0) 0,
+                rgba(255, 255, 255, 0.2) 20%,
+                rgba(255, 255, 255, 0.5) 60%,
+                rgba(255, 255, 255, 0)
+            );
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
             100% {
-                background-position: 468px 0;
+                transform: translateX(100%);
             }
         }
 
-        .skeleton {
-            background: #f6f7f8;
-            background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
-            background-repeat: no-repeat;
-            background-size: 800px 104px;
-            display: inline-block;
-            position: relative;
-            animation: shimmer 1.5s linear infinite forwards;
+        /* Bottom Nav Styles */
+        .mobile-bottom-nav {
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            padding-bottom: env(safe-area-inset-bottom);
         }
 
         /* Standard Transitions */
@@ -258,10 +274,52 @@
             line-height: 1.75;
             letter-spacing: -0.01em;
         }
+
+        /* Scroll Reveal */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+            pointer-events: none;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
     </style>
 </head>
 
 <body class="bg-gray-50 font-sans antialiased min-h-screen flex flex-col">
+    <!-- Mobile Bottom Navigation (Visible only on mobile) -->
+    <div class="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-lg border-t border-gray-100 z-50 mobile-bottom-nav">
+        <div class="flex justify-around items-center h-16">
+            <a href="{% url 'home' %}" class="flex flex-col items-center justify-center w-full h-full text-gray-500 hover:text-green-600 transition-colors {% if request.resolver_match.url_name == 'home' %}text-green-600{% endif %}">
+                <i data-lucide="home" class="h-6 w-6"></i>
+                <span class="text-[10px] font-bold mt-1">Home</span>
+            </a>
+            <a href="{% url 'shop' %}" class="flex flex-col items-center justify-center w-full h-full text-gray-500 hover:text-green-600 transition-colors {% if request.resolver_match.url_name == 'shop' %}text-green-600{% endif %}">
+                <i data-lucide="shopping-bag" class="h-6 w-6"></i>
+                <span class="text-[10px] font-bold mt-1">Shop</span>
+            </a>
+            <a href="{% url 'cart_detail' %}" class="flex flex-col items-center justify-center w-full h-full text-gray-500 hover:text-green-600 transition-colors relative {% if request.resolver_match.url_name == 'cart_detail' %}text-green-600{% endif %}">
+                <i data-lucide="shopping-cart" class="h-6 w-6"></i>
+                <span class="text-[10px] font-bold mt-1">Cart</span>
+                {% if request.session.cart|length > 0 %}
+                <span class="absolute top-2 right-4 h-4 w-4 flex items-center justify-center rounded-full bg-red-500 text-white text-[8px] font-bold">{{ request.session.cart|length }}</span>
+                {% endif %}
+            </a>
+            <a href="{% url 'wishlist' %}" class="flex flex-col items-center justify-center w-full h-full text-gray-500 hover:text-green-600 transition-colors {% if request.resolver_match.url_name == 'wishlist' %}text-green-600{% endif %}">
+                <i data-lucide="heart" class="h-6 w-6"></i>
+                <span class="text-[10px] font-bold mt-1">Wishlist</span>
+            </a>
+            <a href="{% url 'dashboard' %}" class="flex flex-col items-center justify-center w-full h-full text-gray-500 hover:text-green-600 transition-colors {% if request.resolver_match.url_name == 'dashboard' %}text-green-600{% endif %}">
+                <i data-lucide="user" class="h-6 w-6"></i>
+                <span class="text-[10px] font-bold mt-1">Account</span>
+            </a>
+        </div>
+    </div>
 
     <!-- Navbar (Matching Header.tsx) -->
     <header
@@ -283,35 +341,67 @@
 
                     <!-- Mobile Menu Drawer -->
                     <div id="mobile-menu-drawer"
-                        class="fixed inset-y-0 left-0 w-64 bg-white z-50 transform -translate-x-full transition-transform duration-300 ease-in-out shadow-2xl">
-                        <div class="p-4 border-b flex items-center justify-between">
-                            <span class="font-bold text-lg text-green-600">Menu</span>
-                            <button id="mobile-menu-close" class="p-1 hover:bg-gray-100 rounded-full">
-                                <i data-lucide="x" class="h-5 w-5 text-gray-500"></i>
-                            </button>
+                        class="fixed inset-y-0 left-0 w-72 bg-white z-50 transform -translate-x-full transition-transform duration-300 ease-in-out shadow-2xl">
+                        <div class="p-6 border-b bg-green-600 text-white">
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="font-bold text-xl">Al Barakah Mart</span>
+                                <button id="mobile-menu-close" class="p-1 hover:bg-white/20 rounded-full transition-colors">
+                                    <i data-lucide="x" class="h-6 w-6"></i>
+                                </button>
+                            </div>
+                            {% if user.is_authenticated %}
+                            <div class="flex items-center gap-3">
+                                <div class="h-12 w-12 rounded-full border-2 border-white/50 overflow-hidden bg-white/20 flex items-center justify-center">
+                                    {% if user.image %}
+                                    <img src="{{ user.image.url }}" class="h-full w-full object-cover">
+                                    {% else %}
+                                    <i data-lucide="user" class="h-6 w-6"></i>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <p class="text-sm opacity-80">Welcome back,</p>
+                                    <p class="font-bold truncate max-w-[150px]">{{ user.username }}</p>
+                                </div>
+                            </div>
+                            {% else %}
+                            <a href="{% url 'login' %}" class="inline-flex items-center gap-2 bg-white text-green-600 px-4 py-2 rounded-full font-bold text-sm">
+                                <i data-lucide="log-in" class="h-4 w-4"></i> Login / Register
+                            </a>
+                            {% endif %}
                         </div>
-                        <nav class="p-4 space-y-4">
+                        <nav class="p-4 space-y-1">
                             <a href="{% url 'home' %}"
-                                class="block px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-green-600 rounded-lg transition-colors flex items-center gap-3 text-lg">
-                                <i data-lucide="home" class="h-5 w-5"></i> Home
+                                class="flex items-center gap-4 px-4 py-3.5 text-gray-700 hover:bg-green-50 hover:text-green-600 rounded-xl transition-all group {% if request.resolver_match.url_name == 'home' %}bg-green-50 text-green-600{% endif %}">
+                                <i data-lucide="home" class="h-5 w-5 transition-transform group-hover:scale-110"></i>
+                                <span class="font-medium">Home</span>
                             </a>
                             <a href="{% url 'shop' %}"
-                                class="block px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-green-600 rounded-lg transition-colors flex items-center gap-3 text-lg">
-                                <i data-lucide="shopping-bag" class="h-5 w-5"></i> Shop
+                                class="flex items-center gap-4 px-4 py-3.5 text-gray-700 hover:bg-green-50 hover:text-green-600 rounded-xl transition-all group {% if request.resolver_match.url_name == 'shop' %}bg-green-50 text-green-600{% endif %}">
+                                <i data-lucide="shopping-bag" class="h-5 w-5 transition-transform group-hover:scale-110"></i>
+                                <span class="font-medium">Shop All Products</span>
+                            </a>
+                            <a href="{% url 'wishlist' %}"
+                                class="flex items-center gap-4 px-4 py-3.5 text-gray-700 hover:bg-green-50 hover:text-green-600 rounded-xl transition-all group">
+                                <i data-lucide="heart" class="h-5 w-5 transition-transform group-hover:scale-110"></i>
+                                <span class="font-medium">My Wishlist</span>
                             </a>
                             <a href="{% url 'cart_detail' %}"
-                                class="block px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-green-600 rounded-lg transition-colors flex items-center gap-3 text-lg">
-                                <i data-lucide="shopping-cart" class="h-5 w-5"></i> Cart
+                                class="flex items-center gap-4 px-4 py-3.5 text-gray-700 hover:bg-green-50 hover:text-green-600 rounded-xl transition-all group">
+                                <i data-lucide="shopping-cart" class="h-5 w-5 transition-transform group-hover:scale-110"></i>
+                                <span class="font-medium">Shopping Cart</span>
+                                {% if request.session.cart|length > 0 %}
+                                <span class="ml-auto bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">{{ request.session.cart|length }}</span>
+                                {% endif %}
                             </a>
-                            <a href="{% url 'dashboard' %}"
-                                class="block px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-green-600 rounded-lg transition-colors flex items-center gap-3 text-lg">
-                                <i data-lucide="user" class="h-5 w-5"></i> Account
-                            </a>
-                            <div class="border-t my-4 pt-4">
-                                <a href="{% url 'about' %}"
-                                    class="block px-4 py-3 text-base text-gray-600 hover:text-green-600">About Us</a>
-                                <a href="{% url 'contact' %}"
-                                    class="block px-4 py-3 text-base text-gray-600 hover:text-green-600">Contact</a>
+
+                            <div class="h-px bg-gray-100 my-4 mx-4"></div>
+
+                            <div class="px-4 py-2">
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Account & Support</p>
+                                <a href="{% url 'dashboard' %}" class="block py-2.5 text-gray-600 hover:text-green-600 transition-colors">My Account</a>
+                                <a href="{% url 'about' %}" class="block py-2.5 text-gray-600 hover:text-green-600 transition-colors">About Al Barakah</a>
+                                <a href="{% url 'contact' %}" class="block py-2.5 text-gray-600 hover:text-green-600 transition-colors">Contact Support</a>
+                                <a href="{% url 'terms' %}" class="block py-2.5 text-gray-600 hover:text-green-600 transition-colors">Terms & Privacy</a>
                             </div>
                         </nav>
                     </div>
@@ -513,8 +603,94 @@
         </div>
     </footer>
 
+    <!-- Back to Top Button -->
+    <button id="back-to-top"
+        class="fixed bottom-20 md:bottom-8 right-4 md:right-8 z-40 p-3 bg-green-600 text-white rounded-full shadow-lg hover:bg-green-700 transition-all duration-300 opacity-0 invisible translate-y-10">
+        <i data-lucide="arrow-up" class="h-6 w-6"></i>
+    </button>
+
     <script>
         lucide.createIcons();
+
+        // Theme Toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+        const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+
+        // Check for saved theme
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+            themeToggleLightIcon.classList.remove('hidden');
+        } else {
+            document.documentElement.classList.remove('dark');
+            themeToggleDarkIcon.classList.remove('hidden');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            themeToggleDarkIcon.classList.toggle('hidden');
+            themeToggleLightIcon.classList.toggle('hidden');
+
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('color-theme', 'light');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('color-theme', 'dark');
+            }
+        });
+
+        // Mobile Menu Logic
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenuClose = document.getElementById('mobile-menu-close');
+        const mobileMenuDrawer = document.getElementById('mobile-menu-drawer');
+        const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+
+        function openMenu() {
+            mobileMenuDrawer.classList.remove('-translate-x-full');
+            mobileMenuOverlay.classList.remove('hidden');
+            setTimeout(() => mobileMenuOverlay.classList.add('opacity-100'), 10);
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeMenu() {
+            mobileMenuDrawer.classList.add('-translate-x-full');
+            mobileMenuOverlay.classList.remove('opacity-100');
+            setTimeout(() => mobileMenuOverlay.classList.add('hidden'), 300);
+            document.body.style.overflow = '';
+        }
+
+        mobileMenuBtn.addEventListener('click', openMenu);
+        mobileMenuClose.addEventListener('click', closeMenu);
+        mobileMenuOverlay.addEventListener('click', closeMenu);
+
+        // Back to Top Logic
+        const backToTopBtn = document.getElementById('back-to-top');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 400) {
+                backToTopBtn.classList.remove('opacity-0', 'invisible', 'translate-y-10');
+            } else {
+                backToTopBtn.classList.add('opacity-0', 'invisible', 'translate-y-10');
+            }
+        });
+
+        backToTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Scroll Reveal Logic
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal");
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                var elementVisible = 100;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add("active");
+                }
+            }
+        }
+        window.addEventListener("scroll", reveal);
+        document.addEventListener("DOMContentLoaded", reveal);
 
         // Google Translate
         function googleTranslateElementInit() {

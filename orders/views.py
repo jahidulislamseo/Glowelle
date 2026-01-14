@@ -64,6 +64,29 @@ def cart_add_ajax(request, product_id):
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
+@require_POST
+def cart_update(request, product_id, action):
+    cart = Cart(request)
+    product = get_object_or_404(Product, id=product_id)
+    
+    current_quantity = cart.cart.get(str(product_id), {}).get('quantity', 0)
+    
+    if action == 'increment':
+        if product.stock_quantity > current_quantity:
+            cart.add(product=product, quantity=1)
+            messages.success(request, f'Increased quantity for {product.title}')
+        else:
+            messages.error(request, f'Only {product.stock_quantity} items available in stock.')
+    elif action == 'decrement':
+        if current_quantity > 1:
+            cart.add(product=product, quantity=-1)
+            messages.success(request, f'Decreased quantity for {product.title}')
+        else:
+            cart.remove(product)
+            messages.success(request, f'Removed {product.title} from cart.')
+            
+    return redirect('cart_detail')
+
 def cart_remove(request, product_id):
     cart = Cart(request)
     product = get_object_or_404(Product, id=product_id)
