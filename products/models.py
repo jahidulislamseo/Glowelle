@@ -29,9 +29,10 @@ class Brand(models.Model):
 class Product(SEOModel):
     title = models.CharField(max_length=500)
     slug = models.SlugField(unique=True)
+    short_description = models.TextField(max_length=500, null=True, blank=True, help_text="Short summary of the product (300-500 chars)")
     description = models.TextField(null=True, blank=True)
-    price = models.FloatField(db_index=True)
-    original_price = models.FloatField(null=True, blank=True)
+    price = models.DecimalField(max_digits=12, decimal_places=2, db_index=True)
+    original_price = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
     image = models.ImageField(upload_to='products/main/', max_length=255, blank=True, null=True)
     # images field replaced by ProductImage model 
     rating = models.FloatField(default=0)
@@ -44,6 +45,15 @@ class Product(SEOModel):
     brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null=True, blank=True, related_name='products')
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['category', '-created_at'], name='prod_cat_created_idx'),
+            models.Index(fields=['category', 'price'], name='prod_cat_price_idx'),
+            models.Index(fields=['is_best_seller', '-created_at'], name='prod_bestseller_idx'),
+            models.Index(fields=['-created_at', 'in_stock'], name='prod_created_stock_idx'),
+            models.Index(fields=['in_stock', 'category'], name='prod_stock_cat_idx'),
+        ]
 
     def __str__(self):
         return self.title

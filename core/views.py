@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, redirect
 from django.core.cache import cache
 from django.http import JsonResponse
 from django.contrib.admin.views.decorators import staff_member_required
@@ -20,10 +20,27 @@ from django.template.loader import get_template
 from xhtml2pdf import pisa
 from django.contrib.admin.views.decorators import staff_member_required
 from orders.models import Order
+from .models import ContactMessage
+from django.contrib import messages
+
+def contact(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        message = request.POST.get('message')
+        
+        if name and email and message:
+            ContactMessage.objects.create(name=name, email=email, message=message)
+            messages.success(request, 'Your message has been sent successfully! We will contact you soon.')
+            return redirect('contact')
+        else:
+            messages.error(request, 'Please fill in all fields.')
+    
+    return render(request, 'pages/contact.html')
 
 @staff_member_required
 def admin_order_invoice(request, order_id):
-    order = Order.objects.get(pk=order_id)
+    order = get_object_or_404(Order, pk=order_id)
     
     # Increment download count
     order.invoice_download_count += 1
@@ -69,12 +86,12 @@ def analytics_dashboard(request):
     bounces = sessions.filter(is_bounce=True).count()
     bounce_rate = (bounces / total_sessions * 100) if total_sessions > 0 else 0
     
-    # Avg Session Duration
-    valid_sessions = sessions.filter(last_seen__gt=F('start_time'))
-    avg_duration = 0
-    if valid_sessions.exists():
-        total_seconds = sum([(s.last_seen - s.start_time).total_seconds() for s in valid_sessions])
-        avg_duration = total_seconds / valid_sessions.count() / 60 # Minutes
+    # Avg Session Duration (Database Aggregation)
+    from django.db.models import ExpressionWrapper, fields, Q
+    avg_duration_data = sessions.annotate(
+        duration=ExpressionWrapper(F('last_seen') - F('start_time'), output_field=fields.DurationField())
+    ).aggregate(avg_duration=Avg('duration'))
+    avg_duration = avg_duration_data['avg_duration'].total_seconds() / 60 if avg_duration_data['avg_duration'] else 0
 
     # Avg Page Load Time
     page_views = PageView.objects.filter(timestamp__gte=start_date)
@@ -84,80 +101,73 @@ def analytics_dashboard(request):
     devices = sessions.values('device_type').annotate(count=Count('id')).order_by('-count')
     device_data = {d['device_type']: d['count'] for d in devices}
     
-    # Simple Browser Stats (Grouping by raw string for now, ideally parsed)
-    # We will just take top 5 raw strings or ideally use 'browser' field if populated
-    # Since middleware didn't parse browser fully, we rely on what we have or user_agent
-    # For now, let's assume 'browser' field is being populated or just show OS
-    browsers = sessions.values('os').annotate(count=Count('id')).order_by('-count')[:5]
-    browser_data = {b['os'] or 'Unknown': b['count'] for b in browsers}
+    # Browser Stats (Fixed: Now using 'browser' field instead of 'os')
+    browsers = sessions.values('browser').annotate(count=Count('id')).order_by('-count')[:5]
+    browser_data = {b['browser'] or 'Unknown': b['count'] for b in browsers}
 
-    # 3. Events Logic
+    # 3. Events Logic (Optimized: Single Aggregation Query)
     events = AnalyticsEvent.objects.filter(timestamp__gte=start_date)
     
-    # Cart & Checkout Funnel
-    adds = events.filter(event_type='add_to_cart').count()
-    starts = events.filter(event_type='checkout_start').count()
-    payments = events.filter(event_type='payment_success').count()
-    
-    # Auth Stats
-    logins = events.filter(event_type='login').count()
-    signups = events.filter(event_type='signup').count()
-    
+    stats = events.aggregate(
+        adds=Count('id', filter=Q(event_type='add_to_cart')),
+        starts=Count('id', filter=Q(event_type='checkout_start')),
+        payments=Count('id', filter=Q(event_type='payment_success')),
+        logins=Count('id', filter=Q(event_type='login')),
+        signups=Count('id', filter=Q(event_type='signup')),
+        logouts=Count('id', filter=Q(event_type='logout')),
+        wishlist_adds=Count('id', filter=Q(event_type='wishlist_add')),
+        removes_from_cart=Count('id', filter=Q(event_type='remove_from_cart')),
+        coupon_usage=Count('id', filter=Q(event_type='coupon_used')),
+        payment_failed=Count('id', filter=Q(event_type='payment_failed')),
+        out_of_stock_clicks=Count('id', filter=Q(event_type='out_of_stock_click')),
+    )
+
     # Top Searches
     top_searches = events.filter(event_type='search').values('value').annotate(count=Count('id')).order_by('-count')[:5]
     
-    # Top Products (Most Viewed)
-    # Filter PageViews where url starts with /product/
-    top_products = page_views.filter(url__startswith='/product/').values('url').annotate(count=Count('id')).order_by('-count')[:8]
+    # Top Products (Most Viewed) - Clean URLs
+    raw_top_products = page_views.filter(url__startswith='/product/').values('url').annotate(count=Count('id')).order_by('-count')[:8]
+    top_products = []
+    for item in raw_top_products:
+        # Clean /product/slug/ -> slug
+        clean_name = item['url'].replace('/product/', '').strip('/')
+        top_products.append({'url': clean_name.replace('-', ' ').title(), 'count': item['count']})
 
     # 404 Errors
     errors_404 = events.filter(event_type='error_404').values('url').annotate(count=Count('id')).order_by('-count')[:5]
-
-    # 4. User Engagement
-    wishlist_adds = events.filter(event_type='wishlist_add').count()
-    removes_from_cart = events.filter(event_type='remove_from_cart').count()
-    logouts = events.filter(event_type='logout').count()
     
-    # 5. Advanced eCommerce
+    # 5. Advanced eCommerce logic
     # Abandoned Carts: Sessions with add_to_cart but NO payment_success
+    # (This still requires subquery or separate logic as it depends on session flow, keeping distinct check)
     cart_sessions = sessions.filter(events__event_type='add_to_cart')
     purchased_sessions = sessions.filter(events__event_type='payment_success')
     abandoned_carts = cart_sessions.exclude(id__in=purchased_sessions.values('id')).distinct().count()
     
-    # Coupons & Discounts
-    coupon_usage = events.filter(event_type='coupon_used').count()
-    # Also check orders table for redundancy
+    # Coupons redundancy check
     orders_with_coupon = Order.objects.filter(created_at__gte=start_date, coupon__isnull=False).count()
-    total_coupon_usage = max(coupon_usage, orders_with_coupon)
+    total_coupon_usage = max(stats['coupon_usage'], orders_with_coupon)
     
     # 6. Customer Retention
-    # New Users (Joined in period)
     new_users_count = User.objects.filter(date_joined__gte=start_date).count()
-    # Returning Users (Active in period - New)
-    # Total active users in period
     active_users_count = sessions.filter(user__isnull=False).values('user').distinct().count()
     returning_users_count = max(0, active_users_count - new_users_count)
     
-    # Repeat Customers (Placed > 1 order in period)
+    # Repeat Customers
     repeat_customers = Order.objects.filter(created_at__gte=start_date) \
         .values('user') \
         .annotate(order_count=Count('id')) \
         .filter(order_count__gt=1) \
         .count()
         
-    # 7. Operational
-    payment_failed = events.filter(event_type='payment_failed').count()
-    out_of_stock_clicks = events.filter(event_type='out_of_stock_click').count()
-    
     # Checkout Drop-off Rate
-    checkout_starts = starts
-    checkout_success = payments
+    checkout_starts = stats['starts']
+    checkout_success = stats['payments']
     drop_off_rate = 0
     if checkout_starts > 0:
         drop_off_rate = ((checkout_starts - checkout_success) / checkout_starts) * 100
 
     # User Conversion Rate
-    user_conversion_rate = (payments / total_visitors * 100) if total_visitors > 0 else 0
+    user_conversion_rate = (stats['payments'] / total_visitors * 100) if total_visitors > 0 else 0
 
     context = {
         'days': days,
@@ -169,26 +179,26 @@ def analytics_dashboard(request):
         'device_data': device_data,
         'browser_data': browser_data,
         'funnel': {
-            'adds': adds,
-            'starts': starts,
-            'sales': payments,
+            'adds': stats['adds'],
+            'starts': stats['starts'],
+            'sales': stats['payments'],
             'rate': round(user_conversion_rate, 2) if total_users > 0 else 0,
             'drop_off': round(drop_off_rate, 1)
         },
         'auth_stats': {
-            'logins': logins,
-            'signups': signups,
-            'logouts': logouts,
+            'logins': stats['logins'],
+            'signups': stats['signups'],
+            'logouts': stats['logouts'],
             'new_users': new_users_count,
             'returning_users': returning_users_count,
             'repeat_customers': repeat_customers
         },
         'ecommerce': {
-            'wishlist_adds': wishlist_adds,
+            'wishlist_adds': stats['wishlist_adds'],
             'abandoned_carts': abandoned_carts,
             'coupons': total_coupon_usage,
-            'payment_failed': payment_failed,
-            'out_of_stock': out_of_stock_clicks,
+            'payment_failed': stats['payment_failed'],
+            'out_of_stock': stats['out_of_stock_clicks'],
         },
         'top_searches': top_searches,
         'top_products': top_products,
@@ -206,17 +216,17 @@ def admin_stats_api(request):
     last_30_days = timezone.now() - timedelta(days=30)
     
     # 1. Headline KPIs
-    total_revenue_30d = Order.objects.filter(created_at__gte=last_30_days, status='delivered').aggregate(total=Sum('total'))['total'] or 0
+    total_revenue_30d = Order.objects.filter(created_at__gte=last_30_days).exclude(status__in=['cancelled', 'returned']).aggregate(total=Sum('total'))['total'] or 0
     total_orders_30d = Order.objects.filter(created_at__gte=last_30_days).count()
     total_users = User.objects.count()
     
     # Today's stats
     today_start = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
     today_orders = Order.objects.filter(created_at__gte=today_start).count()
-    today_revenue = Order.objects.filter(created_at__gte=today_start, status='delivered').aggregate(total=Sum('total'))['total'] or 0
+    today_revenue = Order.objects.filter(created_at__gte=today_start).exclude(status__in=['cancelled', 'returned']).aggregate(total=Sum('total'))['total'] or 0
     
     # 2. Sales Chart (Daily Revenue last 30 days)
-    sales_data = Order.objects.filter(created_at__gte=last_30_days, status__in=['processing', 'shipped', 'delivered']) \
+    sales_data = Order.objects.filter(created_at__gte=last_30_days).exclude(status__in=['cancelled', 'returned']) \
         .annotate(date=TruncDate('created_at')) \
         .values('date') \
         .annotate(daily_revenue=Sum('total')) \

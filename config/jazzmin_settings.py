@@ -66,6 +66,16 @@ JAZZMIN_SETTINGS = {
         {"model": "users.User"}
     ],
 
+    # Custom links to append to app groups, keyed on app name
+    "custom_links": {
+        "analytics": [{
+            "name": "Dashboard", 
+            "url": "analytics_dashboard", 
+            "icon": "fas fa-chart-line",
+            "permissions": ["analytics.view_visitorsession"]
+        }]
+    },
+
     #############
     # Side Menu #
     #############
@@ -108,6 +118,9 @@ JAZZMIN_SETTINGS = {
         "orders.Courier": "fas fa-truck",
         "marketing.HomeSlider": "fas fa-images",
         "marketing.Coupon": "fas fa-ticket-alt",
+        "marketing.DealOfTheDay": "fas fa-clock",
+        "core.SiteSettings": "fas fa-cogs",
+        "core.ContactMessage": "fas fa-envelope",
     },
     # Icons that are used when one is not specified
     "default_icon_parents": "fas fa-chevron-circle-right",

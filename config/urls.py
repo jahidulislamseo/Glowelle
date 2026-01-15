@@ -48,7 +48,7 @@ urlpatterns = [
 
     # Static Pages
     path('about/', TemplateView.as_view(template_name='pages/about.html'), name='about'),
-    path('contact/', TemplateView.as_view(template_name='pages/contact.html'), name='contact'),
+    path('contact/', core_views.contact, name='contact'),
     path('privacy/', TemplateView.as_view(template_name='pages/privacy.html'), name='privacy'),
     path('terms/', TemplateView.as_view(template_name='pages/terms.html'), name='terms'),
     path('faq/', TemplateView.as_view(template_name='pages/faq.html'), name='faq'),

@@ -27,7 +27,10 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
                         {% for gateway in gateways %}
                         <label class="relative cursor-pointer group">
-                            <input type="radio" name="gateway" value="{{ gateway.id }}" class="peer sr-only" required>
+                            <input type="radio" name="gateway" value="{{ gateway.id }}" 
+                                   data-instruction="{{ gateway.instructions|linebreaksbr }}"
+                                   data-account="{{ gateway.account_number }}"
+                                   class="peer sr-only gateway-radio" required>
                             <div
                                 class="p-4 rounded-lg border-2 border-gray-200 peer-checked:border-green-500 peer-checked:bg-green-50 transition-all hover:border-green-200 flex items-center gap-3 h-full">
                                 {% if gateway.logo %}
@@ -54,13 +57,10 @@
                         <h4 class="font-semibold text-blue-800 mb-2 flex items-center gap-2">
                             <i data-lucide="info" class="h-4 w-4"></i> Payment Instructions
                         </h4>
-                        <p class="text-sm text-blue-700">
-                            1. Go to your Mobile Banking App.<br>
-                            2. Select "Send Money" or "Payment".<br>
-                            3. Enter the number shown above.<br>
-                            4. Enter Amount: <strong>৳{{ order.total|add:60 }}</strong><br>
-                            5. Copy the Transaction ID (TrxID) and paste it below.
-                        </p>
+                        <div id="instruction-content" class="text-sm text-blue-700">
+                            <!-- Dynamic Content will be loaded here -->
+                            <p class="animate-pulse">Select a payment method to view instructions.</p>
+                        </div>
                     </div>
 
                     <div>
@@ -95,5 +95,50 @@
             <i data-lucide="lock" class="h-3 w-3 inline mr-1"></i> 256-bit SSL Encrypted Payment
         </p>
     </div>
+    </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const radios = document.querySelectorAll('.gateway-radio');
+        const instructionBox = document.getElementById('instruction-content');
+        
+        function updateInstructions(radio) {
+            let instructions = radio.dataset.instruction;
+            const account = radio.dataset.account;
+            
+            if (instructions) {
+                // Replace Placeholders
+                instructions = instructions.replace(/\[account_number\]/g, account);
+                instructions = instructions.replace(/\[amount\]/g, '৳{{ order.total|add:60 }}');
+                instructions = instructions.replace(/\[order_id\]/g, '#{{ order.id }}');
+                
+                // Allow line breaks from DB to render as <br> or paragraphs if needed
+                // Django |linebreaksbr filter handles newlines, so we just set innerHTML
+                instructionBox.innerHTML = instructions;
+            } else {
+                // Fallback (Should typically not be reached if DB is populated)
+                instructionBox.innerHTML = `
+                    <p>1. Go to your Mobile Banking App.</p>
+                    <p>2. Select "Send Money" or "Payment".</p>
+                    <p>3. Enter Number: <strong>${account}</strong></p>
+                    <p>4. Enter Amount: <strong>৳{{ order.total|add:60 }}</strong></p>
+                    <p>5. Copy the Transaction ID (TrxID) and paste it below.</p>
+                `;
+            }
+        }
+
+        radios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                updateInstructions(this);
+            });
+        });
+
+        // Auto-select first option
+        if (radios.length > 0) {
+            radios[0].checked = true;
+            updateInstructions(radios[0]);
+        }
+    });
+</script>
 {% endblock %}

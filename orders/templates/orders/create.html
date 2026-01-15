@@ -248,17 +248,18 @@
                                 <li class="flex py-4">
                                     <div
                                         class="h-16 w-16 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
-                                        <img src="{{ item.product.image.url }}" alt="{{ item.product.title }}"
-                                            class="h-full w-full object-cover object-center">
+                                        <a href="{% url 'product_detail' item.product.slug %}">
+                                            <img src="{% if item.product.image %}{{ item.product.image.url }}{% else %}https://placehold.co/100x100?text=No+Image{% endif %}" alt="{{ item.product.title }}"
+                                                class="h-full w-full object-cover object-center">
+                                        </a>
                                     </div>
                                     <div class="ml-4 flex flex-1 flex-col">
                                         <div>
                                             <div class="flex justify-between text-base font-medium text-gray-900">
-                                                <h3 class="line-clamp-1"><a href="#">{{ item.product.title }}</a></h3>
+                                                <h3 class="line-clamp-1"><a href="{% url 'product_detail' item.product.slug %}">{{ item.product.title }}</a></h3>
                                                 <p class="ml-4">৳{{ item.total_price }}</p>
                                             </div>
-                                            <p class="mt-1 text-sm text-gray-500">{{ item.quantity }} x ৳{{ item.price
-                                                }}</p>
+                                            <p class="mt-1 text-sm text-gray-500">{{ item.quantity }} x ৳{{ item.price }}</p>
                                         </div>
                                     </div>
                                 </li>

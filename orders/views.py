@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.db import transaction
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from products.models import Product
 from .cart import Cart
 from .forms import OrderCreateForm
@@ -103,7 +104,6 @@ def cart_detail(request):
 
 from marketing.models import Coupon
 from django.utils import timezone
-from django.contrib import messages
 
 @require_POST
 def coupon_apply(request):
@@ -122,7 +122,6 @@ def coupon_apply(request):
             messages.error(request, "Invalid or expired coupon code.")
     return redirect('cart_detail')
 
-@login_required
 def order_create(request):
     cart = Cart(request)
     if request.method == 'POST':
@@ -134,7 +133,8 @@ def order_create(request):
             try:
                 with transaction.atomic():
                     order = form.save(commit=False)
-                    order.user = request.user
+                    # Assign user if authenticated, else allow guest checkout
+                    order.user = request.user if request.user.is_authenticated else None
                     
                     # Apply Pricing & Discount
                     order.total = cart.get_total_price_after_discount()
@@ -211,16 +211,22 @@ def order_create(request):
         
     return render(request, 'orders/create.html', {'cart': cart, 'form': form, 'addresses': addresses})
 
-@login_required
 def payment_process(request, order_id):
-    order = get_object_or_404(Order, id=order_id, user=request.user)
+    if request.user.is_authenticated:
+        order = get_object_or_404(Order, id=order_id, user=request.user)
+    else:
+        order = get_object_or_404(Order, id=order_id)
+        
     gateways = PaymentGateway.objects.filter(is_active=True)
     return render(request, 'orders/payment.html', {'order': order, 'gateways': gateways})
 
-@login_required
 @require_POST
 def payment_success(request, order_id):
-    order = get_object_or_404(Order, id=order_id, user=request.user)
+    if request.user.is_authenticated:
+        order = get_object_or_404(Order, id=order_id, user=request.user)
+    else:
+        order = get_object_or_404(Order, id=order_id)
+
     cart = Cart(request)
     
     # Get Gateway and Trx ID
@@ -259,3 +265,19 @@ def order_detail(request, order_id):
         user=request.user
     )
     return render(request, 'orders/order_detail.html', {'order': order})
+
+from django.contrib.admin.views.decorators import staff_member_required
+from django.template.loader import render_to_string
+from django.http import HttpResponse
+from xhtml2pdf import pisa
+
+@staff_member_required
+def admin_order_pdf(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    html = render_to_string('orders/admin/invoice_pdf.html', {'order': order})
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'filename=order_{order.id}.pdf'
+    pisa_status = pisa.CreatePDF(html, dest=response)
+    if pisa_status.err:
+        return HttpResponse('We had some errors <pre>' + html + '</pre>')
+    return response

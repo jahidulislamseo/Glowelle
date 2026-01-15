@@ -55,6 +55,14 @@ class OrderAdmin(ImportExportModelAdmin):
     
     inlines = [OrderItemInline, OrderStatusHistoryInline]
     
+    # Optimization
+    list_select_related = ['user']
+    # autocomplete_fields = ['user']
+    
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        return queryset.prefetch_related('items__product')
+    
     # Organize fields for the "Standard" view (fallback or add form)
     fieldsets = (
         ('Identity', {
@@ -85,8 +93,14 @@ class OrderAdmin(ImportExportModelAdmin):
 
 
     def user_link(self, obj):
-        link = reverse("admin:users_user_change", args=[obj.user.id])
-        return format_html('<a href="{}">{}</a>', link, obj.user.username)
+        if obj.user:
+            try:
+                link = reverse("admin:users_user_change", args=[obj.user.id])
+                return format_html('<a href="{}">{}</a>', link, obj.user.username)
+            except Exception:
+                # Fallback if reverse match fails (e.g. invalid app label or admin not registered)
+                return obj.user.username
+        return f"Guest - {obj.full_name}"
     user_link.short_description = 'User'
 
     def total_display(self, obj):
@@ -131,8 +145,8 @@ class OrderAdmin(ImportExportModelAdmin):
         super().save_model(request, obj, form, change)
 
     def invoice_actions(self, obj):
-        # Placeholder for invoice URL
-        return mark_safe('<a class="button" href="#" target="_blank">PDF Invoice</a>')
+        url = reverse('admin_order_pdf', args=[obj.id])
+        return mark_safe(f'<a class="button" href="{url}" target="_blank">PDF Invoice</a>')
 
     invoice_actions.short_description = 'Invoice'
 
@@ -158,11 +172,16 @@ class OrderAdmin(ImportExportModelAdmin):
             order = Order.objects.get(pk=object_id)
             extra_context['timeline'] = order.status_history.all()
             
-            # Customer Lifetime Stats
-            user_orders = Order.objects.filter(user=order.user)
-            extra_context['customer_total_orders'] = user_orders.count()
-            extra_context['customer_lifetime_spend'] = sum(o.total for o in user_orders)
-            extra_context['customer_first_order'] = user_orders.order_by('created_at').first().created_at
+            # Customer Lifetime Stats (Only if user exists)
+            if order.user:
+                user_orders = Order.objects.filter(user=order.user)
+                extra_context['customer_total_orders'] = user_orders.count()
+                extra_context['customer_lifetime_spend'] = sum(o.total for o in user_orders)
+                extra_context['customer_first_order'] = user_orders.order_by('created_at').first().created_at
+            else:
+                 extra_context['customer_total_orders'] = 'N/A (Guest)'
+                 extra_context['customer_lifetime_spend'] = 'N/A'
+                 extra_context['customer_first_order'] = 'N/A'
             
         except Order.DoesNotExist:
             pass

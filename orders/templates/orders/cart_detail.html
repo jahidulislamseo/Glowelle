@@ -12,33 +12,38 @@
             {% for item in cart %}
             <div class="flex items-center gap-4 p-4 border rounded-lg bg-white">
                 <div
-                    class="h-24 w-24 bg-gray-100 rounded-md flex items-center justify-center shrink-0 relative overflow-hidden">
-                    <img src="{{ item.product.image }}" alt="{{ item.product.title }}"
-                        class="object-cover w-full h-full">
+                    class="h-24 w-24 bg-gray-100 rounded-lg flex items-center justify-center shrink-0 relative overflow-hidden group">
+                    {% if item.product.image %}
+                    <img src="{{ item.product.image.url }}" alt="{{ item.product.title }}"
+                        class="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110">
+                    {% else %}
+                    <img src="https://placehold.co/200x200?text=No+Image" alt="{{ item.product.title }}"
+                        class="object-cover w-full h-full opacity-50">
+                    {% endif %}
                 </div>
 
                 <div class="flex-1 min-w-0">
                     <a href="{% url 'product_detail' item.product.slug %}"
-                        class="font-semibold hover:text-green-600 truncate block">
+                        class="font-bold text-gray-900 hover:text-green-600 truncate block transition-colors">
                         {{ item.product.title }}
                     </a>
-                    <div class="text-gray-500 text-sm">{{ item.product.category.name }}</div>
-                    <div class="font-bold text-green-600 mt-1">৳{{ item.price }}</div>
+                    <div class="text-gray-500 text-xs mt-0.5">{{ item.product.category.name }}</div>
+                    <div class="font-bold text-green-600 mt-2">৳{{ item.price }}</div>
                 </div>
 
-                <div class="flex flex-col items-end gap-2">
+                <div class="flex flex-col items-end gap-3">
                     <!-- Quantity Control -->
-                    <div class="flex items-center border rounded-md bg-gray-50 overflow-hidden">
+                    <div class="flex items-center border border-gray-200 rounded-lg bg-white shadow-sm overflow-hidden">
                         <form action="{% url 'cart_update' item.product.id 'decrement' %}" method="post">
                             {% csrf_token %}
-                            <button type="submit" class="px-3 py-1 hover:bg-red-50 hover:text-red-600 transition-colors border-r">
+                            <button type="submit" class="px-3 py-1.5 hover:bg-gray-50 text-gray-500 hover:text-red-600 transition-colors border-r border-gray-200">
                                 <i data-lucide="minus" class="h-4 w-4"></i>
                             </button>
                         </form>
-                        <span class="px-4 py-1 font-bold text-gray-900 border-r">{{ item.quantity }}</span>
+                        <span class="px-4 py-1.5 font-bold text-gray-900">{{ item.quantity }}</span>
                         <form action="{% url 'cart_update' item.product.id 'increment' %}" method="post">
                             {% csrf_token %}
-                            <button type="submit" class="px-3 py-1 hover:bg-green-50 hover:text-green-600 transition-colors">
+                            <button type="submit" class="px-3 py-1.5 hover:bg-gray-50 text-gray-500 hover:text-green-600 transition-colors border-l border-gray-200">
                                 <i data-lucide="plus" class="h-4 w-4"></i>
                             </button>
                         </form>
@@ -47,8 +52,8 @@
                     <form action="{% url 'cart_remove' item.product.id %}" method="post">
                         {% csrf_token %}
                         <button type="submit" onclick="return confirm('Are you sure you want to remove this item?');"
-                            class="text-red-500 text-sm hover:underline flex items-center gap-1 p-2 -mr-2">
-                            <i data-lucide="trash-2" class="h-4 w-4"></i> Remove
+                            class="text-gray-400 text-xs hover:text-red-500 flex items-center gap-1 transition-colors">
+                            <i data-lucide="trash-2" class="h-3.5 w-3.5"></i> Remove
                         </button>
                     </form>
                 </div>
@@ -58,54 +63,68 @@
 
         <!-- Order Summary -->
         <div class="lg:col-span-1">
-            <div class="border rounded-lg p-6 bg-white sticky top-24">
-                <h2 class="text-xl font-bold mb-4">Order Summary</h2>
+            <div class="border rounded-2xl p-6 bg-white sticky top-24 shadow-sm border-gray-100">
+                <h2 class="text-xl font-bold mb-6 text-gray-900">Order Summary</h2>
 
-                <div class="space-y-2 text-sm mb-4 border-b pb-4">
-                    <div class="flex justify-between">
-                        <span class="text-gray-500">Subtotal</span>
-                        <span>৳{{ cart.get_total_price }}</span>
+                <!-- Coupon Section -->
+                <div class="mb-6">
+                    <form action="{% url 'coupon_apply' %}" method="post">
+                        {% csrf_token %}
+                        <div class="flex gap-2">
+                            <input type="text" name="code" placeholder="Enter coupon code"
+                                class="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all uppercase placeholder:normal-case">
+                            <button type="submit"
+                                class="bg-gray-900 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-black transition-colors">
+                                Apply
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="space-y-4 mb-6 border-b border-gray-50 pb-6">
+                    <div class="flex justify-between text-gray-600">
+                        <span>Subtotal</span>
+                        <span class="font-bold text-gray-900">৳{{ cart.get_total_price }}</span>
                     </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-500">Shipping</span>
-                        <span>৳60 (Estimated)</span>
+                    <div class="flex justify-between text-gray-600">
+                        <span>Delivery Fee</span>
+                        <span class="font-bold text-green-600">৳60</span>
                     </div>
                 </div>
+
                 {% with discount=cart.get_discount %}
                 {% if discount > 0 %}
-                <div class="flex justify-between text-green-600 font-medium">
-                    <span>Discount</span>
+                <div class="flex justify-between text-red-500 font-bold mb-6 bg-red-50 p-3 rounded-xl border border-red-100">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="ticket" class="h-4 w-4"></i>
+                        <span>Coupon Discount</span>
+                    </div>
                     <span>-৳{{ discount|floatformat:2 }}</span>
                 </div>
-                <div class="flex justify-between font-bold text-lg pt-2 mt-2 border-t">
+                <div class="flex justify-between font-bold text-2xl text-gray-900 mb-8 pt-4 border-t border-dashed border-gray-200">
                     <span>Total</span>
-                    <span>৳{{ cart.get_total_price_after_discount|add:60|floatformat:2 }}</span>
+                    <span class="text-green-600">৳{{ cart.get_total_price_after_discount|add:60|floatformat:2 }}</span>
                 </div>
                 {% else %}
-                <div class="flex justify-between font-bold text-lg mb-6 pt-2 border-t">
+                <div class="flex justify-between font-bold text-2xl text-gray-900 mb-8 pt-4 border-t border-dashed border-gray-200">
                     <span>Total</span>
-                    <span>৳{{ cart.get_total_price|add:60 }}</span>
+                    <span class="text-green-600">৳{{ cart.get_total_price|add:60 }}</span>
                 </div>
                 {% endif %}
                 {% endwith %}
-            </div>
 
-            <!-- Coupon Form -->
-            <form action="{% url 'coupon_apply' %}" method="post" class="mb-6">
-                {% csrf_token %}
-                <div class="flex gap-2">
-                    <input type="text" name="code" placeholder="Coupon Code"
-                        class="flex-1 border rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-green-500">
-                    <button type="submit"
-                        class="bg-gray-800 text-white px-4 py-2 rounded text-sm hover:bg-gray-700">Apply</button>
+                <a href="{% url 'order_create' %}"
+                    class="w-full bg-green-600 text-white text-center font-bold py-4 px-6 rounded-xl shadow-lg shadow-green-200 hover:bg-green-700 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2">
+                    Checkout Now
+                    <i data-lucide="arrow-right" class="h-5 w-5"></i>
+                </a>
+
+                <div class="mt-6 flex items-center justify-center gap-4">
+                    <img src="https://placehold.co/40x25?text=VISA" class="h-5 grayscale opacity-50">
+                    <img src="https://placehold.co/40x25?text=BKASH" class="h-5 grayscale opacity-50">
+                    <img src="https://placehold.co/40x25?text=COD" class="h-5 grayscale opacity-50">
                 </div>
-            </form>
-
-
-            <a href="{% url 'order_create' %}"
-                class="btn-primary block w-full text-center font-bold py-3 px-4 rounded-md shadow-md">
-                Proceed to Checkout
-            </a>
+            </div>
         </div>
     </div>
 </div>

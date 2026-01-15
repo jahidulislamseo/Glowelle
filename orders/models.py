@@ -154,7 +154,15 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True)
     
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='orders')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='orders', null=True, blank=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['user', '-created_at'], name='order_user_created_idx'),
+            models.Index(fields=['status', '-created_at'], name='order_status_created_idx'),
+            models.Index(fields=['payment_status', 'status'], name='order_payment_status_idx'),
+            models.Index(fields=['-created_at'], name='order_created_idx'),
+        ]
 
     @property
     def order_value_category(self):

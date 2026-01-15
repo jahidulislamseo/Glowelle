@@ -212,8 +212,32 @@
 
         .animation-delay-4000 {
             animation-delay: 4s;
-        }
     </style>
+</section>
+
+<!-- Category Navigation -->
+<section class="py-8 bg-gray-50 border-b border-gray-100">
+    <div class="container mx-auto px-4">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-xl font-bold text-gray-900">Shop by Category</h2>
+            <a href="{% url 'shop' %}" class="text-sm font-medium text-green-600 hover:underline">View All</a>
+        </div>
+        <div class="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+            {% for category in categories %}
+            <a href="{% url 'shop' %}?category={{ category.slug }}" 
+               class="flex-shrink-0 group flex flex-col items-center gap-3 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-green-200 transition-all min-w-[120px]">
+                <div class="h-16 w-16 bg-green-50 rounded-full flex items-center justify-center text-green-600 group-hover:bg-green-600 group-hover:text-white transition-colors duration-300">
+                    {% if category.image %}
+                        <img src="{{ category.image.url }}" alt="{{ category.name }}" class="h-10 w-10 object-contain">
+                    {% else %}
+                        <i data-lucide="layout-grid" class="h-8 w-8"></i>
+                    {% endif %}
+                </div>
+                <span class="text-sm font-semibold text-gray-700 group-hover:text-green-600 transition-colors">{{ category.name }}</span>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
 </section>
 
 <!-- Features Section (Why Choose Us) -->
@@ -268,6 +292,7 @@
     </div>
 </section>
 
+{% if deal_of_the_day and deal_of_the_day.end_date %}
 <!-- Flash Sale Strip -->
 <section class="bg-red-500 py-4 overflow-hidden relative mb-8 reveal">
     <div class="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4 text-white">
@@ -275,44 +300,46 @@
             <i data-lucide="zap" class="h-6 w-6 fill-yellow-300 text-yellow-300"></i>
             <span class="font-bold text-lg uppercase tracking-wide">Flash Sale Ends In:</span>
         </div>
-        <div class="flex gap-4 font-mono text-xl font-bold" id="countdown">
-            <div class="bg-white/20 rounded px-3 py-1 backdrop-blur-sm"><span id="cd-hours">04</span><span
+        <!-- Pass the ISO formatted date string for JS parsing -->
+        <div class="flex gap-4 font-mono text-xl font-bold" id="countdown" data-end="{{ deal_of_the_day.end_date|date:'c' }}">
+            <div class="bg-white/20 rounded px-3 py-1 backdrop-blur-sm"><span id="cd-hours">00</span><span
                     class="text-xs font-normal block text-center">Hrs</span></div>
-            <div class="bg-white/20 rounded px-3 py-1 backdrop-blur-sm"><span id="cd-minutes">32</span><span
+            <div class="bg-white/20 rounded px-3 py-1 backdrop-blur-sm"><span id="cd-minutes">00</span><span
                     class="text-xs font-normal block text-center">Min</span></div>
-            <div class="bg-white/20 rounded px-3 py-1 backdrop-blur-sm"><span id="cd-seconds">15</span><span
+            <div class="bg-white/20 rounded px-3 py-1 backdrop-blur-sm"><span id="cd-seconds">00</span><span
                     class="text-xs font-normal block text-center">Sec</span></div>
         </div>
         <script>
-            // Flash Sale Countdown
-            function startCountdown(duration) {
-                let timer = duration, hours, minutes, seconds;
-                const hoursEl = document.getElementById('cd-hours');
-                const minutesEl = document.getElementById('cd-minutes');
-                const secondsEl = document.getElementById('cd-seconds');
-
-                setInterval(function () {
-                    hours = parseInt(timer / 3600, 10);
-                    minutes = parseInt((timer % 3600) / 60, 10);
-                    seconds = parseInt(timer % 60, 10);
-
-                    hours = hours < 10 ? "0" + hours : hours;
-                    minutes = minutes < 10 ? "0" + minutes : minutes;
-                    seconds = seconds < 10 ? "0" + seconds : seconds;
-
-                    if (hoursEl) hoursEl.textContent = hours;
-                    if (minutesEl) minutesEl.textContent = minutes;
-                    if (secondsEl) secondsEl.textContent = seconds;
-
-                    if (--timer < 0) {
-                        timer = duration; // Reset or stop
-                    }
-                }, 1000);
-            }
-
-            // Start with 4 hours 32 mins 15 seconds (approx 16335 seconds)
             document.addEventListener('DOMContentLoaded', function () {
-                startCountdown(16335);
+                const countdownEl = document.getElementById('countdown');
+                if (!countdownEl) return;
+                
+                const endDateStr = countdownEl.getAttribute('data-end');
+                const endDate = new Date(endDateStr).getTime();
+
+                function updateCountdown() {
+                    const now = new Date().getTime();
+                    const distance = endDate - now;
+
+                    if (distance < 0) {
+                        // Expired
+                        document.getElementById('cd-hours').textContent = "00";
+                        document.getElementById('cd-minutes').textContent = "00";
+                        document.getElementById('cd-seconds').textContent = "00";
+                        return;
+                    }
+
+                    const hours = Math.floor(distance / (1000 * 60 * 60));
+                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                    document.getElementById('cd-hours').textContent = hours < 10 ? "0" + hours : hours;
+                    document.getElementById('cd-minutes').textContent = minutes < 10 ? "0" + minutes : minutes;
+                    document.getElementById('cd-seconds').textContent = seconds < 10 ? "0" + seconds : seconds;
+                }
+
+                setInterval(updateCountdown, 1000);
+                updateCountdown(); // Initial call
             });
         </script>
         <a href="{% url 'shop' %}"
@@ -321,6 +348,7 @@
         </a>
     </div>
 </section>
+{% endif %}
 
 <!-- Featured Products -->
 <section class="py-20 bg-white reveal" id="featured">
@@ -349,11 +377,16 @@
                 <!-- Product Image -->
                 <div class="relative aspect-square w-full overflow-hidden bg-gray-100 skeleton">
                     <a href="{% url 'product_detail' product.slug %}">
-                        <img src="{% if product.image %}{{ product.image.url }}{% else %}https://placehold.co/600?text=No+Image{% endif %}"
-                            alt="{{ product.title }}"
-                            onload="this.classList.remove('opacity-0'); this.parentElement.classList.remove('skeleton')"
-                            class="h-full w-full object-cover transition-all duration-500 group-hover:scale-105 opacity-0">
-                    </a>
+                            <img src="{% if product.image %}{{ product.image.url }}{% else %}https://placehold.co/600?text=No+Image{% endif %}"
+                                alt="{{ product.title }}"
+                                onload="this.classList.remove('opacity-0'); this.parentElement.classList.remove('skeleton')"
+                                class="h-full w-full object-cover transition-all duration-500 group-hover:scale-105 opacity-0">
+                        </a>
+                        <!-- Quick View Button -->
+                        <button onclick="openQuickView('{{ product.id }}')"
+                            class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/90 text-gray-800 px-4 py-2 rounded-full text-xs font-bold shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-green-600 hover:text-white transform translate-y-4 group-hover:translate-y-0 z-20 flex items-center gap-2 whitespace-nowrap">
+                            <i data-lucide="eye" class="h-3 w-3"></i> Quick View
+                        </button>
                     {% if product.discount_percentage %}
                     <div class="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
                         -{{ product.discount_percentage }}%
@@ -522,11 +555,16 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             {% for product in new_arrivals %}
             <div class="flex items-center gap-4 p-4 border rounded-xl hover:shadow-lg transition-shadow">
-                <div class="w-32 h-32 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 skeleton">
+                <div class="w-32 h-32 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 skeleton relative group/img">
                     <img src="{% if product.image %}{{ product.image.url }}{% else %}https://placehold.co/200?text=No+Image{% endif %}"
                         alt="{{ product.title }}" 
                         onload="this.classList.remove('opacity-0'); this.parentElement.classList.remove('skeleton')"
-                        class="w-full h-full object-cover opacity-0 transition-opacity duration-500">
+                        class="w-full h-full object-cover opacity-0 transition-opacity duration-500 group-hover/img:scale-110">
+                    <!-- Mini Quick View for flex items -->
+                    <button onclick="openQuickView('{{ product.id }}')"
+                        class="absolute inset-0 bg-black/40 text-white opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
+                        <i data-lucide="eye" class="h-6 w-6"></i>
+                    </button>
                 </div>
                 <div class="flex-1">
                     <p class="text-sm text-green-600 font-bold mb-1">NEW</p>
@@ -552,19 +590,24 @@
 </section>
 
 <!-- Promotional Banner -->
+<!-- Promotional Banner -->
+{% if deal_of_the_day %}
 <section class="py-10 container mx-auto px-4">
     <div class="relative rounded-3xl overflow-hidden bg-black h-[300px] md:h-[400px] shadow-xl group">
-        <img src="https://images.unsplash.com/photo-1573246123716-6b1782bfc499?auto=format&fit=crop&q=80&w=1000"
-            alt="Fresh Deal"
+        <img src="{% if deal_of_the_day.image %}{{ deal_of_the_day.image.url }}{% else %}https://images.unsplash.com/photo-1573246123716-6b1782bfc499?auto=format&fit=crop&q=80&w=1000{% endif %}"
+            alt="{{ deal_of_the_day.title }}"
             class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700">
         <div class="relative z-10 flex flex-col items-center justify-center h-full text-center text-white px-4">
             <span class="bg-yellow-400 text-yellow-900 px-4 py-1 rounded-full text-sm font-bold mb-6 animate-pulse">
                 LIMITED TIME OFFER
             </span>
-            <h2 class="text-4xl md:text-6xl font-bold mb-4 tracking-tight">Deal of the Day</h2>
+            <h2 class="text-4xl md:text-6xl font-bold mb-4 tracking-tight">{{ deal_of_the_day.title }}</h2>
             <p class="text-lg md:text-xl mb-8 max-w-xl text-gray-100">
-                Get up to <span class="font-bold text-yellow-400">50% OFF</span> on all fresh organic vegetables.
-                Don't miss out on nature's goodness!
+                {{ deal_of_the_day.subtitle|default:"Don't miss out on nature's goodness!" }}
+                {% if deal_of_the_day.discount_percentage %}
+                <br>
+                Get up to <span class="font-bold text-yellow-400">{{ deal_of_the_day.discount_percentage }}% OFF</span>
+                {% endif %}
             </p>
             <div class="flex gap-4">
                 <a href="{% url 'shop' %}"
@@ -575,6 +618,7 @@
         </div>
     </div>
 </section>
+{% endif %}
 
 
 
@@ -618,6 +662,11 @@
                                     onload="this.classList.remove('opacity-0'); this.parentElement.classList.remove('skeleton')"
                                     class="h-full w-full object-cover transition-all duration-500 group-hover:scale-105 opacity-0">
                             </a>
+                            <!-- Quick View Button -->
+                            <button onclick="openQuickView('{{ product.id }}')"
+                                class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/90 text-gray-800 px-4 py-2 rounded-full text-xs font-bold shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-green-600 hover:text-white transform translate-y-4 group-hover:translate-y-0 z-20 flex items-center gap-2 whitespace-nowrap">
+                                <i data-lucide="eye" class="h-3 w-3"></i> Quick View
+                            </button>
                             {% if product.discount_percentage %}
                             <div class="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
                                 -{{ product.discount_percentage }}%
@@ -739,11 +788,18 @@
                 </div>
 
                 <a href="{% url 'product_detail' product.slug %}"
-                    class="block mb-4 overflow-hidden rounded-lg aspect-square skeleton">
+                    class="block mb-4 overflow-hidden rounded-lg aspect-square skeleton relative group/savers">
                     <img src="{% if product.image %}{{ product.image.url }}{% else %}https://placehold.co/600?text=No+Image{% endif %}"
                         alt="{{ product.title }}"
                         onload="this.classList.remove('opacity-0'); this.parentElement.classList.remove('skeleton')"
-                        class="w-full h-full object-cover group-hover:scale-105 transition-all duration-500 opacity-0">
+                        class="w-full h-full object-cover group-hover:scale-105 transition-all duration-500 opacity-0 px-2 lg:px-4">
+                    <!-- Quick View Over Sale Img -->
+                    <button onclick="openQuickView('{{ product.id }}')"
+                        class="absolute inset-0 bg-black/20 opacity-0 group-hover/savers:opacity-100 transition-opacity flex items-center justify-center">
+                        <div class="bg-white/90 text-gray-800 p-2 rounded-full shadow-lg transform scale-90 group-hover/savers:scale-100 transition-transform">
+                            <i data-lucide="eye" class="h-5 w-5"></i>
+                        </div>
+                    </button>
                 </a>
 
                 <div>

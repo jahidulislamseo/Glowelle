@@ -274,8 +274,7 @@
                             <tr>
                                 <td>
                                     <div style="font-weight: 600;">{{ item.product.title }}</div>
-                                    <div style="font-size: 11px; color: var(--text-muted);">SKU: {{
-                                        item.product.slug|default:"N/A" }}</div>
+                                    <div style="font-size: 11px; color: var(--text-muted);">SKU: {{ item.product.slug|default:"N/A" }}</div>
                                 </td>
                                 <td>{{ item.quantity }}</td>
                                 <td>{{ item.price }}</td>
@@ -392,8 +391,7 @@
                     <div class="timeline-dot"></div>
                     <div class="timeline-date">{{ event.created_at|date:"M j, g:i A" }}</div>
                     <div class="timeline-status">{{ event.get_status_display }}</div>
-                    <div class="timeline-desc">{{ event.description|default:"" }} {% if event.created_by %}(by {{
-                        event.created_by.username }}){% endif %}</div>
+                    <div class="timeline-desc">{{ event.description|default:"" }} {% if event.created_by %}(by {{ event.created_by.username }}){% endif %}</div>
                 </div>
                 {% endfor %}
                 {% else %}
@@ -427,7 +425,11 @@
                 </div>
                 <div class="oms-field-row">
                     <span class="oms-label">User ID</span>
-                    <a href="{% url 'admin:users_user_change' original.user.id %}">#{{ original.user.id }}</a>
+                    {% if original.user %}
+                        <a href="{% url 'admin:users_user_change' original.user.id %}">#{{ original.user.id }}</a>
+                    {% else %}
+                        <span class="oms-value">Guest</span>
+                    {% endif %}
                 </div>
                 <div class="oms-field-row">
                     <span class="oms-label">Phone</span>
@@ -500,26 +502,22 @@
                     <span class="oms-label">Invoice #</span>
                     <span class="oms-value">{{ original.invoice_number }}</span>
                 </div>
-                <a href="{% url 'order_invoice' original.id %}" class="button"
+                <a href="{% url 'admin_order_pdf' original.id %}" class="button"
                     style="display: block; text-align: center; margin-top: 10px;">Download Invoice PDF</a>
             </div>
 
             <!-- 13. Support -->
             <div class="oms-card">
                 <h2><i class="fas fa-headset"></i> 13. Support</h2>
-                <div class="oms-field-row"><span class="oms-label">Ticket</span><span class="oms-value">{{
-                        original.support_ticket|default:"None" }}</span></div>
+                <div class="oms-field-row"><span class="oms-label">Ticket</span><span class="oms-value">{{ original.support_ticket|default:"None" }}</span></div>
             </div>
 
             <!-- 14. Automation -->
             <div class="oms-card">
                 <h2><i class="fas fa-robot"></i> 14. Automation</h2>
-                <div class="oms-field-row"><span class="oms-label">Email Sent</span><span class="oms-value">{{
-                        adminform.form.is_confirmation_email_sent }}</span></div>
-                <div class="oms-field-row"><span class="oms-label">SMS Sent</span><span class="oms-value">{{
-                        adminform.form.is_delivery_update_sent }}</span></div>
-                <div style="font-size:10px; color:#777; margin-top:5px;">{{ original.automation_logs|default:"No
-                    logs"|truncatechars:100 }}</div>
+                <div class="oms-field-row"><span class="oms-label">Email Sent</span><span class="oms-value">{{ adminform.form.is_confirmation_email_sent }}</span></div>
+                <div class="oms-field-row"><span class="oms-label">SMS Sent</span><span class="oms-value">{{ adminform.form.is_delivery_update_sent }}</span></div>
+                <div style="font-size:10px; color:#777; margin-top:5px;">{{ original.automation_logs|default:"No logs"|truncatechars:100 }}</div>
             </div>
         </div>
 </div>

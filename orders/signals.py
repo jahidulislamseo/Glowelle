@@ -22,18 +22,30 @@ def send_order_notification(sender, instance, created, **kwargs):
         return 
 
     if template:
-        html_message = render_to_string(template, {'order': instance, 'user': user, 'site_url': 'http://127.0.0.1:8000'}) # site_url hardcoded for dev
+        # For guest users, user is None. Use order details instead.
+        recipient_email = user.email if user else instance.email
+        customer_name = getattr(user, 'first_name', '') or getattr(user, 'username', '') if user else instance.full_name
+
+        context = {
+            'order': instance, 
+            'user': user, 
+            'site_url': 'http://127.0.0.1:8000',
+            'customer_name': customer_name
+        }
+
+        html_message = render_to_string(template, context)
         plain_message = strip_tags(html_message)
         
-        try:
-            send_mail(
-                subject,
-                plain_message,
-                settings.DEFAULT_FROM_EMAIL,
-                [user.email],
-                html_message=html_message,
-                fail_silently=False, # We want to see errors in dev
-            )
-            print(f"Email sent to {user.email} for Order #{instance.id}")
-        except Exception as e:
-            print(f"Failed to send email: {e}")
+        if recipient_email:
+            try:
+                send_mail(
+                    subject,
+                    plain_message,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [recipient_email],
+                    html_message=html_message,
+                    fail_silently=False, 
+                )
+                print(f"Email sent to {recipient_email} for Order #{instance.id}")
+            except Exception as e:
+                print(f"Failed to send email: {e}")

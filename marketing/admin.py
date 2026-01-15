@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import Coupon, HomeSlider
+from .models import Coupon, HomeSlider, DealOfTheDay
 
 @admin.register(Coupon)
 class CouponAdmin(admin.ModelAdmin):
@@ -19,3 +19,10 @@ class HomeSliderAdmin(admin.ModelAdmin):
             return format_html('<img src="{}" style="width: 120px; height: 50px; object-fit: cover; border-radius: 4px;" />', obj.image.url)
         return "-"
     display_image.short_description = "Preview"
+
+@admin.register(DealOfTheDay)
+class DealOfTheDayAdmin(admin.ModelAdmin):
+    list_display = ['title', 'discount_percentage', 'end_date', 'is_active', 'created_at']
+    list_editable = ['is_active', 'end_date']
+    list_filter = ['is_active', 'end_date']
+    search_fields = ['title', 'subtitle']

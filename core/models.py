@@ -37,8 +37,20 @@ class SiteSettings(models.Model):
     search_console_code = models.CharField(max_length=100, blank=True, help_text="Google verification code")
     
     # Contact (Optional based on user)
+    # Contact (Optional based on user)
     support_email = models.EmailField(blank=True)
     support_phone = models.CharField(max_length=20, blank=True)
+    address = models.TextField(blank=True, help_text="Full address (e.g. House 123, Road 4, Dhaka)")
+    
+    # Branding
+    logo = models.ImageField(upload_to='branding/', blank=True, null=True, help_text="Site Logo (Recommended height: 50px)")
+    favicon = models.ImageField(upload_to='branding/', blank=True, null=True, help_text="Browser Tab Icon (Recommended: 32x32px)")
+    
+    # Social Media
+    facebook_url = models.URLField(blank=True, help_text="Facebook Page URL")
+    instagram_url = models.URLField(blank=True, help_text="Instagram Profile URL")
+    twitter_url = models.URLField(blank=True, help_text="Twitter/X Profile URL")
+    youtube_url = models.URLField(blank=True, help_text="YouTube Channel URL")
     
     class Meta:
         verbose_name = "Site Settings"
@@ -52,3 +64,16 @@ class SiteSettings(models.Model):
         if not self.pk and SiteSettings.objects.exists():
             return
         super(SiteSettings, self).save(*args, **kwargs)
+
+class ContactMessage(models.Model):
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Message from {self.name} ({self.created_at.strftime('%Y-%m-%d')})"
+
+    class Meta:
+        ordering = ['-created_at']

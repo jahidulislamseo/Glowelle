@@ -1,11 +1,12 @@
 from django.core.cache import cache
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Category, Product, Review, Wishlist
-from marketing.models import HomeSlider
+from marketing.models import HomeSlider, DealOfTheDay
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from analytics.models import AnalyticsEvent, VisitorSession
+from django.utils import timezone
 
 def home(request):
     # Try fetching from cache first
@@ -16,6 +17,9 @@ def home(request):
         new_arrivals = list(Product.objects.select_related('category', 'brand').order_by('-created_at')[:4])
         on_sale_products = list(Product.objects.select_related('category', 'brand').filter(original_price__isnull=False)[:4])
         sliders = list(HomeSlider.objects.filter(is_active=True).order_by('sort_order'))
+        
+        # Deal of the Day
+        deal_of_the_day = DealOfTheDay.objects.filter(is_active=True, end_date__gt=timezone.now()).first()
         
         # Categorized Products for Homepage
         target_slugs = ['fruits', 'vegetables', 'meat-fish', 'personal-care', 'snacks', 'beverages', 'dairy']
@@ -40,6 +44,7 @@ def home(request):
             'on_sale_products': on_sale_products,
             'sliders': sliders,
             'categorized_products': categorized_products,
+            'deal_of_the_day': deal_of_the_day,
         }
         # Cache for 15 minutes (900 seconds)
         cache.set('home_page_data', home_data, 900)
@@ -55,7 +60,9 @@ def home(request):
     return render(request, 'products/home.html', context)
 
 def shop(request):
-    products = Product.objects.select_related('category', 'brand').all().order_by('-created_at')
+    products = Product.objects.select_related('category', 'brand')\
+        .prefetch_related('additional_images', 'reviews')\
+        .all().order_by('-created_at')
     categories = Category.objects.all()
     
     # Filter by Category
@@ -102,18 +109,36 @@ def shop(request):
                     value=query[:255]
                 )
     
+    # Pagination
+    from django.core.paginator import Paginator
+    paginator = Paginator(products, 12) # 12 products per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     # Wishlist Context
     wishlist_product_ids = []
     if request.user.is_authenticated:
         wishlist_product_ids = list(Wishlist.objects.filter(user=request.user).values_list('product_id', flat=True))
         
     context = {
-        'products': products,
+        'products': page_obj,
         'categories': categories,
         'current_category': category_slug,
         'query': query,
         'wishlist_product_ids': wishlist_product_ids,
+        'page_obj': page_obj,
     }
+
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        from django.template.loader import render_to_string
+        from django.http import JsonResponse
+        html = render_to_string('products/partials/product_list.html', context, request=request)
+        return JsonResponse({
+            'html': html,
+            'has_next': page_obj.has_next(),
+            'next_page': page_obj.next_page_number() if page_obj.has_next() else None
+        })
+
     return render(request, 'products/shop.html', context)
 
 def product_detail(request, slug):

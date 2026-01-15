@@ -62,6 +62,10 @@ class ProductAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('title',)}
     inlines = [ProductImageInline, ProductVideoInline, ProductVariantInline]
     actions = ['make_out_of_stock', 'add_stock_10']
+    
+    # Optimization
+    list_select_related = ['category', 'brand']
+    autocomplete_fields = ['category', 'brand']
 
     def make_out_of_stock(self, request, queryset):
         updated = queryset.update(stock_quantity=0, in_stock=False)
@@ -76,7 +80,7 @@ class ProductAdmin(admin.ModelAdmin):
     
     fieldsets = (
         ('General Information', {
-            'fields': ('title', 'slug', 'category', 'brand', 'description', 'price', 'original_price', 'image')
+            'fields': ('title', 'slug', 'category', 'brand', 'short_description', 'description', 'price', 'original_price', 'image')
         }),
         ('Status & Visibility', {
             'fields': ('in_stock', 'stock_quantity', 'is_new', 'is_best_seller')
@@ -98,6 +102,13 @@ class StockLogAdmin(admin.ModelAdmin):
     list_display = ['product', 'variant', 'quantity', 'reason', 'created_by', 'created_at']
     list_filter = ['reason', 'created_at']
     search_fields = ['product__title', 'reason']
+    readonly_fields = ['product', 'variant', 'quantity', 'reason', 'created_by', 'created_at']
+    
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):

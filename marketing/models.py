@@ -24,3 +24,15 @@ class HomeSlider(models.Model):
 
     def __str__(self):
         return self.title or "Slider Image"
+
+class DealOfTheDay(models.Model):
+    title = models.CharField(max_length=255, default="Deal of the Day")
+    subtitle = models.CharField(max_length=500, blank=True, null=True, help_text="e.g. Get up to 50% OFF...")
+    image = models.ImageField(upload_to='deals/', help_text="Background Banner Image (Recommended: 1000x400px)")
+    discount_percentage = models.IntegerField(default=0, help_text="e.g. 50")
+    end_date = models.DateTimeField(help_text="Countdown will end at this time")
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title

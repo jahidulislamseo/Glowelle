@@ -12,4 +12,5 @@ urlpatterns = [
     path('cart/apply-coupon/', views.coupon_apply, name='coupon_apply'),
     path('order/<int:order_id>/', views.order_detail, name='order_detail'),
     path('cart/update/<int:product_id>/<str:action>/', views.cart_update, name='cart_update'),
+    path('office/order/<int:order_id>/pdf/', views.admin_order_pdf, name='admin_order_pdf'),
 ]

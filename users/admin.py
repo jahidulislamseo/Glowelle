@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import gettext_lazy as _
-from django.db.models import Sum, Count
+from django.db.models import Sum, Count, Q
 from .models import User, Address, Wallet, SupportTicket
 
 @admin.register(User)
@@ -21,18 +21,22 @@ class UserAdmin(BaseUserAdmin):
     )
 
     def get_order_count(self, obj):
-        return obj.orders.count()
+        return getattr(obj, 'orders_count', 0)
     get_order_count.short_description = 'Orders'
     get_order_count.admin_order_field = 'orders_count'
 
     def get_total_spent(self, obj):
-        total = obj.orders.filter(status='completed').aggregate(Sum('total'))['total__sum']
+        total = getattr(obj, 'total_spent', 0)
         return f"৳ {total or 0}"
     get_total_spent.short_description = 'Total Spent'
+    get_total_spent.admin_order_field = 'total_spent'
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
-        queryset = queryset.annotate(orders_count=Count('orders'))
+        queryset = queryset.annotate(
+            orders_count=Count('orders'),
+            total_spent=Sum('orders__total', filter=Q(orders__status='delivered'))
+        )
         return queryset
 
 @admin.register(Address)

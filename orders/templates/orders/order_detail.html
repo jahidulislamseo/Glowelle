@@ -47,27 +47,85 @@
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden print-container">
             <!-- Header -->
             <div class="p-8 border-b border-gray-100 bg-gray-50/50">
-                <div class="flex justify-between items-start">
+                <div class="flex flex-col md:flex-row justify-between items-start gap-6">
                     <div>
                         <h1 class="text-2xl font-bold text-gray-900">Order #{{ order.id }}</h1>
                         <p class="text-sm text-gray-500 mt-1">Placed on {{ order.created_at|date:"F j, Y, g:i a" }}</p>
-                        <div class="mt-4">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                        <div class="mt-4 no-print">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider
                                 {% if order.status == 'pending' %}bg-yellow-100 text-yellow-800
                                 {% elif order.status == 'processing' %}bg-blue-100 text-blue-800
                                 {% elif order.status == 'shipped' %}bg-purple-100 text-purple-800
                                 {% elif order.status == 'delivered' %}bg-green-100 text-green-800
+                                {% elif order.status == 'cancelled' %}bg-red-100 text-red-800
                                 {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                <span class="w-2 h-2 rounded-full mr-2 
+                                    {% if order.status == 'pending' %}bg-yellow-500
+                                    {% elif order.status == 'processing' %}bg-blue-500
+                                    {% elif order.status == 'shipped' %}bg-purple-500
+                                    {% elif order.status == 'delivered' %}bg-green-500
+                                    {% elif order.status == 'cancelled' %}bg-red-500
+                                    {% else %}bg-gray-500{% endif %} animate-pulse"></span>
                                 {{ order.get_status_display }}
                             </span>
                         </div>
                     </div>
-                    <div class="text-right">
+                    <div class="text-left md:text-right">
                         <h2 class="text-xl font-bold text-green-600">Al Barakah Mart</h2>
                         <p class="text-sm text-gray-500">123 Green Road, Dhaka</p>
                         <p class="text-sm text-gray-500">support@albarakahmart.com</p>
                     </div>
                 </div>
+
+                <!-- Progress Bar -->
+                {% if order.status != 'cancelled' and order.status != 'returned' %}
+                <div class="mt-12 mb-4 px-4 no-print">
+                    <div class="relative">
+                        <!-- Background Line -->
+                        <div class="absolute top-1/2 left-0 w-full h-1 bg-gray-200 -translate-y-1/2 rounded-full"></div>
+                        
+                        <!-- Progress Line -->
+                        <div class="absolute top-1/2 left-0 h-1 bg-green-500 -translate-y-1/2 rounded-full transition-all duration-1000"
+                             style="width: {% if order.status == 'pending' %}0%{% elif order.status == 'processing' %}33%{% elif order.status == 'shipped' %}66%{% elif order.status == 'delivered' %}100%{% endif %}">
+                        </div>
+
+                        <!-- Steps -->
+                        <div class="relative flex justify-between">
+                            <!-- Step 1: Pending -->
+                            <div class="flex flex-col items-center">
+                                <div class="w-10 h-10 rounded-full flex items-center justify-center border-4 {% if order.status == 'pending' or order.status == 'processing' or order.status == 'shipped' or order.status == 'delivered' %}bg-green-500 border-green-100 text-white{% else %}bg-white border-gray-200 text-gray-400{% endif %} z-10 transition-colors duration-500 shadow-sm">
+                                    <i data-lucide="file-text" class="h-5 w-5"></i>
+                                </div>
+                                <span class="text-[10px] md:text-xs font-bold mt-2 text-gray-500 uppercase tracking-tighter md:tracking-normal">Pending</span>
+                            </div>
+
+                            <!-- Step 2: Processing -->
+                            <div class="flex flex-col items-center">
+                                <div class="w-10 h-10 rounded-full flex items-center justify-center border-4 {% if order.status == 'processing' or order.status == 'shipped' or order.status == 'delivered' %}bg-green-500 border-green-100 text-white{% else %}bg-white border-gray-200 text-gray-400{% endif %} z-10 transition-colors duration-500 shadow-sm">
+                                    <i data-lucide="package" class="h-5 w-5"></i>
+                                </div>
+                                <span class="text-[10px] md:text-xs font-bold mt-2 text-gray-500 uppercase tracking-tighter md:tracking-normal">Processing</span>
+                            </div>
+
+                            <!-- Step 3: Shipped -->
+                            <div class="flex flex-col items-center">
+                                <div class="w-10 h-10 rounded-full flex items-center justify-center border-4 {% if order.status == 'shipped' or order.status == 'delivered' %}bg-green-500 border-green-100 text-white{% else %}bg-white border-gray-200 text-gray-400{% endif %} z-10 transition-colors duration-500 shadow-sm">
+                                    <i data-lucide="truck" class="h-5 w-5"></i>
+                                </div>
+                                <span class="text-[10px] md:text-xs font-bold mt-2 text-gray-500 uppercase tracking-tighter md:tracking-normal">Shipped</span>
+                            </div>
+
+                            <!-- Step 4: Delivered -->
+                            <div class="flex flex-col items-center">
+                                <div class="w-10 h-10 rounded-full flex items-center justify-center border-4 {% if order.status == 'delivered' %}bg-green-500 border-green-100 text-white{% else %}bg-white border-gray-200 text-gray-400{% endif %} z-10 transition-colors duration-500 shadow-sm">
+                                    <i data-lucide="check-circle" class="h-5 w-5"></i>
+                                </div>
+                                <span class="text-[10px] md:text-xs font-bold mt-2 text-gray-500 uppercase tracking-tighter md:tracking-normal">Delivered</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
             </div>
 
             <!-- Addresses & Info -->

@@ -6,9 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- SEO & Meta Tags -->
-    <title>{% if product %}{{ product.get_meta_title }} | Al Barakah Mart{% elif category %}{{ category.get_meta_title
-        }} | Al Barakah Mart{% else %}{{ site_settings.site_title|default:"Al Barakah Mart" }} | Premium Organic
-        Grocery{% endif %}</title>
+    <title>{% if product %}{{ product.get_meta_title }} | Al Barakah Mart{% elif category %}{{ category.get_meta_title }} | Al Barakah Mart{% else %}{{ site_settings.site_title|default:"Al Barakah Mart" }} | Premium Organic Grocery{% endif %}</title>
     <meta name="description"
         content="{% if product %}{{ product.get_meta_description }}{% elif category %}{{ category.get_meta_description }}{% else %}{{ site_settings.meta_description|default:'Your one-stop shop for fresh organic fruits, vegetables, meat, and daily essentials in Dhaka.' }}{% endif %}">
     <link rel="canonical" href="{{ request.build_absolute_uri }}">
@@ -72,7 +70,7 @@
       "@type": "Organization",
       "name": "{{ site_settings.site_title|default:'Al Barakah Mart' }}",
       "url": "{{ request.scheme }}://{{ request.get_host }}",
-      "logo": "{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo.png' %}",
+      "logo": "{% if site_settings.logo %}{{ request.scheme }}://{{ request.get_host }}{{ site_settings.logo.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo.png' %}{% endif %}",
       "contactPoint": {
         "@type": "ContactPoint",
         "telephone": "{{ site_settings.support_phone|default:'+880 1234 567890' }}",
@@ -129,7 +127,11 @@
     </script>
 
     <!-- Favicon -->
+    {% if site_settings.favicon %}
+    <link rel="shortcut icon" href="{{ site_settings.favicon.url }}" type="image/png">
+    {% else %}
     <link rel="shortcut icon" href="{% static 'images/logo.png' %}" type="image/png">
+    {% endif %}
 
     <!-- Tailwind CSS (CDN for immediate Dark Mode support) -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -324,6 +326,25 @@
     <!-- Navbar (Matching Header.tsx) -->
     <header
         class="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur shadow-sm dark:bg-gray-900/95 dark:border-gray-800 transition-colors duration-200">
+        <!-- Benefit Bar Section -->
+        <div class="bg-green-600 text-white text-[10px] sm:text-xs py-1.5 overflow-hidden">
+            <div class="container mx-auto px-4">
+                <div class="flex items-center justify-center sm:justify-between gap-4 animate-pulse">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="truck" class="h-3 w-3 sm:h-4 sm:w-4"></i>
+                        <span>FREE DELIVERY ABOVE ৳1000</span>
+                    </div>
+                    <div class="hidden sm:flex items-center gap-2">
+                        <i data-lucide="shield-check" class="h-4 w-4"></i>
+                        <span>100% SECURE PAYMENT</span>
+                    </div>
+                    <div class="hidden md:flex items-center gap-2">
+                        <i data-lucide="headset" class="h-4 w-4"></i>
+                        <span>24/7 CUSTOMER SUPPORT</span>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="container mx-auto px-4 md:px-6">
             <div class="flex h-16 items-center justify-between gap-4">
 
@@ -408,7 +429,11 @@
 
 
                     <a href="{% url 'home' %}" class="flex items-center gap-2">
+                        {% if site_settings.logo %}
+                        <img src="{{ site_settings.logo.url }}" alt="{{ site_settings.site_title }}" class="h-12 w-auto">
+                        {% else %}
                         <img src="{% static 'images/logo.png' %}" alt="Al Barakah Mart" class="h-12 w-auto">
+                        {% endif %}
                     </a>
                 </div>
 
@@ -456,8 +481,7 @@
                         {% if request.session.cart|length > 0 %}
                         <!-- Badge -->
                         <span
-                            class="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold shadow-sm pointer-events-none">{{
-                            request.session.cart|length }}</span>
+                            class="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold shadow-sm pointer-events-none">{{ request.session.cart|length }}</span>
                         {% endif %}
                         <span class="sr-only">Cart</span>
                     </a>
@@ -533,22 +557,38 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <!-- Brand Info -->
                 <div class="space-y-4">
-                    <h3 class="text-xl font-bold text-green-600">Al Barakah Mart</h3>
-                    <p class="text-sm text-gray-500">Your one-stop shop for fresh organic fruits, vegetables, meat, and
-                        daily essentials.</p>
+                    {% if site_settings.logo %}
+                        <img src="{{ site_settings.logo.url }}" alt="{{ site_settings.site_title }}" class="h-10 w-auto">
+                    {% else %}
+                        <h3 class="text-xl font-bold text-green-600">{{ site_settings.site_title }}</h3>
+                    {% endif %}
+                    
+                    <p class="text-sm text-gray-500">{{ site_settings.meta_description|default:"Your one-stop shop for fresh organic fruits, vegetables, meat, and daily essentials." }}</p>
+                    
                     <div class="flex space-x-4">
-                        <a href="https://facebook.com" target="_blank"
+                        {% if site_settings.facebook_url %}
+                        <a href="{{ site_settings.facebook_url }}" target="_blank"
                             class="h-11 w-11 text-gray-500 hover:text-green-600 flex items-center justify-center transition-colors border border-gray-200 rounded-lg hover:border-green-200 hover:bg-green-50"><i
                                 data-lucide="facebook" class="h-5 w-5"></i></a>
-                        <a href="https://instagram.com" target="_blank"
+                        {% endif %}
+                        
+                        {% if site_settings.instagram_url %}
+                        <a href="{{ site_settings.instagram_url }}" target="_blank"
                             class="h-11 w-11 text-gray-500 hover:text-green-600 flex items-center justify-center transition-colors border border-gray-200 rounded-lg hover:border-green-200 hover:bg-green-50"><i
                                 data-lucide="instagram" class="h-5 w-5"></i></a>
-                        <a href="https://twitter.com" target="_blank"
+                        {% endif %}
+                        
+                        {% if site_settings.twitter_url %}
+                        <a href="{{ site_settings.twitter_url }}" target="_blank"
                             class="h-11 w-11 text-gray-500 hover:text-green-600 flex items-center justify-center transition-colors border border-gray-200 rounded-lg hover:border-green-200 hover:bg-green-50"><i
                                 data-lucide="twitter" class="h-5 w-5"></i></a>
-                        <a href="https://youtube.com" target="_blank"
+                        {% endif %}
+                        
+                        {% if site_settings.youtube_url %}
+                        <a href="{{ site_settings.youtube_url }}" target="_blank"
                             class="h-11 w-11 text-gray-500 hover:text-green-600 flex items-center justify-center transition-colors border border-gray-200 rounded-lg hover:border-green-200 hover:bg-green-50"><i
                                 data-lucide="youtube" class="h-5 w-5"></i></a>
+                        {% endif %}
                     </div>
                 </div>
 
@@ -571,13 +611,13 @@
                     <h4 class="font-semibold mb-4">Contact Info</h4>
                     <ul class="space-y-2 text-sm text-gray-500">
                         <li class="flex items-center gap-2"><i data-lucide="map-pin" class="h-4 w-4 text-green-600"></i>
-                            <span>Dhaka, Bangladesh</span>
+                            <span>{{ site_settings.address|default:"Dhaka, Bangladesh" }}</span>
                         </li>
                         <li class="flex items-center gap-2"><i data-lucide="phone" class="h-4 w-4 text-green-600"></i>
-                            <span>+880 1234 567890</span>
+                            <span>{{ site_settings.support_phone|default:"+880 1234 567890" }}</span>
                         </li>
                         <li class="flex items-center gap-2"><i data-lucide="mail" class="h-4 w-4 text-green-600"></i>
-                            <span>contact@albarakah.bd</span>
+                            <span>{{ site_settings.support_email|default:"contact@albarakah.bd" }}</span>
                         </li>
                     </ul>
                 </div>
@@ -609,8 +649,53 @@
         <i data-lucide="arrow-up" class="h-6 w-6"></i>
     </button>
 
+    <!-- Quick View Modal -->
+    <div id="quick-view-modal" class="fixed inset-0 z-[60] hidden">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeQuickView()"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl p-4">
+            <div class="bg-white rounded-2xl shadow-2xl overflow-hidden relative">
+                <button onclick="closeQuickView()" class="absolute top-4 right-4 z-10 p-2 hover:bg-gray-100 rounded-full transition-colors">
+                    <i data-lucide="x" class="h-6 w-6 text-gray-500"></i>
+                </button>
+                <div id="quick-view-content" class="min-h-[400px]">
+                    <!-- Content loaded via AJAX -->
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         lucide.createIcons();
+
+        // Quick View Logic
+        function openQuickView(productId) {
+            const modal = document.getElementById('quick-view-modal');
+            const content = document.getElementById('quick-view-content');
+            
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            
+            content.innerHTML = `
+                <div class="flex items-center justify-center min-h-[400px]">
+                    <div class="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-b-green-600"></div>
+                </div>
+            `;
+            
+            fetch(`/product/quick-view/${productId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    content.innerHTML = data.html;
+                    lucide.createIcons();
+                })
+                .catch(error => {
+                    content.innerHTML = '<div class="p-8 text-center text-red-500 font-bold">Error loading product details. Please try again.</div>';
+                });
+        }
+
+        function closeQuickView() {
+            document.getElementById('quick-view-modal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
 
         // Theme Toggle
         const themeToggle = document.getElementById('theme-toggle');
