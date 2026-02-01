@@ -216,91 +216,6 @@
     </style>
 </section>
 
-<!-- Category Navigation (Carousel) -->
-<section class="py-12 bg-gray-50 border-b border-gray-100">
-    <div class="container mx-auto px-4 relative group/section">
-        <div class="flex items-center justify-between mb-8">
-            <h2 class="text-2xl font-bold text-gray-900">Shop by Category</h2>
-            <div class="flex items-center gap-2">
-                <a href="{% url 'shop' %}"
-                    class="text-sm font-medium text-green-600 hover:text-green-700 hover:underline">View All</a>
-            </div>
-        </div>
-
-        <div class="relative">
-            <!-- Scroll Buttons -->
-            <button onclick="scrollCategories('left')"
-                class="absolute left-0 top-1/2 -translate-y-1/2 -ml-4 z-10 bg-white/90 hover:bg-white text-gray-700 p-2 rounded-full shadow-lg border border-gray-100 opacity-0 group-hover/section:opacity-100 transition-all duration-300 hover:scale-110 disabled:opacity-0 hidden md:block"
-                aria-label="Scroll Left">
-                <i data-lucide="chevron-left" class="h-6 w-6"></i>
-            </button>
-
-            <button onclick="scrollCategories('right')"
-                class="absolute right-0 top-1/2 -translate-y-1/2 -mr-4 z-10 bg-white/90 hover:bg-white text-gray-700 p-2 rounded-full shadow-lg border border-gray-100 opacity-0 group-hover/section:opacity-100 transition-all duration-300 hover:scale-110 hidden md:block"
-                aria-label="Scroll Right">
-                <i data-lucide="chevron-right" class="h-6 w-6"></i>
-            </button>
-
-            <!-- Scroll Container -->
-            <div id="category-scroll-container"
-                class="flex gap-6 overflow-x-auto pb-8 pt-4 scrollbar-hide scroll-smooth px-2">
-                {% for category in categories %}
-                <a href="{% url 'shop' %}?category={{ category.slug }}"
-                    class="flex-shrink-0 group flex flex-col items-center w-[120px] md:w-[140px] px-2 transition-all duration-300 hover:-translate-y-2">
-
-                    <!-- Image Card -->
-                    <div
-                        class="h-28 w-28 md:h-32 md:w-32 rounded-full bg-white border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] group-hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] group-hover:border-green-200 overflow-hidden flex items-center justify-center transition-all duration-500 relative mb-4">
-                        <div
-                            class="absolute inset-0 bg-green-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        </div>
-                        {% if category.image %}
-                        <img src="{{ category.image.url }}" alt="{{ category.name }}"
-                            class="h-14 w-14 md:h-16 md:w-16 object-contain relative z-10 transform group-hover:scale-110 transition-transform duration-500">
-                        {% else %}
-                        <i data-lucide="layout-grid" class="h-8 w-8 md:h-10 md:w-10 text-green-600 relative z-10"></i>
-                        {% endif %}
-                    </div>
-
-                    <!-- Text -->
-                    <h3
-                        class="text-center font-bold text-gray-700 group-hover:text-green-700 transition-colors text-sm md:text-base leading-tight px-1">
-                        {{ category.name }}
-                    </h3>
-                </a>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
-
-    <style>
-        /* Hide scrollbar for Chrome, Safari and Opera */
-        .scrollbar-hide::-webkit-scrollbar {
-            display: none;
-        }
-
-        /* Hide scrollbar for IE, Edge and Firefox */
-        .scrollbar-hide {
-            -ms-overflow-style: none;
-            /* IE and Edge */
-            scrollbar-width: none;
-            /* Firefox */
-        }
-    </style>
-</section>
-
-<script>
-    function scrollCategories(direction) {
-        const container = document.getElementById('category-scroll-container');
-        const scrollAmount = 300; // Adjust as needed
-
-        if (direction === 'left') {
-            container.scrollLeft -= scrollAmount;
-        } else {
-            container.scrollLeft += scrollAmount;
-        }
-    }
-</script>
 
 <!-- Features Section (Why Choose Us) -->
 <section class="py-12 bg-white border-b border-gray-100">
@@ -356,7 +271,7 @@
 
 {% if deal_of_the_day and deal_of_the_day.end_date %}
 <!-- Flash Sale Strip -->
-<section class="bg-red-500 py-4 overflow-hidden relative mb-8 reveal">
+<section class="bg-red-500 py-4 overflow-hidden relative mb-8 ">
     <div class="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4 text-white">
         <div class="flex items-center gap-3 animate-pulse">
             <i data-lucide="zap" class="h-6 w-6 fill-yellow-300 text-yellow-300"></i>
@@ -414,7 +329,7 @@
 {% endif %}
 
 <!-- Featured Products -->
-<section class="py-20 bg-white reveal" id="featured">
+<section class="py-20 bg-white " id="featured">
     <div class="container mx-auto px-4">
         <div class="flex justify-between items-end mb-12">
             <div class="max-w-2xl">
@@ -443,7 +358,8 @@
                     <a href="{% url 'product_detail' product.slug %}">
                         <img src="{% if product.image %}{{ product.image.url }}{% else %}https://placehold.co/600?text=No+Image{% endif %}"
                             alt="{{ product.title }}"
-                            onload="this.classList.remove('opacity-0'); this.parentElement.classList.remove('skeleton')"
+                            onload="this.classList.remove('opacity-0'); this.closest('.skeleton').classList.remove('skeleton')"
+                            onerror="this.closest('.skeleton').classList.remove('skeleton')"
                             class="h-full w-full object-cover transition-all duration-500 group-hover:scale-105 opacity-0">
                     </a>
                     <!-- Quick View Button -->
@@ -502,7 +418,7 @@
 </section>
 
 <!-- Testimonials Section -->
-<section class="py-20 bg-gray-50 border-t border-gray-100 reveal">
+<section class="py-20 bg-gray-50 border-t border-gray-100 ">
     <div class="container mx-auto px-4">
         <div class="text-center mb-16">
             <h2 class="text-3xl font-bold mb-4">What Our Clients Say</h2>
@@ -589,16 +505,17 @@
 
 
 <!-- New Arrivals Split Section -->
-<section class="py-20 bg-white reveal">
+<section class="py-20 bg-white ">
     <div class="container mx-auto px-4">
         <h2 class="text-3xl font-bold mb-8">Fresh Arrivals</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             {% for product in new_arrivals %}
             <div class="flex items-center gap-4 p-4 border rounded-xl hover:shadow-lg transition-shadow">
                 <div class="w-32 h-32 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 skeleton relative group/img">
-                    <img src="{% if product.image %}{{ product.image.url }}{% else %}https://placehold.co/200?text=No+Image{% endif %}"
+                        <img src="{% if product.image %}{{ product.image.url }}{% else %}https://placehold.co/200?text=No+Image{% endif %}"
                         alt="{{ product.title }}"
-                        onload="this.classList.remove('opacity-0'); this.parentElement.classList.remove('skeleton')"
+                        onload="this.classList.remove('opacity-0'); this.closest('.skeleton').classList.remove('skeleton')"
+                        onerror="this.closest('.skeleton').classList.remove('skeleton')"
                         class="w-full h-full object-cover opacity-0 transition-opacity duration-500 group-hover/img:scale-110">
                     <!-- Mini Quick View for flex items -->
                     <button onclick="openQuickView('{{ product.id }}')"
@@ -664,7 +581,7 @@
 
 <!-- Categorized Products Loop -->
 <!-- Categorized Products Tabbed Section -->
-<section class="py-20 bg-white border-t border-gray-100 reveal">
+<section class="py-20 bg-white border-t border-gray-100 ">
     <div class="container mx-auto px-4">
         <div class="text-center mb-12">
             <h2 class="text-3xl font-bold mb-4">Shop by Category</h2>
@@ -701,7 +618,8 @@
                             <a href="{% url 'product_detail' product.slug %}">
                                 <img src="{% if product.image %}{{ product.image.url }}{% else %}https://placehold.co/600?text=No+Image{% endif %}"
                                     alt="{{ product.title }}"
-                                    onload="this.classList.remove('opacity-0'); this.parentElement.classList.remove('skeleton')"
+                                    onload="this.classList.remove('opacity-0'); this.closest('.skeleton').classList.remove('skeleton')"
+                                    onerror="this.closest('.skeleton').classList.remove('skeleton')"
                                     class="h-full w-full object-cover transition-all duration-500 group-hover:scale-105 opacity-0">
                             </a>
                             <!-- Quick View Button -->
@@ -817,7 +735,7 @@
 </script>
 
 <!-- On Sale / Best Value Section -->
-<section class="py-20 bg-green-50 reveal">
+<section class="py-20 bg-green-50 ">
     <div class="container mx-auto px-4">
         <div class="flex justify-between items-end mb-12">
             <div>
@@ -833,16 +751,18 @@
             {% for product in on_sale_products %}
             <div
                 class="bg-white rounded-lg p-4 relative border border-gray-100 group hover:border-green-200 transition-colors">
-                <div class="absolute top-4 left-4 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
-                    SALE
-                </div>
-
                 <a href="{% url 'product_detail' product.slug %}"
                     class="block mb-4 overflow-hidden rounded-lg aspect-square skeleton relative group/savers">
                     <img src="{% if product.image %}{{ product.image.url }}{% else %}https://placehold.co/600?text=No+Image{% endif %}"
                         alt="{{ product.title }}"
-                        onload="this.classList.remove('opacity-0'); this.parentElement.classList.remove('skeleton')"
+                        onload="this.classList.remove('opacity-0'); this.closest('.skeleton').classList.remove('skeleton')"
+                        onerror="this.closest('.skeleton').classList.remove('skeleton')"
                         class="w-full h-full object-cover group-hover:scale-105 transition-all duration-500 opacity-0 px-2 lg:px-4">
+                    
+                    <div class="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm z-10">
+                        SALE
+                    </div>
+
                     <!-- Quick View Over Sale Img -->
                     <button onclick="openQuickView('{{ product.id }}')"
                         class="absolute inset-0 bg-black/20 opacity-0 group-hover/savers:opacity-100 transition-opacity flex items-center justify-center">
@@ -929,7 +849,7 @@
     </section>
 
     <!-- FAQ Section -->
-    <section class="py-20 bg-white reveal">
+    <section class="py-20 bg-white ">
         <div class="container mx-auto px-4 max-w-4xl">
             <div class="text-center mb-12">
                 <h2 class="text-3xl font-bold mb-4">Frequently Asked Questions</h2>

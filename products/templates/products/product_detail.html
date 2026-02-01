@@ -1,460 +1,742 @@
-{% extends 'base.html' %}
-{% load markdownify %}
-
-{% block content %}
+{% extends 'base.html' %} {% load markdownify %} {% block content %}
 <div class="container mx-auto px-4 py-8">
-    <!-- Breadcrumb -->
-    <nav class="flex mb-8 text-sm text-gray-500" aria-label="Breadcrumb">
-        <ol class="inline-flex items-center space-x-1 md:space-x-3">
-            <li class="inline-flex items-center">
-                <a href="{% url 'home' %}" class="hover:text-green-600 flex items-center gap-1">
-                    <i data-lucide="home" class="h-3 w-3"></i> Home
-                </a>
-            </li>
-            <li>
-                <div class="flex items-center">
-                    <i data-lucide="chevron-right" class="h-4 w-4 text-gray-400"></i>
-                    <a href="{% url 'shop' %}" class="ml-1 md:ml-2 hover:text-green-600">Shop</a>
-                </div>
-            </li>
-            <li>
-                <div class="flex items-center">
-                    <i data-lucide="chevron-right" class="h-4 w-4 text-gray-400"></i>
-                    <a href="{% url 'shop' %}?category={{ product.category.slug }}"
-                        class="ml-1 md:ml-2 hover:text-green-600">{{ product.category.name }}</a>
-                </div>
-            </li>
-            <li aria-current="page">
-                <div class="flex items-center">
-                    <i data-lucide="chevron-right" class="h-4 w-4 text-gray-400"></i>
-                    <span class="ml-1 md:ml-2 font-medium text-gray-900 truncate max-w-[200px]">{{ product.title }}</span>
-                </div>
-            </li>
-        </ol>
-    </nav>
+  <!-- Breadcrumb -->
+  <nav class="flex mb-8 text-sm text-gray-500" aria-label="Breadcrumb">
+    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+      <li class="inline-flex items-center">
+        <a
+          href="{% url 'home' %}"
+          class="hover:text-green-600 flex items-center gap-1"
+        >
+          <i data-lucide="home" class="h-3 w-3"></i> Home
+        </a>
+      </li>
+      <li>
+        <div class="flex items-center">
+          <i data-lucide="chevron-right" class="h-4 w-4 text-gray-400"></i>
+          <a href="{% url 'shop' %}" class="ml-1 md:ml-2 hover:text-green-600"
+            >Shop</a
+          >
+        </div>
+      </li>
+      <li>
+        <div class="flex items-center">
+          <i data-lucide="chevron-right" class="h-4 w-4 text-gray-400"></i>
+          <a
+            href="{% url 'shop' %}?category={{ product.category.slug }}"
+            class="ml-1 md:ml-2 hover:text-green-600"
+            >{{ product.category.name }}</a
+          >
+        </div>
+      </li>
+      <li aria-current="page">
+        <div class="flex items-center">
+          <i data-lucide="chevron-right" class="h-4 w-4 text-gray-400"></i>
+          <span
+            class="ml-1 md:ml-2 font-medium text-gray-900 truncate max-w-[200px]"
+            >{{ product.title }}</span
+          >
+        </div>
+      </li>
+    </ol>
+  </nav>
 
-    <div class="grid md:grid-cols-2 gap-8 lg:gap-12 mb-16">
+  <div class="grid md:grid-cols-2 gap-8 lg:gap-12 mb-16">
         <!-- Image Gallery -->
         <div class="space-y-4">
-            <div class="aspect-square relative bg-white border rounded-lg overflow-hidden group cursor-zoom-in">
+            <div class="aspect-square relative bg-white border rounded-lg overflow-hidden group cursor-pointer">
                 {% if product.is_new %}
                 <span
                     class="absolute top-4 left-4 bg-green-600 text-white text-xs font-bold px-2 py-1 rounded-full z-10">New</span>
                 {% endif %}
-                <img id="main-image" src="{{ product.image.url }}" alt="{{ product.title }}"
-                    class="object-cover w-full h-full transition-transform duration-500 group-hover:scale-125 origin-center">
-            </div>
-            {% if product.additional_images.exists %}
-            <div class="grid grid-cols-4 gap-4">
-                {% for img in product.additional_images.all %}
-                <button onclick="document.getElementById('main-image').src='{{ img.image.url }}'"
-                    class="aspect-square relative border rounded-md overflow-hidden hover:border-green-600 transition-colors">
-                    <img src="{{ img.image.url }}" alt="Thumbnail" class="object-cover w-full h-full">
-                </button>
-                {% endfor %}
-            </div>
-            {% endif %}
-        </div>
-
-        <!-- Product Info -->
-        <div class="space-y-6">
-            <div>
-                <h1 class="text-3xl font-bold text-gray-900">{{ product.title }}</h1>
-                <div class="flex items-center gap-4 mt-2">
-                    <div class="flex items-center gap-1">
-                        <i data-lucide="star" class="h-4 w-4 fill-yellow-400 text-yellow-400"></i>
-                        <span class="font-medium">{{ product.rating|default:"5.0" }}</span>
-                        <span class="text-gray-500">({{ product.reviews_count }} reviews)</span>
-                    </div>
-                    {% if product.stock_quantity > 0 %}
-                    <div class="flex items-center gap-1 text-green-600 text-sm font-medium">
-                        <i data-lucide="check" class="h-4 w-4"></i> In Stock ({{ product.stock_quantity }} available)
-                    </div>
-                    {% else %}
-                    <div class="flex items-center gap-1 text-red-500 text-sm font-medium">
-                        <i data-lucide="x-circle" class="h-4 w-4"></i> Out of Stock
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-
-
-            <div class="flex items-end gap-3">
-                <span class="text-4xl font-bold text-green-600">৳{{ product.price }}</span>
-                {% if product.original_price %}
-                <span class="text-xl text-gray-400 line-through mb-1">৳{{ product.original_price }}</span>
-                {% endif %}
-            </div>
-
-            <div class="prose prose-sm text-gray-600 prose-text">
-                {% if product.short_description %}
-                {{ product.short_description|markdownify }}
-                {% else %}
-                {{ product.description|truncatewords_html:50|markdownify }}
-                {% endif %}
-                <ul class="list-disc pl-4 mt-2 space-y-2">
-                    <li>100% Organic & Fresh</li>
-                    <li>Quality Checked</li>
-                    <li>Secure Packaging</li>
-                </ul>
-            </div>
-
-
-            <!-- Add to Cart Section -->
-            <div class="pt-4 border-t border-b py-4 space-y-4">
-                <div class="flex items-center gap-4">
-                    <span class="font-medium text-gray-700">Quantity:</span>
-                    <div class="flex items-center border-2 border-green-600 rounded-lg overflow-hidden bg-white">
-                        <button type="button" class="px-5 py-3 bg-green-600 text-white font-bold text-xl hover:bg-green-700 transition-colors" onclick="decrementQty()">
-                            −
-                        </button>
-                        <span id="qty-display" class="w-20 text-center font-bold text-2xl text-gray-800">1</span>
-                        <button type="button" class="px-5 py-3 bg-green-600 text-white font-bold text-xl hover:bg-green-700 transition-colors" onclick="incrementQty()">
-                            +
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="flex gap-4">
-                {% if product.stock_quantity > 0 %}
-                <form action="{% url 'cart_add' product.id %}" method="post" class="flex-1">
-                    {% csrf_token %}
-                    <input type="hidden" name="quantity" value="1" id="qty-input">
-                    <button type="submit"
-                        class="btn-primary flex-1 inline-flex items-center justify-center whitespace-nowrap font-medium rounded-md px-8 w-full text-lg h-12 gap-2 shadow-lg">
-                        <i data-lucide="shopping-cart" class="h-5 w-5"></i>
-                        Add to Cart
-                    </button>
-                </form>
-                {% else %}
-                <button type="button" disabled
-                    class="btn-primary flex-1 inline-flex items-center justify-center whitespace-nowrap font-medium rounded-md px-8 w-full text-lg h-12 gap-2 shadow-lg">
-                    Out of Stock
-                </button>
-                {% endif %}
-
-                <a href="{% url 'toggle_wishlist' product.id %}"
-                    class="wishlist-btn inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 cursor-pointer border rounded-md px-6 h-12 {% if is_in_wishlist %}border-red-200 bg-red-50 text-red-500 hover:bg-red-100{% else %}border-gray-200 bg-white hover:bg-gray-100 text-gray-500{% endif %}">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                        class="lucide lucide-heart h-5 w-5 {% if is_in_wishlist %}fill-current{% endif %}">
-                        <path
-                            d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5">
-                        </path>
-                    </svg>
-                </a>
-
-                <button
-                    class="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 cursor-pointer hover:bg-gray-100 rounded-md px-6 h-12 border border-gray-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                        class="lucide lucide-share2 h-5 w-5">
-                        <circle cx="18" cy="5" r="3"></circle>
-                        <circle cx="6" cy="12" r="3"></circle>
-                        <circle cx="18" cy="19" r="3"></circle>
-                        <line x1="8.59" x2="15.42" y1="13.51" y2="17.49"></line>
-                        <line x1="15.41" x2="8.59" y1="6.51" y2="10.49"></line>
-                    </svg>
-                </button>
-            </div>
-
-            <script>
-                function incrementQty() {
-                    const display = document.getElementById('qty-display');
-                    const input = document.getElementById('qty-input');
-                    let val = parseInt(display.innerText);
-                    val++;
-                    display.innerText = val;
-                    input.value = val;
-                }
-                function decrementQty() {
-                    const display = document.getElementById('qty-display');
-                    const input = document.getElementById('qty-input');
-                    let val = parseInt(display.innerText);
-                    if (val > 1) {
-                        val--;
-                        display.innerText = val;
-                        input.value = val;
-                    }
-                }
-            </script>
-
-            <!-- Additional Action Buttons -->
-            <div class="space-y-3 mt-6">
-                <!-- Cash on Delivery Button -->
-                <a href="{% url 'order_create' %}" 
-                    class="w-full flex items-center justify-center gap-3 bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 px-6 rounded-lg transition-all shadow-md hover:shadow-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6">
-                        <rect width="20" height="14" x="2" y="5" rx="2"></rect>
-                        <line x1="2" x2="22" y1="10" y2="10"></line>
-                    </svg>
-                    <span>ক্যাশ অন ডেলিভারিতে অর্ডার করুন</span>
-                </a>
-
-                <!-- Messenger & WhatsApp Buttons -->
-                <div class="grid grid-cols-2 gap-3">
-                    <!-- Messenger Button -->
-                    <a href="https://m.me/YOUR_PAGE_ID" target="_blank"
-                        class="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-all shadow-md hover:shadow-lg">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 2C6.5 2 2 6.14 2 11.25c0 2.88 1.44 5.45 3.69 7.14V22l3.59-1.97c.95.26 1.96.4 3.02.4 5.5 0 10-4.14 10-9.25S17.5 2 12 2zm1.03 12.41l-2.49-2.65-4.86 2.65 5.35-5.67 2.55 2.65 4.8-2.65-5.35 5.67z"/>
-                        </svg>
-                        <span>Chat with us</span>
-                    </a>
-
-                    <!-- WhatsApp Button -->
-                    <a href="https://wa.me/8801234567890" target="_blank"
-                        class="flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-lg transition-all shadow-md hover:shadow-lg">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-                        </svg>
-                        <span>WhatsApp Us</span>
-                    </a>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-4 text-sm text-gray-500 pt-6 border-t mt-6">
-                <div class="flex items-center gap-3 p-3 bg-green-50 rounded-xl">
-                    <i data-lucide="truck" class="h-5 w-5 text-green-600"></i>
-                    <div>
-                        <p class="font-bold text-gray-900 leading-none">Fast Delivery</p>
-                        <p class="text-[10px]">Dhaka inside 24h</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3 p-3 bg-green-50 rounded-xl">
-                    <i data-lucide="shield-check" class="h-5 w-5 text-green-600"></i>
-                    <div>
-                        <p class="font-bold text-gray-900 leading-none">Secure Pay</p>
-                        <p class="text-[10px]">Cash on delivery</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Tabs -->
-    <div class="mb-16">
-        <div class="border-b border-gray-200">
-            <nav class="-mb-px flex space-x-8" aria-label="Tabs">
-                <button id="tab-desc-btn" onclick="switchTab('desc')"
-                    class="border-green-500 text-green-600 whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium transition-colors">
-                    Description
-                </button>
-                <button id="tab-reviews-btn" onclick="switchTab('reviews')"
-                    class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium transition-colors">
-                    Reviews
-                </button>
-            </nav>
-        </div>
-        <div class="py-8">
-            <!-- Description Content -->
-            <div id="tab-desc-content" class="block animate-fade-in">
-                <h3 class="text-xl font-bold mb-6">Product Description</h3>
-                <div class="prose max-w-none text-gray-600 leading-relaxed">
-                    {{ product.description|markdownify }}
-                </div>
-            </div>
-
-            <!-- Reviews Content -->
-            <div id="tab-reviews-content" class="hidden animate-fade-in">
-                <h3 class="text-xl font-bold mb-6">Customer Reviews</h3>
-                <div class="space-y-8 mb-8">
-                    {% for review in reviews %}
-                    <div class="border-b border-gray-100 pb-6">
-                        <div class="flex items-center gap-2 mb-2">
-                            <div class="font-bold text-gray-900">{{ review.user.username }}</div>
-                            <div class="flex text-yellow-400">
-                                {% for i in "12345"|make_list %}
-                                {% if forloop.counter <= review.rating %} <i data-lucide="star"
-                                    class="h-3 w-3 fill-current"></i>
-                                    {% else %}
-                                    <i data-lucide="star" class="h-3 w-3"></i>
-                                    {% endif %}
-                                    {% endfor %}
-                            </div>
-                            <span class="text-xs text-gray-400">{{ review.created_at|date:"M d, Y" }}</span>
-                        </div>
-                        <p class="text-gray-600">{{ review.comment }}</p>
-                    </div>
-                    {% empty %}
-                    <p class="text-gray-500 italic">No reviews yet. Be the first to review!</p>
+                
+                <!-- Sliding Container -->
+                <div id="image-slider-container" class="flex w-full h-full transition-transform duration-500 ease-in-out">
+                    <img src="{{ product.image.url }}" alt="{{ product.title }}"
+                        class="object-cover w-full h-full flex-shrink-0">
+                    {% for img in product.additional_images.all %}
+                    <img src="{{ img.image.url }}" alt="Extra"
+                        class="object-cover w-full h-full flex-shrink-0">
                     {% endfor %}
                 </div>
-
-                <!-- Add Review Form -->
-                {% if user.is_authenticated %}
-                <form action="{% url 'add_review' product.slug %}" method="post"
-                    class="bg-gray-50 p-6 rounded-xl border border-gray-100">
-                    {% csrf_token %}
-                    <h4 class="font-bold text-lg mb-4">Write a Review</h4>
-                    <div class="mb-4">
-                        <label for="id_rating" class="block text-sm font-medium text-gray-700 mb-1">Rating</label>
-                        <select id="id_rating" name="rating"
-                            class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring-green-500 transition-all">
-                            <option value="5">5 ⭐⭐⭐⭐⭐ (Excellent)</option>
-                            <option value="4">4 ⭐⭐⭐⭐ (Good)</option>
-                            <option value="3">3 ⭐⭐⭐ (Average)</option>
-                            <option value="2">2 ⭐⭐ (Poor)</option>
-                            <option value="1">1 ⭐ (Terrible)</option>
-                        </select>
-                    </div>
-                    <div class="mb-4">
-                        <label for="id_comment" class="block text-sm font-medium text-gray-700 mb-1">Comment</label>
-                        <textarea id="id_comment" name="comment" rows="3" required
-                            class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring-green-500 transition-all"
-                            placeholder="Share your thoughts..."></textarea>
-                    </div>
-                    <button type="submit"
-                        class="bg-green-600 text-white px-6 py-2 rounded-md font-bold hover:bg-green-700 transition-all active:scale-95">Submit
-                        Review</button>
-                </form>
-                {% else %}
-                <div class="bg-gray-50 p-6 rounded-xl border border-gray-100 text-center">
-                    <p class="text-gray-600">Please <a href="{% url 'login' %}?next={{ request.path }}"
-                            class="text-green-600 font-bold hover:underline">login</a> to write a review.</p>
+                
+                <!-- Navigation Arrows -->
+                {% if product.additional_images.exists %}
+                <div class="absolute inset-0 flex items-center justify-between p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onclick="prevImage(true)" class="p-2 rounded-full bg-white/80 hover:bg-white text-gray-800 shadow-sm transition-all active:scale-95">
+                        <i data-lucide="chevron-left" class="h-6 w-6"></i>
+                    </button>
+                    <button onclick="nextImage(true)" class="p-2 rounded-full bg-white/80 hover:bg-white text-gray-800 shadow-sm transition-all active:scale-95">
+                        <i data-lucide="chevron-right" class="h-6 w-6"></i>
+                    </button>
                 </div>
                 {% endif %}
             </div>
-        </div>
+
+      <!-- Thumbnails -->
+      {% if product.additional_images.exists %}
+      <div class="grid grid-cols-5 gap-3" id="thumbnail-container">
+        <button
+          onclick="changeSlide(0, true)"
+          class="thumbnail-btn aspect-square relative border-2 border-green-600 rounded-md overflow-hidden transition-all"
+        >
+          <img
+            src="{{ product.image.url }}"
+            alt="Main"
+            class="object-cover w-full h-full"
+          />
+        </button>
+        {% for img in product.additional_images.all %}
+        <button
+          onclick="changeSlide({{ forloop.counter }}, true)"
+          class="thumbnail-btn aspect-square relative border-2 border-transparent rounded-md overflow-hidden hover:border-green-600/50 transition-all"
+        >
+          <img
+            src="{{ img.image.url }}"
+            alt="Thumbnail"
+            class="object-cover w-full h-full"
+          />
+        </button>
+        {% endfor %}
+      </div>
+      {% endif %}
     </div>
 
-    <script>
-        function switchTab(tab) {
-            const descBtn = document.getElementById('tab-desc-btn');
-            const reviewsBtn = document.getElementById('tab-reviews-btn');
-            const descContent = document.getElementById('tab-desc-content');
-            const reviewsContent = document.getElementById('tab-reviews-content');
+    <!-- Product Info -->
+    <div class="space-y-6">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900">{{ product.title }}</h1>
+        <div class="flex items-center gap-4 mt-2">
+          <div class="flex items-center gap-1">
+            <i
+              data-lucide="star"
+              class="h-4 w-4 fill-yellow-400 text-yellow-400"
+            ></i>
+            <span class="font-medium">{{ product.rating|default:"5.0" }}</span>
+            <span class="text-gray-500"
+              >({{ product.reviews_count }} reviews)</span
+            >
+          </div>
+          {% if product.stock_quantity > 0 %}
+          <div
+            class="flex items-center gap-1 text-green-600 text-sm font-medium"
+          >
+            <i data-lucide="check" class="h-4 w-4"></i> In Stock ({{
+            product.stock_quantity }} available)
+          </div>
+          {% else %}
+          <div class="flex items-center gap-1 text-red-500 text-sm font-medium">
+            <i data-lucide="x-circle" class="h-4 w-4"></i> Out of Stock
+          </div>
+          {% endif %}
+        </div>
+      </div>
 
-            if (tab === 'desc') {
-                descContent.classList.remove('hidden');
-                reviewsContent.classList.add('hidden');
+      <div class="flex items-end gap-3">
+        <span class="text-4xl font-bold text-green-600"
+          >৳{{ product.price }}</span
+        >
+        {% if product.original_price %}
+        <span class="text-xl text-gray-400 line-through mb-1"
+          >৳{{ product.original_price }}</span
+        >
+        {% endif %}
+      </div>
 
-                descBtn.classList.add('border-green-500', 'text-green-600');
-                descBtn.classList.remove('border-transparent', 'text-gray-500');
+      <div class="prose prose-sm text-gray-600 prose-text">
+        {% if product.short_description %}
+          {{ product.short_description|markdownify }}
+        {% else %}
+          {{ product.description|markdownify|truncatewords_html:50 }}
+        {% endif %}
+        <ul class="list-disc pl-4 mt-2 space-y-2">
+          <li>100% Organic & Fresh</li>
+          <li>Quality Checked</li>
+          <li>Secure Packaging</li>
+        </ul>
+      </div>
 
-                reviewsBtn.classList.remove('border-green-500', 'text-green-600');
-                reviewsBtn.classList.add('border-transparent', 'text-gray-500');
-            } else {
-                descContent.classList.add('hidden');
-                reviewsContent.classList.remove('hidden');
+      <!-- Add to Cart Section -->
+      <div class="pt-4 border-t border-b py-4 space-y-4">
+        <div class="flex items-center gap-4">
+          <span class="font-medium text-gray-700">Quantity:</span>
+          <div
+            class="flex items-center border-2 border-green-600 rounded-lg overflow-hidden bg-white"
+          >
+            <button
+              type="button"
+              class="px-5 py-3 bg-green-600 text-white font-bold text-xl hover:bg-green-700 transition-colors"
+              onclick="decrementQty()"
+            >
+              −
+            </button>
+            <span
+              id="qty-display"
+              class="w-20 text-center font-bold text-2xl text-gray-800"
+              >1</span
+            >
+            <button
+              type="button"
+              class="px-5 py-3 bg-green-600 text-white font-bold text-xl hover:bg-green-700 transition-colors"
+              onclick="incrementQty()"
+            >
+              +
+            </button>
+          </div>
+        </div>
+      </div>
 
-                reviewsBtn.classList.add('border-green-500', 'text-green-600');
-                reviewsBtn.classList.remove('border-transparent', 'text-gray-500');
+      <div class="flex gap-4">
+        {% if product.stock_quantity > 0 %}
+        <form
+          action="{% url 'cart_add' product.id %}"
+          method="post"
+          class="flex-1"
+        >
+          {% csrf_token %}
+          <input type="hidden" name="quantity" value="1" id="qty-input" />
+          <button
+            type="submit"
+            class="btn-primary flex-1 inline-flex items-center justify-center whitespace-nowrap font-medium rounded-md px-8 w-full text-lg h-12 gap-2 shadow-lg"
+          >
+            <i data-lucide="shopping-cart" class="h-5 w-5"></i>
+            Add to Cart
+          </button>
+        </form>
+        {% else %}
+        <button
+          type="button"
+          disabled
+          class="btn-primary flex-1 inline-flex items-center justify-center whitespace-nowrap font-medium rounded-md px-8 w-full text-lg h-12 gap-2 shadow-lg"
+        >
+          Out of Stock
+        </button>
+        {% endif %}
 
-                descBtn.classList.remove('border-green-500', 'text-green-600');
-                descBtn.classList.add('border-transparent', 'text-gray-500');
+        <a
+          href="{% url 'toggle_wishlist' product.id %}"
+          class="wishlist-btn inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 cursor-pointer border rounded-md px-6 h-12 {% if is_in_wishlist %}border-red-200 bg-red-50 text-red-500 hover:bg-red-100{% else %}border-gray-200 bg-white hover:bg-gray-100 text-gray-500{% endif %}"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="lucide lucide-heart h-5 w-5 {% if is_in_wishlist %}fill-current{% endif %}"
+          >
+            <path
+              d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5"
+            ></path>
+          </svg>
+        </a>
+
+        <button
+          class="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 cursor-pointer hover:bg-gray-100 rounded-md px-6 h-12 border border-gray-200"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="lucide lucide-share2 h-5 w-5"
+          >
+            <circle cx="18" cy="5" r="3"></circle>
+            <circle cx="6" cy="12" r="3"></circle>
+            <circle cx="18" cy="19" r="3"></circle>
+            <line x1="8.59" x2="15.42" y1="13.51" y2="17.49"></line>
+            <line x1="15.41" x2="8.59" y1="6.51" y2="10.49"></line>
+          </svg>
+        </button>
+      </div>
+
+      <script>
+        // Quantity logic
+        function incrementQty() {
+            const display = document.getElementById('qty-display');
+            const input = document.getElementById('qty-input');
+            let val = parseInt(display.innerText);
+            val++;
+            display.innerText = val;
+            input.value = val;
+        }
+        function decrementQty() {
+            const display = document.getElementById('qty-display');
+            const input = document.getElementById('qty-input');
+            let val = parseInt(display.innerText);
+            if (val > 1) {
+                val--;
+                display.innerText = val;
+                input.value = val;
             }
         }
-    </script>
 
-    <!-- Related Products -->
-    <div>
-        <h2 class="text-2xl font-bold mb-6">Related Products</h2>
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-            {% for p in related_products %}
-            <div
-                class="rounded-lg border bg-card text-card-foreground group relative overflow-hidden border-none shadow-sm hover:shadow-md transition-all bg-white">
-                <!-- Wishlist Button -->
-                <a href="{% url 'toggle_wishlist' p.id %}"
-                    class="wishlist-btn absolute top-2 right-2 z-20 p-2.5 rounded-full bg-white/90 shadow-sm {% if p.id in wishlist_product_ids %}text-red-500{% else %}text-gray-500{% endif %} hover:text-red-500 hover:bg-white transition-all duration-300 group-hover:opacity-100 {% if p.id in wishlist_product_ids %}opacity-100{% else %}opacity-0{% endif %} min-w-[44px] min-h-[44px] flex items-center justify-center">
-                    <i data-lucide="heart" class="h-5 w-5 {% if p.id in wishlist_product_ids %}fill-current{% endif %}"></i>
-                </a>
-                
+        // Image Slideshow logic
+        let currentImageIndex = 0;
+        let autoplayInterval;
+        const totalImages = {{ product.additional_images.count|add:1 }};
 
-                <a href="{% url 'product_detail' p.slug %}">
-                    <div class="aspect-square relative bg-gray-100 overflow-hidden">
-                        {% if p.image %}
-                        <img src="{{ p.image.url }}" alt="{{ p.title }}"
-                            class="object-cover w-full h-full transition-all duration-500 group-hover:scale-105">
-                        {% else %}
-                        <img src="https://placehold.co/600x400?text=No+Image" alt="{{ p.title }}"
-                            class="object-cover w-full h-full transition-all duration-500 group-hover:scale-105">
-                        {% endif %}
-                    </div>
-                </a>
+        function startAutoplay() {
+            if (totalImages <= 1) return;
+            autoplayInterval = setInterval(() => {
+                nextImage();
+            }, 5000);
+        }
 
-                <div class="p-3">
-                    <div class="text-xs text-muted-foreground mb-1">{{ p.category.name }}</div>
-                    <a href="{% url 'product_detail' p.slug %}">
-                        <h3
-                            class="font-semibold truncate group-hover:text-green-600 transition-colors text-sm text-gray-900">
-                            {{ p.title }}</h3>
-                    </a>
-                    <div class="flex items-center gap-1 mt-1 mb-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            class="lucide lucide-star h-3 w-3 fill-yellow-400 text-yellow-400">
-                            <path
-                                d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z">
-                            </path>
-                        </svg>
-                        <span class="text-xs font-medium">{{ p.rating }}</span>
-                        <span class="text-xs text-gray-500">({{ p.reviews_count }})</span>
-                    </div>
-                    <div class="flex items-baseline gap-2">
-                        <span class="font-bold text-sm text-green-600">৳{{ p.price }}</span>
-                        {% if p.original_price %}
-                        <span class="text-xs text-gray-400 line-through">৳{{ p.original_price }}</span>
-                        {% endif %}
-                    </div>
-                </div>
+        function stopAutoplay() {
+            if (autoplayInterval) clearInterval(autoplayInterval);
+        }
 
-                <div class="flex items-center p-3 pt-0">
-                    <form action="{% url 'cart_add' p.id %}" method="post" class="w-full">
-                        {% csrf_token %}
-                        <input type="hidden" name="quantity" value="1">
-                        <button type="submit"
-                            class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 cursor-pointer bg-green-800 text-white hover:bg-green-800/80 h-8 px-3 py-1 w-full gap-2 shadow-sm">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="lucide lucide-shopping-cart h-3 w-3">
-                                <circle cx="8" cy="21" r="1"></circle>
-                                <circle cx="19" cy="21" r="1"></circle>
-                                <path
-                                    d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12">
-                                </path>
-                            </svg>
-                            Add
-                        </button>
-                    </form>
-                </div>
-            </div>
-            {% endfor %}
+        function changeSlide(index, isManual = false) {
+            if (isManual) stopAutoplay();
+            
+            currentImageIndex = index;
+            const slider = document.getElementById('image-slider-container');
+            slider.style.transform = `translateX(-${index * 100}%)`;
+
+            // Update thumbnails
+            document.querySelectorAll('.thumbnail-btn').forEach((btn, i) => {
+                if (i === index) {
+                    btn.classList.add('border-green-600');
+                    btn.classList.remove('border-transparent');
+                } else {
+                    btn.classList.remove('border-green-600');
+                    btn.classList.add('border-transparent');
+                }
+            });
+
+            if (isManual) startAutoplay();
+        }
+
+        function nextImage(isManual = false) {
+            if (totalImages <= 1) return;
+            currentImageIndex = (currentImageIndex + 1) % totalImages;
+            changeSlide(currentImageIndex, isManual);
+        }
+
+        function prevImage(isManual = false) {
+            if (totalImages <= 1) return;
+            currentImageIndex = (currentImageIndex - 1 + totalImages) % totalImages;
+            changeSlide(currentImageIndex, isManual);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextImage(true);
+            if (e.key === 'ArrowLeft') prevImage(true);
+        });
+
+        // Initialize autoplay
+        document.addEventListener('DOMContentLoaded', startAutoplay);
+      </script>
+
+      <!-- Additional Action Buttons -->
+      <div class="space-y-3 mt-6">
+        <!-- Cash on Delivery Button -->
+        <a
+          href="{% url 'order_create' %}"
+          class="w-full flex items-center justify-center gap-3 bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 px-6 rounded-lg transition-all shadow-md hover:shadow-lg"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="h-6 w-6"
+          >
+            <rect width="20" height="14" x="2" y="5" rx="2"></rect>
+            <line x1="2" x2="22" y1="10" y2="10"></line>
+          </svg>
+          <span>ক্যাশ অন ডেলিভারিতে অর্ডার করুন</span>
+        </a>
+
+        <!-- Messenger & WhatsApp Buttons -->
+        <div class="grid grid-cols-2 gap-3">
+          <!-- Messenger Button -->
+          <a
+            href="https://m.me/YOUR_PAGE_ID"
+            target="_blank"
+            class="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-all shadow-md hover:shadow-lg"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
+              <path
+                d="M12 2C6.5 2 2 6.14 2 11.25c0 2.88 1.44 5.45 3.69 7.14V22l3.59-1.97c.95.26 1.96.4 3.02.4 5.5 0 10-4.14 10-9.25S17.5 2 12 2zm1.03 12.41l-2.49-2.65-4.86 2.65 5.35-5.67 2.55 2.65 4.8-2.65-5.35 5.67z"
+              />
+            </svg>
+            <span>Chat with us</span>
+          </a>
+
+          <!-- WhatsApp Button -->
+          <a
+            href="https://wa.me/8801234567890"
+            target="_blank"
+            class="flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-lg transition-all shadow-md hover:shadow-lg"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
+              <path
+                d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"
+              />
+            </svg>
+            <span>WhatsApp Us</span>
+          </a>
         </div>
+      </div>
+
+      <div
+        class="grid grid-cols-2 gap-4 text-sm text-gray-500 pt-6 border-t mt-6"
+      >
+        <div class="flex items-center gap-3 p-3 bg-green-50 rounded-xl">
+          <i data-lucide="truck" class="h-5 w-5 text-green-600"></i>
+          <div>
+            <p class="font-bold text-gray-900 leading-none">Fast Delivery</p>
+            <p class="text-[10px]">Dhaka inside 24h</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3 p-3 bg-green-50 rounded-xl">
+          <i data-lucide="shield-check" class="h-5 w-5 text-green-600"></i>
+          <div>
+            <p class="font-bold text-gray-900 leading-none">Secure Pay</p>
+            <p class="text-[10px]">Cash on delivery</p>
+          </div>
+        </div>
+      </div>
     </div>
-    <!-- Schema.org Structured Data -->
-    <script type="application/ld+json">
-{
-"@context": "https://schema.org/",
-"@type": "Product",
-"name": "{{ product.title|escapejs }}",
-"image": [
-"{{ product.image.url }}"
-{% if product.additional_images.exists %}{% for img in product.additional_images.all %}, "{{ img.image.url }}"{% endfor %}{% endif %}
-],
-"description": "{{ product.description|striptags|truncatewords:50|escapejs }}",
-"sku": "{{ product.id }}",
-"brand": {
-"@type": "Brand",
-"name": "{{ product.brand.name|default:'Al Barakah Mart'|escapejs }}"
-},
-"offers": {
-"@type": "Offer",
-"url": "{{ request.build_absolute_uri }}",
-"priceCurrency": "BDT",
-"price": "{{ product.price }}",
-"itemCondition": "https://schema.org/NewCondition",
-"availability": "{% if product.in_stock %}https://schema.org/InStock{% else %}https://schema.org/OutOfStock{% endif %}"
-}
-{% if product.reviews_count > 0 %},
-"aggregateRating": {
-"@type": "AggregateRating",
-"ratingValue": "{{ product.rating|default:5 }}",
-"reviewCount": "{{ product.reviews_count }}"
-}
-{% endif %}
-}
-</script>
+  </div>
+
+  <!-- Tabs -->
+  <div class="mb-16">
+    <div class="border-b border-gray-200">
+      <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+        <button
+          id="tab-desc-btn"
+          onclick="switchTab('desc')"
+          class="border-green-500 text-green-600 whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium transition-colors"
+        >
+          Description
+        </button>
+        <button
+          id="tab-reviews-btn"
+          onclick="switchTab('reviews')"
+          class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium transition-colors"
+        >
+          Reviews
+        </button>
+      </nav>
+    </div>
+    <div class="py-8">
+      <!-- Description Content -->
+      <div id="tab-desc-content" class="block animate-fade-in">
+        <h3 class="text-xl font-bold mb-6">Product Description</h3>
+        <div class="prose max-w-none text-gray-600 leading-relaxed">
+          {{ product.description|markdownify }}
+        </div>
+      </div>
+
+      <!-- Reviews Content -->
+      <div id="tab-reviews-content" class="hidden animate-fade-in">
+        <h3 class="text-xl font-bold mb-6">Customer Reviews</h3>
+        <div class="space-y-8 mb-8">
+          {% for review in reviews %}
+          <div class="border-b border-gray-100 pb-6">
+            <div class="flex items-center gap-2 mb-2">
+              <div class="font-bold text-gray-900">
+                {{ review.user.username }}
+              </div>
+              <div class="flex text-yellow-400">
+                {% for i in "12345"|make_list %}
+                {% if forloop.counter <= review.rating %}
+                <i data-lucide="star" class="h-3 w-3 fill-current"></i>
+                {% else %}
+                <i data-lucide="star" class="h-3 w-3"></i>
+                {% endif %}
+                {% endfor %}
+              </div>
+              <span class="text-xs text-gray-400"
+                >{{ review.created_at|date:"M d, Y" }}</span
+              >
+            </div>
+            <p class="text-gray-600">{{ review.comment }}</p>
+          </div>
+          {% empty %}
+          <p class="text-gray-500 italic">
+            No reviews yet. Be the first to review!
+          </p>
+          {% endfor %}
+        </div>
+
+        <!-- Add Review Form -->
+        {% if user.is_authenticated %}
+        <form
+          action="{% url 'add_review' product.slug %}"
+          method="post"
+          class="bg-gray-50 p-6 rounded-xl border border-gray-100"
+        >
+          {% csrf_token %}
+          <h4 class="font-bold text-lg mb-4">Write a Review</h4>
+          <div class="mb-4">
+            <label
+              for="id_rating"
+              class="block text-sm font-medium text-gray-700 mb-1"
+              >Rating</label
+            >
+            <select
+              id="id_rating"
+              name="rating"
+              class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring-green-500 transition-all"
+            >
+              <option value="5">5 ⭐⭐⭐⭐⭐ (Excellent)</option>
+              <option value="4">4 ⭐⭐⭐⭐ (Good)</option>
+              <option value="3">3 ⭐⭐⭐ (Average)</option>
+              <option value="2">2 ⭐⭐ (Poor)</option>
+              <option value="1">1 ⭐ (Terrible)</option>
+            </select>
+          </div>
+          <div class="mb-4">
+            <label
+              for="id_comment"
+              class="block text-sm font-medium text-gray-700 mb-1"
+              >Comment</label
+            >
+            <textarea
+              id="id_comment"
+              name="comment"
+              rows="3"
+              required
+              class="w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring-green-500 transition-all"
+              placeholder="Share your thoughts..."
+            ></textarea>
+          </div>
+          <button
+            type="submit"
+            class="bg-green-600 text-white px-6 py-2 rounded-md font-bold hover:bg-green-700 transition-all active:scale-95"
+          >
+            Submit Review
+          </button>
+        </form>
+        {% else %}
+        <div
+          class="bg-gray-50 p-6 rounded-xl border border-gray-100 text-center"
+        >
+          <p class="text-gray-600">
+            Please
+            <a
+              href="{% url 'login' %}?next={{ request.path }}"
+              class="text-green-600 font-bold hover:underline"
+              >login</a
+            >
+            to write a review.
+          </p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function switchTab(tab) {
+      const descBtn = document.getElementById("tab-desc-btn");
+      const reviewsBtn = document.getElementById("tab-reviews-btn");
+      const descContent = document.getElementById("tab-desc-content");
+      const reviewsContent = document.getElementById("tab-reviews-content");
+
+      if (tab === "desc") {
+        descContent.classList.remove("hidden");
+        reviewsContent.classList.add("hidden");
+
+        descBtn.classList.add("border-green-500", "text-green-600");
+        descBtn.classList.remove("border-transparent", "text-gray-500");
+
+        reviewsBtn.classList.remove("border-green-500", "text-green-600");
+        reviewsBtn.classList.add("border-transparent", "text-gray-500");
+      } else {
+        descContent.classList.add("hidden");
+        reviewsContent.classList.remove("hidden");
+
+        reviewsBtn.classList.add("border-green-500", "text-green-600");
+        reviewsBtn.classList.remove("border-transparent", "text-gray-500");
+
+        descBtn.classList.remove("border-green-500", "text-green-600");
+        descBtn.classList.add("border-transparent", "text-gray-500");
+      }
+    }
+  </script>
+
+  <!-- Related Products -->
+  <div>
+    <h2 class="text-2xl font-bold mb-6">Related Products</h2>
+    <div
+      class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6"
+    >
+      {% for p in related_products %}
+      <div
+        class="rounded-lg border bg-card text-card-foreground group relative overflow-hidden border-none shadow-sm hover:shadow-md transition-all bg-white"
+      >
+        <!-- Wishlist Button -->
+        <a
+          href="{% url 'toggle_wishlist' p.id %}"
+          class="wishlist-btn absolute top-2 right-2 z-20 p-2.5 rounded-full bg-white/90 shadow-sm {% if p.id in wishlist_product_ids %}text-red-500{% else %}text-gray-500{% endif %} hover:text-red-500 hover:bg-white transition-all duration-300 group-hover:opacity-100 {% if p.id in wishlist_product_ids %}opacity-100{% else %}opacity-0{% endif %} min-w-[44px] min-h-[44px] flex items-center justify-center"
+        >
+          <i
+            data-lucide="heart"
+            class="h-5 w-5 {% if p.id in wishlist_product_ids %}fill-current{% endif %}"
+          ></i>
+        </a>
+
+        <a href="{% url 'product_detail' p.slug %}">
+          <div class="aspect-square relative bg-gray-100 overflow-hidden skeleton">
+            {% if p.image %}
+            <img
+              src="{{ p.image.url }}"
+              alt="{{ p.title }}"
+              onload="this.classList.remove('opacity-0'); this.closest('.skeleton').classList.remove('skeleton')"
+              onerror="this.closest('.skeleton').classList.remove('skeleton')"
+              class="object-cover w-full h-full transition-all duration-500 group-hover:scale-105 opacity-0"
+            />
+            {% else %}
+            <img
+              src="https://placehold.co/600x400?text=No+Image"
+              alt="{{ p.title }}"
+              onload="this.classList.remove('opacity-0'); this.closest('.skeleton').classList.remove('skeleton')"
+              onerror="this.closest('.skeleton').classList.remove('skeleton')"
+              class="object-cover w-full h-full transition-all duration-500 group-hover:scale-105 opacity-0"
+            />
+            {% endif %}
+          </div>
+        </a>
+
+        <div class="p-3">
+          <div class="text-xs text-muted-foreground mb-1">
+            {{ p.category.name }}
+          </div>
+          <a href="{% url 'product_detail' p.slug %}">
+            <h3
+              class="font-semibold truncate group-hover:text-green-600 transition-colors text-sm text-gray-900"
+            >
+              {{ p.title }}
+            </h3>
+          </a>
+          <div class="flex items-center gap-1 mt-1 mb-2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-star h-3 w-3 fill-yellow-400 text-yellow-400"
+            >
+              <path
+                d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"
+              ></path>
+            </svg>
+            <span class="text-xs font-medium">{{ p.rating }}</span>
+            <span class="text-xs text-gray-500">({{ p.reviews_count }})</span>
+          </div>
+          <div class="flex items-baseline gap-2">
+            <span class="font-bold text-sm text-green-600">৳{{ p.price }}</span>
+            {% if p.original_price %}
+            <span class="text-xs text-gray-400 line-through"
+              >৳{{ p.original_price }}</span
+            >
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="flex items-center p-3 pt-0">
+          <form action="{% url 'cart_add' p.id %}" method="post" class="w-full">
+            {% csrf_token %}
+            <input type="hidden" name="quantity" value="1" />
+            <button
+              type="submit"
+              class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 cursor-pointer bg-green-800 text-white hover:bg-green-800/80 h-8 px-3 py-1 w-full gap-2 shadow-sm"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-shopping-cart h-3 w-3"
+              >
+                <circle cx="8" cy="21" r="1"></circle>
+                <circle cx="19" cy="21" r="1"></circle>
+                <path
+                  d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"
+                ></path>
+              </svg>
+              Add
+            </button>
+          </form>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  <!-- Schema.org Structured Data -->
+  <script type="application/ld+json">
+    {
+    "@context": "https://schema.org/",
+    "@type": "Product",
+    "name": "{{ product.title|escapejs }}",
+    "image": [
+    "{{ product.image.url }}"
+    {% if product.additional_images.exists %}{% for img in product.additional_images.all %}, "{{ img.image.url }}"{% endfor %}{% endif %}
+    ],
+    "description": "{{ product.description|striptags|truncatewords:50|escapejs }}",
+    "sku": "{{ product.id }}",
+    "brand": {
+    "@type": "Brand",
+    "name": "{{ product.brand.name|default:'Al Barakah Mart'|escapejs }}"
+    },
+    "offers": {
+    "@type": "Offer",
+    "url": "{{ request.build_absolute_uri }}",
+    "priceCurrency": "BDT",
+    "price": "{{ product.price }}",
+    "itemCondition": "https://schema.org/NewCondition",
+    "availability": "{% if product.in_stock %}https://schema.org/InStock{% else %}https://schema.org/OutOfStock{% endif %}"
+    }
+    {% if product.reviews_count > 0 %},
+    "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "{{ product.rating|default:5 }}",
+    "reviewCount": "{{ product.reviews_count }}"
+    }
+    {% endif %}
+    }
+  </script>
 </div>
 {% endblock %}
