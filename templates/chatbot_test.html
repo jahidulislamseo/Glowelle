@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Test Page</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .animate-bounce {
+            animation: bounce 1s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="max-w-4xl w-full p-8">
+        <h1 class="text-4xl font-bold text-center mb-8 text-green-600">
+            🤖 Al Barakah Mart Chatbot Test
+        </h1>
+        
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-2xl font-semibold mb-4">✅ Test Instructions</h2>
+            <ol class="list-decimal list-inside space-y-2 text-gray-700">
+                <li>Look for the <strong class="text-green-600">green chat button</strong> in the bottom-right corner</li>
+                <li>Click it to open the chatbot window</li>
+                <li>Try these test messages:
+                    <ul class="ml-8 mt-2 space-y-1">
+                        <li>• "আপনার কাছে কলা আছে?" (Bangla test)</li>
+                        <li>• "Do you have bananas?" (English test)</li>
+                        <li>• "কলা অর্ডার করতে চাই" (Buying intent test)</li>
+                        <li>• "Delivery কত দিনে হয়?" (Support test)</li>
+                    </ul>
+                </li>
+                <li>Check if you get intelligent responses</li>
+            </ol>
+        </div>
+
+        <div class="bg-blue-50 border-l-4 border-blue-500 p-6 rounded">
+            <h3 class="font-bold text-blue-900 mb-2">📊 Expected Behavior:</h3>
+            <ul class="space-y-2 text-blue-800">
+                <li>✅ Chatbot should respond in the same language you use</li>
+                <li>✅ Should show product info with prices and stock</li>
+                <li>✅ Should detect if you want to buy (enthusiastic response)</li>
+                <li>✅ Should provide delivery and payment info</li>
+                <li>✅ Responses should be smart and sales-focused</li>
+            </ul>
+        </div>
+
+        <div class="mt-6 bg-yellow-50 border-l-4 border-yellow-500 p-6 rounded">
+            <h3 class="font-bold text-yellow-900 mb-2">🐛 If Chatbot Doesn't Work:</h3>
+            <ol class="list-decimal list-inside space-y-2 text-yellow-800">
+                <li>Press <kbd class="bg-gray-200 px-2 py-1 rounded">F12</kbd> to open Developer Console</li>
+                <li>Click on "Console" tab</li>
+                <li>Look for any red error messages</li>
+                <li>Try sending a message and check for errors</li>
+                <li>Take a screenshot and share with me</li>
+            </ol>
+        </div>
+
+        <div class="mt-8 text-center">
+            <button onclick="testAPI()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition">
+                🧪 Test API Directly
+            </button>
+            <div id="api-result" class="mt-4 p-4 bg-gray-50 rounded hidden"></div>
+        </div>
+    </div>
+
+    <script>
+        async function testAPI() {
+            const resultDiv = document.getElementById('api-result');
+            resultDiv.classList.remove('hidden');
+            resultDiv.innerHTML = '<p class="text-blue-600">⏳ Testing API...</p>';
+            
+            try {
+                const response = await fetch('/api/chatbot/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: 'hello' })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    resultDiv.innerHTML = `
+                        <p class="text-green-600 font-bold">✅ API Working!</p>
+                        <p class="mt-2 text-gray-700"><strong>Response:</strong> ${data.response.substring(0, 200)}...</p>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <p class="text-red-600 font-bold">❌ API Error</p>
+                        <p class="mt-2 text-gray-700">${data.response}</p>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <p class="text-red-600 font-bold">❌ Connection Error</p>
+                    <p class="mt-2 text-gray-700">${error.message}</p>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

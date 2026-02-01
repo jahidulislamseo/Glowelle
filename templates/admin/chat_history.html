@@ -1,0 +1,247 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block content %}
+<style>
+    :root {
+        --primary: #6366f1;
+        --secondary: #f1f5f9;
+        --user-msg: #dcfce7;
+        --bot-msg: #ffffff;
+    }
+
+    .chat-layout {
+        display: grid;
+        grid-template-columns: 350px 1fr;
+        gap: 0;
+        height: 85vh;
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+        margin-top: 20px;
+    }
+
+    /* Left Sidebar: Session List */
+    .session-list {
+        background: #f8fafc;
+        border-right: 1px solid #e2e8f0;
+        overflow-y: auto;
+    }
+
+    .session-item {
+        padding: 15px;
+        border-bottom: 1px solid #e2e8f0;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .session-item:hover, .session-item.active {
+        background: white;
+        border-left: 4px solid var(--primary);
+    }
+
+    .session-time {
+        font-size: 11px;
+        color: #64748b;
+        margin-bottom: 4px;
+        display: block;
+    }
+
+    .session-preview {
+        font-size: 13px;
+        color: #334155;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-weight: 500;
+    }
+
+    .session-id {
+        font-size: 10px;
+        font-family: monospace;
+        color: #94a3b8;
+    }
+
+    /* Right Panel: Chat Area */
+    .chat-area {
+        display: flex;
+        flex-direction: column;
+        background: #f1f5f9;
+        height: 100%;
+    }
+
+    .chat-header {
+        padding: 15px 20px;
+        background: white;
+        border-bottom: 1px solid #e2e8f0;
+        font-weight: 600;
+        color: #1e293b;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .messages-container {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    /* Bubbles */
+    .msg-row {
+        display: flex;
+        width: 100%;
+    }
+
+    .msg-row.user {
+        justify-content: flex-end;
+    }
+
+    .msg-row.bot {
+        justify-content: flex-start;
+    }
+
+    .bubble {
+        max-width: 70%;
+        padding: 10px 16px;
+        border-radius: 12px;
+        font-size: 14px;
+        line-height: 1.5;
+        position: relative;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    .msg-row.user .bubble {
+        background: var(--user-msg);
+        color: #166534;
+        border-top-right-radius: 2px;
+    }
+
+    .msg-row.bot .bubble {
+        background: var(--bot-msg);
+        color: #1e293b;
+        border-top-left-radius: 2px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .role-badge {
+        font-size: 10px;
+        font-weight: bold;
+        margin-bottom: 2px;
+        display: block;
+        opacity: 0.7;
+    }
+
+    /* Empty State */
+    .empty-state {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: #94a3b8;
+        font-size: 14px;
+    }
+    
+    .hidden { display: none; }
+</style>
+
+<div style="padding: 20px;">
+    <h1 style="font-size: 24px; font-weight: 800; color: #1e293b; margin-bottom: 5px;">💬 Live Chat History</h1>
+    <p style="color: #64748b; font-size: 14px;">Monitor AI conversations and improved user experience.</p>
+
+    <div class="chat-layout">
+        <!-- Sidebar -->
+        <div class="session-list">
+            {% for session in sessions %}
+            <div class="session-item" onclick="loadSession('{{ session.session_id }}', this)">
+                <span class="session-time">{{ session.updated_at|date:"M d, H:i" }} · {{ session.message_count }} msgs</span>
+                <div class="session-preview">{{ session.last_message|default:"(Empty)" }}</div>
+                <div class="session-id">ID: {{ session.session_id|truncatechars:15 }}</div>
+            </div>
+            {% empty %}
+            <div style="padding: 20px; text-align: center; color: #94a3b8;">No history found</div>
+            {% endfor %}
+        </div>
+
+        <!-- Chat Area -->
+        <div class="chat-area">
+            <div class="chat-header">
+                <span id="active-session-id">Select a conversation</span>
+                <span style="font-size: 12px; color: #64748b;" id="msg-count"></span>
+            </div>
+
+            <div class="messages-container" id="message-viewer">
+                <div class="empty-state">Select a session from the left to view detail.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Embedded Data via json_script for safety -->
+{{ sessions|json_script:"sessions-data" }}
+
+<script>
+    // Parse the JSON data safely
+    const sessionsData = JSON.parse(document.getElementById('sessions-data').textContent);
+    
+    // Convert to map for easy lookup
+    const allSessions = {};
+    sessionsData.forEach(session => {
+        allSessions[session.session_id] = session.history;
+    });
+
+    function loadSession(sessionId, el) {
+        // Highlight active
+        document.querySelectorAll('.session-item').forEach(i => i.classList.remove('active'));
+        el.classList.add('active');
+
+        // Update Header
+        document.getElementById('active-session-id').textContent = 'Session: ' + sessionId;
+        
+        const history = allSessions[sessionId];
+        const container = document.getElementById('message-viewer');
+        container.innerHTML = '';
+
+        if (!history || history.length === 0) {
+            container.innerHTML = '<div class="empty-state">No messages in this session.</div>';
+            return;
+        }
+
+        document.getElementById('msg-count').textContent = history.length + ' messages';
+
+        // Render Messages
+        history.forEach(msg => {
+            const row = document.createElement('div');
+            row.className = `msg-row ${msg.role === 'user' ? 'user' : 'bot'}`;
+            
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            
+            // Convert newlines to <br> for display
+            // Also basic markdown bold support
+            let content = msg.content
+                .replace(/\n/g, '<br>')
+                .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+
+            bubble.innerHTML = `<span class="role-badge">${msg.role.toUpperCase()}</span>${content}`;
+            
+            row.appendChild(bubble);
+            container.appendChild(row);
+        });
+
+        // Scroll to bottom
+        container.scrollTop = container.scrollHeight;
+    }
+    
+    // Auto-select first if exists
+    document.addEventListener('DOMContentLoaded', () => {
+        const first = document.querySelector('.session-item');
+        if(first) first.click();
+    });
+</script>
+{% endblock %}
