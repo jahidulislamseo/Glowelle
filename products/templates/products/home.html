@@ -212,33 +212,95 @@
 
         .animation-delay-4000 {
             animation-delay: 4s;
+        }
     </style>
 </section>
 
-<!-- Category Navigation -->
-<section class="py-8 bg-gray-50 border-b border-gray-100">
-    <div class="container mx-auto px-4">
-        <div class="flex items-center justify-between mb-6">
-            <h2 class="text-xl font-bold text-gray-900">Shop by Category</h2>
-            <a href="{% url 'shop' %}" class="text-sm font-medium text-green-600 hover:underline">View All</a>
+<!-- Category Navigation (Carousel) -->
+<section class="py-12 bg-gray-50 border-b border-gray-100">
+    <div class="container mx-auto px-4 relative group/section">
+        <div class="flex items-center justify-between mb-8">
+            <h2 class="text-2xl font-bold text-gray-900">Shop by Category</h2>
+            <div class="flex items-center gap-2">
+                <a href="{% url 'shop' %}"
+                    class="text-sm font-medium text-green-600 hover:text-green-700 hover:underline">View All</a>
+            </div>
         </div>
-        <div class="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
-            {% for category in categories %}
-            <a href="{% url 'shop' %}?category={{ category.slug }}" 
-               class="flex-shrink-0 group flex flex-col items-center gap-3 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-green-200 transition-all min-w-[120px]">
-                <div class="h-16 w-16 bg-green-50 rounded-full flex items-center justify-center text-green-600 group-hover:bg-green-600 group-hover:text-white transition-colors duration-300">
-                    {% if category.image %}
-                        <img src="{{ category.image.url }}" alt="{{ category.name }}" class="h-10 w-10 object-contain">
-                    {% else %}
-                        <i data-lucide="layout-grid" class="h-8 w-8"></i>
-                    {% endif %}
-                </div>
-                <span class="text-sm font-semibold text-gray-700 group-hover:text-green-600 transition-colors">{{ category.name }}</span>
-            </a>
-            {% endfor %}
+
+        <div class="relative">
+            <!-- Scroll Buttons -->
+            <button onclick="scrollCategories('left')"
+                class="absolute left-0 top-1/2 -translate-y-1/2 -ml-4 z-10 bg-white/90 hover:bg-white text-gray-700 p-2 rounded-full shadow-lg border border-gray-100 opacity-0 group-hover/section:opacity-100 transition-all duration-300 hover:scale-110 disabled:opacity-0 hidden md:block"
+                aria-label="Scroll Left">
+                <i data-lucide="chevron-left" class="h-6 w-6"></i>
+            </button>
+
+            <button onclick="scrollCategories('right')"
+                class="absolute right-0 top-1/2 -translate-y-1/2 -mr-4 z-10 bg-white/90 hover:bg-white text-gray-700 p-2 rounded-full shadow-lg border border-gray-100 opacity-0 group-hover/section:opacity-100 transition-all duration-300 hover:scale-110 hidden md:block"
+                aria-label="Scroll Right">
+                <i data-lucide="chevron-right" class="h-6 w-6"></i>
+            </button>
+
+            <!-- Scroll Container -->
+            <div id="category-scroll-container"
+                class="flex gap-6 overflow-x-auto pb-8 pt-4 scrollbar-hide scroll-smooth px-2">
+                {% for category in categories %}
+                <a href="{% url 'shop' %}?category={{ category.slug }}"
+                    class="flex-shrink-0 group flex flex-col items-center w-[120px] md:w-[140px] px-2 transition-all duration-300 hover:-translate-y-2">
+
+                    <!-- Image Card -->
+                    <div
+                        class="h-28 w-28 md:h-32 md:w-32 rounded-full bg-white border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] group-hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] group-hover:border-green-200 overflow-hidden flex items-center justify-center transition-all duration-500 relative mb-4">
+                        <div
+                            class="absolute inset-0 bg-green-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        </div>
+                        {% if category.image %}
+                        <img src="{{ category.image.url }}" alt="{{ category.name }}"
+                            class="h-14 w-14 md:h-16 md:w-16 object-contain relative z-10 transform group-hover:scale-110 transition-transform duration-500">
+                        {% else %}
+                        <i data-lucide="layout-grid" class="h-8 w-8 md:h-10 md:w-10 text-green-600 relative z-10"></i>
+                        {% endif %}
+                    </div>
+
+                    <!-- Text -->
+                    <h3
+                        class="text-center font-bold text-gray-700 group-hover:text-green-700 transition-colors text-sm md:text-base leading-tight px-1">
+                        {{ category.name }}
+                    </h3>
+                </a>
+                {% endfor %}
+            </div>
         </div>
     </div>
+
+    <style>
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Hide scrollbar for IE, Edge and Firefox */
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            /* IE and Edge */
+            scrollbar-width: none;
+            /* Firefox */
+        }
+    </style>
 </section>
+
+<script>
+    function scrollCategories(direction) {
+        const container = document.getElementById('category-scroll-container');
+        const scrollAmount = 300; // Adjust as needed
+
+        if (direction === 'left') {
+            container.scrollLeft -= scrollAmount;
+        } else {
+            container.scrollLeft += scrollAmount;
+        }
+    }
+</script>
 
 <!-- Features Section (Why Choose Us) -->
 <section class="py-12 bg-white border-b border-gray-100">
@@ -301,7 +363,8 @@
             <span class="font-bold text-lg uppercase tracking-wide">Flash Sale Ends In:</span>
         </div>
         <!-- Pass the ISO formatted date string for JS parsing -->
-        <div class="flex gap-4 font-mono text-xl font-bold" id="countdown" data-end="{{ deal_of_the_day.end_date|date:'c' }}">
+        <div class="flex gap-4 font-mono text-xl font-bold" id="countdown"
+            data-end="{{ deal_of_the_day.end_date|date:'c' }}">
             <div class="bg-white/20 rounded px-3 py-1 backdrop-blur-sm"><span id="cd-hours">00</span><span
                     class="text-xs font-normal block text-center">Hrs</span></div>
             <div class="bg-white/20 rounded px-3 py-1 backdrop-blur-sm"><span id="cd-minutes">00</span><span
@@ -313,7 +376,7 @@
             document.addEventListener('DOMContentLoaded', function () {
                 const countdownEl = document.getElementById('countdown');
                 if (!countdownEl) return;
-                
+
                 const endDateStr = countdownEl.getAttribute('data-end');
                 const endDate = new Date(endDateStr).getTime();
 
@@ -371,22 +434,23 @@
                 <!-- Wishlist Button -->
                 <a href="{% url 'toggle_wishlist' product.id %}"
                     class="wishlist-btn absolute top-2 right-2 z-20 p-2.5 rounded-full bg-white/90 shadow-sm {% if product.id in wishlist_product_ids %}text-red-500{% else %}text-gray-500{% endif %} hover:text-red-500 hover:bg-white transition-all duration-300 group-hover:opacity-100 {% if product.id in wishlist_product_ids %}opacity-100{% else %}opacity-0{% endif %} min-w-[44px] min-h-[44px] flex items-center justify-center">
-                    <i data-lucide="heart" class="h-5 w-5 {% if product.id in wishlist_product_ids %}fill-current{% endif %}"></i>
+                    <i data-lucide="heart"
+                        class="h-5 w-5 {% if product.id in wishlist_product_ids %}fill-current{% endif %}"></i>
                 </a>
 
                 <!-- Product Image -->
                 <div class="relative aspect-square w-full overflow-hidden bg-gray-100 skeleton">
                     <a href="{% url 'product_detail' product.slug %}">
-                            <img src="{% if product.image %}{{ product.image.url }}{% else %}https://placehold.co/600?text=No+Image{% endif %}"
-                                alt="{{ product.title }}"
-                                onload="this.classList.remove('opacity-0'); this.parentElement.classList.remove('skeleton')"
-                                class="h-full w-full object-cover transition-all duration-500 group-hover:scale-105 opacity-0">
-                        </a>
-                        <!-- Quick View Button -->
-                        <button onclick="openQuickView('{{ product.id }}')"
-                            class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/90 text-gray-800 px-4 py-2 rounded-full text-xs font-bold shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-green-600 hover:text-white transform translate-y-4 group-hover:translate-y-0 z-20 flex items-center gap-2 whitespace-nowrap">
-                            <i data-lucide="eye" class="h-3 w-3"></i> Quick View
-                        </button>
+                        <img src="{% if product.image %}{{ product.image.url }}{% else %}https://placehold.co/600?text=No+Image{% endif %}"
+                            alt="{{ product.title }}"
+                            onload="this.classList.remove('opacity-0'); this.parentElement.classList.remove('skeleton')"
+                            class="h-full w-full object-cover transition-all duration-500 group-hover:scale-105 opacity-0">
+                    </a>
+                    <!-- Quick View Button -->
+                    <button onclick="openQuickView('{{ product.id }}')"
+                        class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/90 text-gray-800 px-4 py-2 rounded-full text-xs font-bold shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-green-600 hover:text-white transform translate-y-4 group-hover:translate-y-0 z-20 flex items-center gap-2 whitespace-nowrap">
+                        <i data-lucide="eye" class="h-3 w-3"></i> Quick View
+                    </button>
                     {% if product.discount_percentage %}
                     <div class="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
                         -{{ product.discount_percentage }}%
@@ -398,7 +462,7 @@
                     <div class="text-sm text-muted-foreground mb-1">{{ product.category.name }}</div>
                     <a href="{% url 'product_detail' product.slug %}">
                         <h3 class="font-semibold truncate group-hover:text-green-600 transition-colors text-gray-900">
-                                {{ product.title }}</h3>
+                            {{ product.title }}</h3>
                     </a>
                     <div class="flex items-center gap-1 mt-1 mb-2">
                         <i data-lucide="star" class="h-3 w-3 fill-yellow-400 text-yellow-400"></i>
@@ -521,31 +585,7 @@
     </div>
 </section>
 
-<!-- Categories Section -->
-<section class="py-20 bg-gray-50 reveal">
-    <div class="container mx-auto px-4">
-        <div class="flex justify-between items-end mb-12">
-            <div>
-                <h2 class="text-3xl font-bold mb-2">Shop by Category</h2>
-                <p class="text-gray-500">Browse our wide range of organic products</p>
-            </div>
-            <a href="#" class="text-green-600 font-medium hover:underline flex items-center">
-                View All <i data-lucide="arrow-right" class="ml-1 h-4 w-4"></i>
-            </a>
-        </div>
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {% for category in categories %}
-            <a href="{% url 'shop' %}?category={{ category.slug }}"
-                class="group bg-white p-6 rounded-xl border border-gray-100 hover:shadow-md transition-all text-center">
-                <div class="text-4xl mb-4 group-hover:scale-110 transition-transform duration-300">
-                    {{ category.icon|default:"📦" }}
-                </div>
-                <h3 class="font-medium group-hover:text-green-600 transition-colors">{{ category.name }}</h3>
-            </a>
-            {% endfor %}
-        </div>
-    </div>
-</section>
+
 
 
 <!-- New Arrivals Split Section -->
@@ -557,7 +597,7 @@
             <div class="flex items-center gap-4 p-4 border rounded-xl hover:shadow-lg transition-shadow">
                 <div class="w-32 h-32 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 skeleton relative group/img">
                     <img src="{% if product.image %}{{ product.image.url }}{% else %}https://placehold.co/200?text=No+Image{% endif %}"
-                        alt="{{ product.title }}" 
+                        alt="{{ product.title }}"
                         onload="this.classList.remove('opacity-0'); this.parentElement.classList.remove('skeleton')"
                         class="w-full h-full object-cover opacity-0 transition-opacity duration-500 group-hover/img:scale-110">
                     <!-- Mini Quick View for flex items -->
@@ -629,7 +669,7 @@
         <div class="text-center mb-12">
             <h2 class="text-3xl font-bold mb-4">Shop by Category</h2>
             <p class="text-gray-500 mb-8">Quickly find what you need from our top categories</p>
-            
+
             <div class="flex flex-wrap justify-center gap-3 mb-10 overflow-x-auto pb-4 no-scrollbar" id="category-tabs">
                 {% for category_data in categorized_products %}
                 <button onclick="switchTab('{{ category_data.category.slug }}')"
@@ -643,15 +683,17 @@
 
         <div class="relative">
             {% for category_data in categorized_products %}
-            <div id="tab-{{ category_data.category.slug }}" 
+            <div id="tab-{{ category_data.category.slug }}"
                 class="category-panel transition-all duration-500 transform {% if not forloop.first %}hidden opacity-0 translate-y-4{% else %}opacity-100 translate-y-0{% endif %}">
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {% for product in category_data.products %}
-                    <div class="rounded-lg border bg-card text-card-foreground group relative overflow-hidden border-none shadow-sm hover:shadow-md transition-all bg-white">
+                    <div
+                        class="rounded-lg border bg-card text-card-foreground group relative overflow-hidden border-none shadow-sm hover:shadow-md transition-all bg-white">
                         <!-- Wishlist Button -->
                         <a href="{% url 'toggle_wishlist' product.id %}"
                             class="wishlist-btn absolute top-2 right-2 z-20 p-2.5 rounded-full bg-white/90 shadow-sm {% if product.id in wishlist_product_ids %}text-red-500{% else %}text-gray-500{% endif %} hover:text-red-500 hover:bg-white transition-all duration-300 group-hover:opacity-100 {% if product.id in wishlist_product_ids %}opacity-100{% else %}opacity-0{% endif %} min-w-[44px] min-h-[44px] flex items-center justify-center">
-                            <i data-lucide="heart" class="h-5 w-5 {% if product.id in wishlist_product_ids %}fill-current{% endif %}"></i>
+                            <i data-lucide="heart"
+                                class="h-5 w-5 {% if product.id in wishlist_product_ids %}fill-current{% endif %}"></i>
                         </a>
 
                         <!-- Product Image -->
@@ -668,7 +710,8 @@
                                 <i data-lucide="eye" class="h-3 w-3"></i> Quick View
                             </button>
                             {% if product.discount_percentage %}
-                            <div class="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
+                            <div
+                                class="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
                                 -{{ product.discount_percentage }}%
                             </div>
                             {% endif %}
@@ -677,7 +720,8 @@
                         <div class="p-4">
                             <div class="text-sm text-muted-foreground mb-1">{{ product.category.name }}</div>
                             <a href="{% url 'product_detail' product.slug %}">
-                                <h3 class="font-semibold truncate group-hover:text-green-600 transition-colors text-gray-900">
+                                <h3
+                                    class="font-semibold truncate group-hover:text-green-600 transition-colors text-gray-900">
                                     {{ product.title }}</h3>
                             </a>
                             <div class="flex items-center gap-1 mt-1 mb-2">
@@ -714,7 +758,7 @@
                     </div>
                     {% endfor %}
                 </div>
-                
+
                 <div class="text-center mt-12">
                     <a href="{% url 'shop' %}?category={{ category_data.category.slug }}"
                         class="inline-flex items-center gap-2 bg-green-50 text-green-700 px-10 py-4 rounded-full font-bold hover:bg-green-100 transition-all border border-green-100 hover:scale-105 transform">
@@ -729,8 +773,14 @@
 </section>
 
 <style>
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
 </style>
 
 <script>
@@ -741,7 +791,7 @@
             panel.classList.remove('opacity-100', 'translate-y-0');
             panel.classList.add('opacity-0', 'translate-y-4');
         });
-        
+
         const activePanel = document.getElementById('tab-' + slug);
         activePanel.classList.remove('hidden');
         // Trigger reflow for transition
@@ -754,11 +804,11 @@
             btn.classList.remove('bg-green-600', 'border-green-600', 'text-white', 'active-tab');
             btn.classList.add('text-gray-600', 'bg-white', 'hover:border-green-300', 'hover:text-green-600', 'border-gray-200');
         });
-        
+
         const activeBtn = document.querySelector(`[data-category="${slug}"]`);
         activeBtn.classList.add('bg-green-600', 'border-green-600', 'text-white', 'active-tab');
         activeBtn.classList.remove('text-gray-600', 'bg-white', 'hover:border-green-300', 'hover:text-green-600', 'border-gray-200');
-        
+
         // Refresh icons if needed
         if (typeof lucide !== 'undefined') {
             lucide.createIcons();
@@ -796,7 +846,8 @@
                     <!-- Quick View Over Sale Img -->
                     <button onclick="openQuickView('{{ product.id }}')"
                         class="absolute inset-0 bg-black/20 opacity-0 group-hover/savers:opacity-100 transition-opacity flex items-center justify-center">
-                        <div class="bg-white/90 text-gray-800 p-2 rounded-full shadow-lg transform scale-90 group-hover/savers:scale-100 transition-transform">
+                        <div
+                            class="bg-white/90 text-gray-800 p-2 rounded-full shadow-lg transform scale-90 group-hover/savers:scale-100 transition-transform">
                             <i data-lucide="eye" class="h-5 w-5"></i>
                         </div>
                     </button>
@@ -832,231 +883,237 @@
         </div>
     </div>
 
-<!-- Trust & Certification Section -->
-<section class="py-12 bg-green-50 border-t border-b border-green-100">
-    <div class="container mx-auto px-4">
-        <div class="flex flex-wrap justify-around items-center gap-8 opacity-80 grayscale hover:grayscale-0 transition-all duration-700">
-            <div class="flex items-center gap-3">
-                <div class="bg-white p-3 rounded-full shadow-sm">
-                    <i data-lucide="leaf" class="h-8 w-8 text-green-600"></i>
-                </div>
-                <div class="text-left">
-                    <p class="font-bold text-gray-900 text-sm">Certified Organic</p>
-                    <p class="text-xs text-gray-500">100% Natural Sourcing</p>
-                </div>
-            </div>
-            <div class="flex items-center gap-3">
-                <div class="bg-white p-3 rounded-full shadow-sm">
-                    <i data-lucide="shield-check" class="h-8 w-8 text-green-600"></i>
-                </div>
-                <div class="text-left">
-                    <p class="font-bold text-gray-900 text-sm">Secure Payment</p>
-                    <p class="text-xs text-gray-500">SSL Encrypted Checkout</p>
-                </div>
-            </div>
-            <div class="flex items-center gap-3">
-                <div class="bg-white p-3 rounded-full shadow-sm">
-                    <i data-lucide="package" class="h-8 w-8 text-green-600"></i>
-                </div>
-                <div class="text-left">
-                    <p class="font-bold text-gray-900 text-sm">Eco Packaging</p>
-                    <p class="text-xs text-gray-500">Recyclable Materials</p>
-                </div>
-            </div>
-            <div class="flex items-center gap-3">
-                <div class="bg-white p-3 rounded-full shadow-sm">
-                    <i data-lucide="award" class="h-8 w-8 text-green-600"></i>
-                </div>
-                <div class="text-left">
-                    <p class="font-bold text-gray-900 text-sm">Quality Assured</p>
-                    <p class="text-xs text-gray-500">Strict Quality Checks</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- FAQ Section -->
-<section class="py-20 bg-white reveal">
-    <div class="container mx-auto px-4 max-w-4xl">
-        <div class="text-center mb-12">
-            <h2 class="text-3xl font-bold mb-4">Frequently Asked Questions</h2>
-            <p class="text-gray-500">Common questions about our services</p>
-        </div>
-
-        <div class="space-y-4">
-            <!-- FAQ Item 1 -->
-            <details
-                class="group bg-gray-50 rounded-xl p-4 [&_summary::-webkit-details-marker]:hidden border border-gray-100 open:border-green-200 open:bg-green-50 transition-colors">
-                <summary
-                    class="flex cursor-pointer items-center justify-between gap-1.5 text-gray-900 font-bold group-open:text-green-700">
-                    <h3 class="text-lg">How fast is the delivery?</h3>
-                    <span class="relative size-5 shrink-0 ml-4">
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            class="absolute inset-0 size-5 opacity-100 group-open:opacity-0" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            class="absolute inset-0 size-5 opacity-0 group-open:opacity-100" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                    </span>
-                </summary>
-                <p class="mt-4 leading-relaxed text-gray-700">
-                    We offer express delivery within Dhaka city. You can expect your grocery at your doorstep within 2-4
-                    hours of placing the order. For other areas, it takes 24-48 hours.
-                </p>
-            </details>
-
-            <!-- FAQ Item 2 -->
-            <details
-                class="group bg-gray-50 rounded-xl p-4 [&_summary::-webkit-details-marker]:hidden border border-gray-100 open:border-green-200 open:bg-green-50 transition-colors">
-                <summary
-                    class="flex cursor-pointer items-center justify-between gap-1.5 text-gray-900 font-bold group-open:text-green-700">
-                    <h3 class="text-lg">Are your products 100% organic?</h3>
-                    <span class="relative size-5 shrink-0 ml-4">
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            class="absolute inset-0 size-5 opacity-100 group-open:opacity-0" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            class="absolute inset-0 size-5 opacity-0 group-open:opacity-100" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                    </span>
-                </summary>
-                <p class="mt-4 leading-relaxed text-gray-700">
-                    Yes! We source our vegetables, fruits, and other products directly from certified organic farms. We
-                    ensure zero chemical usage in our supply chain.
-                </p>
-            </details>
-
-            <!-- FAQ Item 3 -->
-            <details
-                class="group bg-gray-50 rounded-xl p-4 [&_summary::-webkit-details-marker]:hidden border border-gray-100 open:border-green-200 open:bg-green-50 transition-colors">
-                <summary
-                    class="flex cursor-pointer items-center justify-between gap-1.5 text-gray-900 font-bold group-open:text-green-700">
-                    <h3 class="text-lg">What is your return policy?</h3>
-                    <span class="relative size-5 shrink-0 ml-4">
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            class="absolute inset-0 size-5 opacity-100 group-open:opacity-0" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            class="absolute inset-0 size-5 opacity-0 group-open:opacity-100" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                    </span>
-                </summary>
-                <p class="mt-4 leading-relaxed text-gray-700">
-                    If you are not satisfied with the quality of any product, you can return it immediately at the time
-                    of delivery. We have a 'no questions asked' return policy for fresh items.
-                </p>
-            </details>
-        </div>
-    </div>
-</section>
-
-<!-- App Download Section -->
-<section class="py-20 bg-green-50 overflow-hidden">
-    <div class="container mx-auto px-4">
-        <div
-            class="bg-green-600 rounded-3xl p-8 md:p-16 flex flex-col md:flex-row items-center justify-between relative overflow-hidden shadow-2xl">
-            <!-- Decor -->
+    <!-- Trust & Certification Section -->
+    <section class="py-12 bg-green-50 border-t border-b border-green-100">
+        <div class="container mx-auto px-4">
             <div
-                class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2">
-            </div>
-            <div
-                class="absolute bottom-0 left-0 w-64 h-64 bg-black/10 rounded-full blur-3xl transform -translate-x-1/2 translate-y-1/2">
-            </div>
-
-            <div class="relative z-10 md:w-1/2 text-white mb-8 md:mb-0 text-center md:text-left">
-                <div
-                    class="inline-block bg-green-500/50 backdrop-blur-sm px-4 py-1 rounded-full text-sm font-bold mb-4 border border-green-400">
-                    📱 Mobile App Coming Soon
-                </div>
-                <h2 class="text-3xl md:text-5xl font-bold mb-4 leading-tight">Shop on the Go!</h2>
-                <p class="text-green-100 text-lg mb-8 max-w-md">
-                    Download the Al Barakah Mart app for a better shopping experience. Get exclusive deals, track
-                    orders, and more.
-                </p>
-                <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-                    <button
-                        class="bg-black text-white px-6 py-3 rounded-xl flex items-center justify-center gap-3 hover:bg-gray-900 transition-colors shadow-lg group">
-                        <i data-lucide="apple" class="h-8 w-8 fill-current"></i>
-                        <div class="text-left">
-                            <div class="text-[10px] uppercase font-bold tracking-wider opacity-80">Download on the</div>
-                            <div class="text-xl font-bold leading-none">App Store</div>
-                        </div>
-                    </button>
-                    <button
-                        class="bg-black text-white px-6 py-3 rounded-xl flex items-center justify-center gap-3 hover:bg-gray-900 transition-colors shadow-lg group">
-                        <i data-lucide="play" class="h-8 w-8 fill-white"></i>
-                        <div class="text-left">
-                            <div class="text-[10px] uppercase font-bold tracking-wider opacity-80">Get it on</div>
-                            <div class="text-xl font-bold leading-none">Google Play</div>
-                        </div>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Mockup Image -->
-            <div class="relative z-10 md:w-1/2 flex justify-center perspective-1000">
-                <div
-                    class="relative w-64 md:w-72 bg-gray-900 rounded-[3rem] border-8 border-gray-900 shadow-2xl overflow-hidden transform rotate-[-5deg] hover:rotate-0 transition-transform duration-500">
-                    <div
-                        class="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-6 bg-gray-900 rounded-b-xl z-20">
+                class="flex flex-wrap justify-around items-center gap-8 opacity-80 grayscale hover:grayscale-0 transition-all duration-700">
+                <div class="flex items-center gap-3">
+                    <div class="bg-white p-3 rounded-full shadow-sm">
+                        <i data-lucide="leaf" class="h-8 w-8 text-green-600"></i>
                     </div>
-                    <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=400"
-                        alt="App Screen" class="w-full h-full object-cover">
-                    <!-- Overlay -->
-                    <div
-                        class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-6 text-white text-center">
-                        <p class="font-bold text-xl">Al Barakah Mart</p>
-                        <p class="text-sm opacity-80">Freshness in your pocket</p>
+                    <div class="text-left">
+                        <p class="font-bold text-gray-900 text-sm">Certified Organic</p>
+                        <p class="text-xs text-gray-500">100% Natural Sourcing</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="bg-white p-3 rounded-full shadow-sm">
+                        <i data-lucide="shield-check" class="h-8 w-8 text-green-600"></i>
+                    </div>
+                    <div class="text-left">
+                        <p class="font-bold text-gray-900 text-sm">Secure Payment</p>
+                        <p class="text-xs text-gray-500">SSL Encrypted Checkout</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="bg-white p-3 rounded-full shadow-sm">
+                        <i data-lucide="package" class="h-8 w-8 text-green-600"></i>
+                    </div>
+                    <div class="text-left">
+                        <p class="font-bold text-gray-900 text-sm">Eco Packaging</p>
+                        <p class="text-xs text-gray-500">Recyclable Materials</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="bg-white p-3 rounded-full shadow-sm">
+                        <i data-lucide="award" class="h-8 w-8 text-green-600"></i>
+                    </div>
+                    <div class="text-left">
+                        <p class="font-bold text-gray-900 text-sm">Quality Assured</p>
+                        <p class="text-xs text-gray-500">Strict Quality Checks</p>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- Newsletter Section -->
-<section class="py-20 bg-green-900 text-white relative overflow-hidden">
-    <!-- Decorative Circles -->
-    <div class="absolute -top-24 -left-24 w-64 h-64 bg-green-800 rounded-full opacity-50 blur-3xl"></div>
-    <div class="absolute -bottom-24 -right-24 w-64 h-64 bg-green-800 rounded-full opacity-50 blur-3xl"></div>
+    <!-- FAQ Section -->
+    <section class="py-20 bg-white reveal">
+        <div class="container mx-auto px-4 max-w-4xl">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold mb-4">Frequently Asked Questions</h2>
+                <p class="text-gray-500">Common questions about our services</p>
+            </div>
 
-    <div class="container mx-auto px-4 text-center relative z-10">
-        <div class="h-16 w-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-6 backdrop-blur-sm">
-            <i data-lucide="mail" class="h-8 w-8 text-white"></i>
+            <div class="space-y-4">
+                <!-- FAQ Item 1 -->
+                <details
+                    class="group bg-gray-50 rounded-xl p-4 [&_summary::-webkit-details-marker]:hidden border border-gray-100 open:border-green-200 open:bg-green-50 transition-colors">
+                    <summary
+                        class="flex cursor-pointer items-center justify-between gap-1.5 text-gray-900 font-bold group-open:text-green-700">
+                        <h3 class="text-lg">How fast is the delivery?</h3>
+                        <span class="relative size-5 shrink-0 ml-4">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                class="absolute inset-0 size-5 opacity-100 group-open:opacity-0" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                class="absolute inset-0 size-5 opacity-0 group-open:opacity-100" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </span>
+                    </summary>
+                    <p class="mt-4 leading-relaxed text-gray-700">
+                        We offer express delivery within Dhaka city. You can expect your grocery at your doorstep within
+                        2-4
+                        hours of placing the order. For other areas, it takes 24-48 hours.
+                    </p>
+                </details>
+
+                <!-- FAQ Item 2 -->
+                <details
+                    class="group bg-gray-50 rounded-xl p-4 [&_summary::-webkit-details-marker]:hidden border border-gray-100 open:border-green-200 open:bg-green-50 transition-colors">
+                    <summary
+                        class="flex cursor-pointer items-center justify-between gap-1.5 text-gray-900 font-bold group-open:text-green-700">
+                        <h3 class="text-lg">Are your products 100% organic?</h3>
+                        <span class="relative size-5 shrink-0 ml-4">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                class="absolute inset-0 size-5 opacity-100 group-open:opacity-0" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                class="absolute inset-0 size-5 opacity-0 group-open:opacity-100" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </span>
+                    </summary>
+                    <p class="mt-4 leading-relaxed text-gray-700">
+                        Yes! We source our vegetables, fruits, and other products directly from certified organic farms.
+                        We
+                        ensure zero chemical usage in our supply chain.
+                    </p>
+                </details>
+
+                <!-- FAQ Item 3 -->
+                <details
+                    class="group bg-gray-50 rounded-xl p-4 [&_summary::-webkit-details-marker]:hidden border border-gray-100 open:border-green-200 open:bg-green-50 transition-colors">
+                    <summary
+                        class="flex cursor-pointer items-center justify-between gap-1.5 text-gray-900 font-bold group-open:text-green-700">
+                        <h3 class="text-lg">What is your return policy?</h3>
+                        <span class="relative size-5 shrink-0 ml-4">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                class="absolute inset-0 size-5 opacity-100 group-open:opacity-0" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                class="absolute inset-0 size-5 opacity-0 group-open:opacity-100" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </span>
+                    </summary>
+                    <p class="mt-4 leading-relaxed text-gray-700">
+                        If you are not satisfied with the quality of any product, you can return it immediately at the
+                        time
+                        of delivery. We have a 'no questions asked' return policy for fresh items.
+                    </p>
+                </details>
+            </div>
         </div>
-        <h2 class="text-3xl md:text-4xl font-bold mb-4">Stay Fresh, Stay Updated</h2>
-        <p class="text-green-100 mb-8 max-w-lg mx-auto">
-            Subscribe to our newsletter to get updates about new products, special offers, and organic farming tips.
-        </p>
+    </section>
 
-        <form class="max-w-md mx-auto relative flex gap-2">
-            <input type="email" placeholder="Enter your email address"
-                class="w-full px-6 py-4 rounded-full bg-white/10 border border-green-700 text-white placeholder:text-green-200 focus:outline-none focus:ring-2 focus:ring-green-400 focus:bg-white/20 transition-all backdrop-blur-sm">
-            <button type="submit"
-                class="absolute right-2 top-2 bottom-2 bg-white text-green-900 px-6 rounded-full font-bold hover:bg-green-50 transition-colors shadow-md text-sm">
-                Subscribe
-            </button>
-        </form>
-        <p class="text-xs text-green-300 mt-4">We respect your privacy. Unsubscribe at any time.</p>
-    </div>
-</section>
-{% endblock %}
+    <!-- App Download Section -->
+    <section class="py-20 bg-green-50 overflow-hidden">
+        <div class="container mx-auto px-4">
+            <div
+                class="bg-green-600 rounded-3xl p-8 md:p-16 flex flex-col md:flex-row items-center justify-between relative overflow-hidden shadow-2xl">
+                <!-- Decor -->
+                <div
+                    class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2">
+                </div>
+                <div
+                    class="absolute bottom-0 left-0 w-64 h-64 bg-black/10 rounded-full blur-3xl transform -translate-x-1/2 translate-y-1/2">
+                </div>
+
+                <div class="relative z-10 md:w-1/2 text-white mb-8 md:mb-0 text-center md:text-left">
+                    <div
+                        class="inline-block bg-green-500/50 backdrop-blur-sm px-4 py-1 rounded-full text-sm font-bold mb-4 border border-green-400">
+                        📱 Mobile App Coming Soon
+                    </div>
+                    <h2 class="text-3xl md:text-5xl font-bold mb-4 leading-tight">Shop on the Go!</h2>
+                    <p class="text-green-100 text-lg mb-8 max-w-md">
+                        Download the Al Barakah Mart app for a better shopping experience. Get exclusive deals, track
+                        orders, and more.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                        <button
+                            class="bg-black text-white px-6 py-3 rounded-xl flex items-center justify-center gap-3 hover:bg-gray-900 transition-colors shadow-lg group">
+                            <i data-lucide="apple" class="h-8 w-8 fill-current"></i>
+                            <div class="text-left">
+                                <div class="text-[10px] uppercase font-bold tracking-wider opacity-80">Download on the
+                                </div>
+                                <div class="text-xl font-bold leading-none">App Store</div>
+                            </div>
+                        </button>
+                        <button
+                            class="bg-black text-white px-6 py-3 rounded-xl flex items-center justify-center gap-3 hover:bg-gray-900 transition-colors shadow-lg group">
+                            <i data-lucide="play" class="h-8 w-8 fill-white"></i>
+                            <div class="text-left">
+                                <div class="text-[10px] uppercase font-bold tracking-wider opacity-80">Get it on</div>
+                                <div class="text-xl font-bold leading-none">Google Play</div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mockup Image -->
+                <div class="relative z-10 md:w-1/2 flex justify-center perspective-1000">
+                    <div
+                        class="relative w-64 md:w-72 bg-gray-900 rounded-[3rem] border-8 border-gray-900 shadow-2xl overflow-hidden transform rotate-[-5deg] hover:rotate-0 transition-transform duration-500">
+                        <div
+                            class="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-6 bg-gray-900 rounded-b-xl z-20">
+                        </div>
+                        <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=400"
+                            alt="App Screen" class="w-full h-full object-cover">
+                        <!-- Overlay -->
+                        <div
+                            class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-6 text-white text-center">
+                            <p class="font-bold text-xl">Al Barakah Mart</p>
+                            <p class="text-sm opacity-80">Freshness in your pocket</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter Section -->
+    <section class="py-20 bg-green-900 text-white relative overflow-hidden">
+        <!-- Decorative Circles -->
+        <div class="absolute -top-24 -left-24 w-64 h-64 bg-green-800 rounded-full opacity-50 blur-3xl"></div>
+        <div class="absolute -bottom-24 -right-24 w-64 h-64 bg-green-800 rounded-full opacity-50 blur-3xl"></div>
+
+        <div class="container mx-auto px-4 text-center relative z-10">
+            <div
+                class="h-16 w-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-6 backdrop-blur-sm">
+                <i data-lucide="mail" class="h-8 w-8 text-white"></i>
+            </div>
+            <h2 class="text-3xl md:text-4xl font-bold mb-4">Stay Fresh, Stay Updated</h2>
+            <p class="text-green-100 mb-8 max-w-lg mx-auto">
+                Subscribe to our newsletter to get updates about new products, special offers, and organic farming tips.
+            </p>
+
+            <form class="max-w-md mx-auto relative flex gap-2">
+                <input type="email" placeholder="Enter your email address"
+                    class="w-full px-6 py-4 rounded-full bg-white/10 border border-green-700 text-white placeholder:text-green-200 focus:outline-none focus:ring-2 focus:ring-green-400 focus:bg-white/20 transition-all backdrop-blur-sm">
+                <button type="submit"
+                    class="absolute right-2 top-2 bottom-2 bg-white text-green-900 px-6 rounded-full font-bold hover:bg-green-50 transition-colors shadow-md text-sm">
+                    Subscribe
+                </button>
+            </form>
+            <p class="text-xs text-green-300 mt-4">We respect your privacy. Unsubscribe at any time.</p>
+        </div>
+    </section>
+    {% endblock %}
