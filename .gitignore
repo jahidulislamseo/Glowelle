@@ -34,9 +34,10 @@ db.sqlite3-journal
 /static_root
 
 # Environment variables
-.env
-.env.local
-.env.*.local
+# WARNING: .env is now tracked in Git - SECURITY RISK!
+# .env
+# .env.local
+# .env.*.local
 
 # IDE
 .vscode/
