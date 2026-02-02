@@ -133,25 +133,45 @@
                 <!-- Price Range -->
                 <div>
                     <h3 class="font-semibold mb-3">Price Range</h3>
-                    <div class="flex items-center gap-2">
-                        <input type="number" placeholder="Min"
-                            class="w-20 h-10 px-3 rounded-md border border-gray-200 text-sm">
-                        <span>-</span>
-                        <input type="number" placeholder="Max"
-                            class="w-20 h-10 px-3 rounded-md border border-gray-200 text-sm">
-                    </div>
+                    <form action="{% url 'shop' %}" method="get" id="price-filter-form">
+                        {% if current_category %}
+                        <input type="hidden" name="category" value="{{ current_category }}">
+                        {% endif %}
+                        <div class="flex items-center gap-2 mb-3">
+                            <input type="number" name="min_price" placeholder="Min" value="{{ request.GET.min_price }}"
+                                class="w-20 h-10 px-3 rounded-md border border-gray-200 text-sm">
+                            <span>-</span>
+                            <input type="number" name="max_price" placeholder="Max" value="{{ request.GET.max_price }}"
+                                class="w-20 h-10 px-3 rounded-md border border-gray-200 text-sm">
+                        </div>
+                        <button type="submit" class="w-full bg-green-600 text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-green-700 transition-colors">
+                            Apply
+                        </button>
+                    </form>
                 </div>
 
                 <!-- Sort By -->
                 <div>
                     <h3 class="font-semibold mb-3">Sort By</h3>
-                    <select class="w-full h-10 px-3 rounded-md border border-gray-200 bg-white text-sm">
-                        <option>Newest Arrivals</option>
-                        <option>Price:Low to High</option>
-                        <option>Price:High to Low</option>
-                        <option>Best Selling</option>
-                    </select>
+                    <form action="{% url 'shop' %}" method="get" id="sort-form">
+                        {% if current_category %}
+                        <input type="hidden" name="category" value="{{ current_category }}">
+                        {% endif %}
+                        {% if request.GET.min_price %}
+                        <input type="hidden" name="min_price" value="{{ request.GET.min_price }}">
+                        {% endif %}
+                        {% if request.GET.max_price %}
+                        <input type="hidden" name="max_price" value="{{ request.GET.max_price }}">
+                        {% endif %}
+                        <select name="sort" onchange="this.form.submit()" class="w-full h-10 px-3 rounded-md border border-gray-200 bg-white text-sm">
+                            <option value="">Newest Arrivals</option>
+                            <option value="price_low" {% if request.GET.sort == 'price_low' %}selected{% endif %}>Price:Low to High</option>
+                            <option value="price_high" {% if request.GET.sort == 'price_high' %}selected{% endif %}>Price:High to Low</option>
+                            <option value="best_selling" {% if request.GET.sort == 'best_selling' %}selected{% endif %}>Best Selling</option>
+                        </select>
+                    </form>
                 </div>
+
             </div>
         </aside>
 

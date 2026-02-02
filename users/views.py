@@ -174,8 +174,9 @@ def order_history(request):
 
 @login_required
 def address_list(request):
-    addresses = request.user.addresses.all().order_by('-is_default', '-created_at')
+    addresses = request.user.addresses.all().order_by('-is_default', 'id')
     return render(request, 'users/dashboard_addresses.html', {'addresses': addresses})
+
 
 @login_required
 def wallet_view(request):

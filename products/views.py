@@ -90,12 +90,17 @@ def shop(request):
         products = products.filter(price__lte=max_price)
 
     # Sort
-    sort_by = request.GET.get('sort', 'newest')
-    if sort_by == 'price_asc':
+    sort_by = request.GET.get('sort', '')
+    if sort_by == 'price_low':
         products = products.order_by('price')
-    elif sort_by == 'price_desc':
+    elif sort_by == 'price_high':
         products = products.order_by('-price')
-    else: # newest
+    elif sort_by == 'best_selling':
+        # Sort by number of times ordered
+        products = products.annotate(
+            order_count=Count('orderitem')
+        ).order_by('-order_count', '-created_at')
+    else:  # newest or empty
         products = products.order_by('-created_at')
 
     # Search
