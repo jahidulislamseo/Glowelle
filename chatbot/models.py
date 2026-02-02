@@ -75,6 +75,7 @@ class ChatbotIntent(models.Model):
     intent_key = models.CharField(max_length=50, unique=True, help_text="The internal key (e.g., 'buying', 'support')")
     display_name = models.CharField(max_length=100)
     keywords = models.TextField(help_text="Comma-separated keywords to trigger this intent")
+    is_active = models.BooleanField(default=True, help_text="Whether this intent is active")
     
     class Meta:
         verbose_name = "Chatbot Intent"
@@ -83,3 +84,39 @@ class ChatbotIntent(models.Model):
 
     def __str__(self):
         return self.display_name
+
+class ChatbotConversationMemory(models.Model):
+    """
+    Tracks conversation history and user preferences for memory-based learning.
+    """
+    session_id = models.CharField(max_length=255, db_index=True, help_text="Unique session identifier")
+    user_message = models.TextField(help_text="User's message")
+    bot_response = models.TextField(help_text="Bot's response")
+    detected_intent = models.CharField(max_length=50, blank=True, help_text="Detected intent (greeting, product_query, etc.)")
+    
+    # User preferences (stored as JSON)
+    user_preferences = models.JSONField(
+        default=dict, 
+        blank=True,
+        help_text="User preferences like last_product, language, etc."
+    )
+    
+    # Greeting counter
+    greeting_count = models.IntegerField(default=0, help_text="Number of times user greeted in this session")
+    
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    
+    class Meta:
+        verbose_name = "Conversation Memory"
+        verbose_name_plural = "Conversation Memories"
+        db_table = 'chatbot_conversation_memory'
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['session_id', '-created_at'], name='session_created_idx'),
+        ]
+    
+    def __str__(self):
+        return f"Session {self.session_id} - {self.created_at.strftime('%Y-%m-%d %H:%M')}"
+
+# Import analytics models
+from .analytics_models import ChatbotAnalytics, ChatbotMetric, PopularProduct

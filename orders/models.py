@@ -249,6 +249,14 @@ class Order(models.Model):
                 description=f"Order marked as {self.get_status_display()}"
             )
             
+            # Send notification on status change
+            if status_changed:
+                try:
+                    from chatbot.notification_service import send_order_notification
+                    send_order_notification(self, status_change=True)
+                except Exception as e:
+                    print(f"Notification error: {e}")
+            
         self._original_status = self.status
 
     def __str__(self):

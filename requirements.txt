@@ -46,3 +46,7 @@ dnspython>=2.5.0
 openai
 google-generativeai>=0.8.0
 django-allauth==0.63.3
+
+# Advanced Chatbot Features
+twilio>=9.10.0
+deep-translator>=1.11.4

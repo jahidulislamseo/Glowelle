@@ -11,6 +11,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import render
 from django.utils import timezone
 from django.conf import settings
+from django.db import models
 import google.generativeai as genai
 from openai import OpenAI
 from decouple import config
@@ -21,6 +22,21 @@ from products.models import Product
 from core.mongodb_utils import get_mongodb_db
 from core.models import SiteSettings
 from .models import ChatbotFAQ, ChatbotSettings, ChatbotSuggestion, ChatbotIntent
+from .ai_training_helpers import (
+    detect_intent_advanced, 
+    get_greeting_response, 
+    get_training_response,
+    save_conversation_memory,
+    get_session_memory,
+    get_user_info
+)
+from .analytics_models import ChatbotMetric, ChatbotAnalytics, PopularProduct
+from .recommendation_engine import get_recommendation_context
+from .language_support import detect_language, get_system_prompt_by_language
+from .payment_integration import get_payment_service
+from .discount_engine import get_discount_context
+from .order_manager import get_order_manager
+from .personality_engine import get_contextual_greeting, get_time_based_greeting
 
 User = get_user_model()
 
@@ -58,7 +74,16 @@ class OpenRouterSession:
         self.model = model
         self.history = [] 
 
-    def send_message(self, message):
+    def send_message(self, message, system_instructions=""):
+        if system_instructions and not self.history:
+            self.history.append({"role": "system", "content": system_instructions})
+        elif system_instructions:
+            # Update system prompt if it changed or ensure it's at the top
+            if self.history and self.history[0]["role"] == "system":
+                self.history[0]["content"] = system_instructions
+            else:
+                self.history.insert(0, {"role": "system", "content": system_instructions})
+                
         self.history.append({"role": "user", "content": message})
         try:
             completion = self.client.chat.completions.create(
@@ -69,7 +94,7 @@ class OpenRouterSession:
                 model=self.model,
                 messages=self.history,
                 temperature=0.9,
-                max_tokens=300
+                max_tokens=400
             )
             response_text = completion.choices[0].message.content
             self.history.append({"role": "assistant", "content": response_text})
@@ -117,19 +142,36 @@ def create_order_from_chat(session_id, phone, address, chat_history):
         except:
             pass
     try:
+        # Try to find user by phone
         user = User.objects.filter(phone=phone).first()
+        
+        # If no user found, try to find by phone in different format
+        if not user:
+            clean_phone = phone.replace('+88', '').replace('88', '').replace('-', '').replace(' ', '')
+            user = User.objects.filter(phone__contains=clean_phone).first()
+        
+        # Get user email or use a valid default
+        user_email = user.email if user and user.email else f"chatbot_{phone.replace('+', '').replace(' ', '')}@albarakahmart.com"
+        user_name = user.get_full_name() if user and hasattr(user, 'get_full_name') else "Chat Customer"
+        
+        # Create order with all required fields
         order = Order.objects.create(
             user=user,
-            full_name="Chat Customer",
+            full_name=user_name,
+            email=user_email,
             phone=phone,
             address=address,
             city="Dhaka",
             payment_method='cod',
+            payment_status='unpaid',
             subtotal=target_product['price'] * target_qty,
+            delivery_charge=0,
             total=target_product['price'] * target_qty,
             status='pending',
             source='website'
         )
+        
+        # Create order item
         product_obj = Product.objects.get(id=target_product['id'])
         OrderItem.objects.create(
             order=order,
@@ -137,9 +179,27 @@ def create_order_from_chat(session_id, phone, address, chat_history):
             quantity=target_qty,
             price=target_product['price']
         )
+        
+        # Track order in analytics
+        try:
+            from .analytics_models import ChatbotMetric
+            metric = ChatbotMetric.objects.filter(session_id=session_id).order_by('-started_at').first()
+            if metric:
+                metric.mark_order_placed(order)
+        except Exception as analytics_error:
+            print(f"Analytics tracking error: {analytics_error}")
+        
+        # Send notification (if configured)
+        try:
+            from .notification_service import send_order_notification
+            send_order_notification(order)
+        except Exception as notif_error:
+            print(f"Notification error: {notif_error}")
+        
         return order, f"✅ Order #{order.order_reference} Placed! Total: {order.total} BDT. We will call you soon."
     except Exception as e:
-        return None, "❌ Sorry, I couldn't place the order due to a technical error."
+        print(f"Order creation error: {e}")
+        return None, f"❌ Sorry, I couldn't place the order. Error: {str(e)}"
 
 def detect_intent(message):
     message_lower = message.lower()
@@ -205,44 +265,102 @@ def handle_order_tracking(message, session_id):
         return "❌ Sorry, I encountered an error while tracking your order. Please try again or contact support."
 
 def get_product_context(query, intent='browsing'):
+    """
+    Advanced search with keyword cleaning, tokenization, and multi-DB retrieval.
+    """
+    # 1. Clean the query
+    noise_words = [
+        'ase', 'hobe', 'ache', 'chi', 'koto', 'dam', 'price', 'bhai', 'apnader', 
+        'have', 'is', 'available', 'want', 'need', 'অাছে', 'হবে', 'দাম', 'কত', 'চান', 'ভাই'
+    ]
+    # Remove punctuation and split into tokens
+    clean_query = re.sub(r'[^\w\s]', ' ', query.lower())
+    tokens = [t for t in clean_query.split() if t and t not in noise_words]
+    
+    if not tokens:
+        # Fallback to original query if everything was noise
+        tokens = [query.lower()]
+
+    # 2. Retrieval from Django DB (Primary)
+    # Search for products where title or description contains ANY of the tokens
+    q_objects = models.Q()
+    for token in tokens:
+        q_objects |= models.Q(title__icontains=token) | models.Q(short_description__icontains=token)
+    
+    django_products = list(Product.objects.filter(q_objects).values(
+        'id', 'title', 'price', 'slug', 'short_description', 'original_price', 'stock_quantity', 'category__name'
+    )[:5])
+
+    # 3. Retrieval from MongoDB (Secondary/Archive)
     db = get_mongodb_db()
-    if db is None:
-        return "", []
-    priority_products = list(Product.objects.filter(chatbot_priority=True).values('id', 'title', 'price', 'slug', 'short_description'))
-    products = db['products'].find({
-        "$or": [
-            {"title": {"$regex": query, "$options": "i"}},
-            {"description": {"$regex": query, "$options": "i"}},
-            {"category_name": {"$regex": query, "$options": "i"}},
-            {"short_description": {"$regex": query, "$options": "i"}}
-        ]
-    }).limit(5)
-    products_list = list(products)
-    if priority_products and not query == "":
-        matched_priority = [p for p in priority_products if query.lower() in p['title'].lower()]
-        products_list = matched_priority + products_list
-    if not products_list:
-        return "❌ No specific products found.", []
-    context = "📦 Available Products:\n"
-    for p in products_list:
+    mongo_products = []
+    if db is not None:
+        try:
+            mongo_query = {"$or": []}
+            for token in tokens:
+                mongo_query["$or"].extend([
+                    {"title": {"$regex": token, "$options": "i"}},
+                    {"description": {"$regex": token, "$options": "i"}},
+                    {"category_name": {"$regex": token, "$options": "i"}}
+                ])
+            if mongo_query["$or"]:
+                mongo_products = list(db['products'].find(mongo_query).limit(5))
+        except Exception:
+            pass
+
+    # 4. Merge and Deduplicate (Prioritize Django DB)
+    seen_slugs = set()
+    unified_products = []
+    
+    for p in django_products:
+        if p['slug'] not in seen_slugs:
+            # Rename original_price to compare_at_price for consistent logic below
+            p['compare_at_price'] = p.pop('original_price')
+            p['category_name'] = p.pop('category__name')
+            unified_products.append(p)
+            seen_slugs.add(p['slug'])
+            
+    for p in mongo_products:
+        p_slug = p.get('slug')
+        if p_slug and p_slug not in seen_slugs:
+            # MongoDB objects usually have compare_at_price if synced correctly
+            unified_products.append(p)
+            seen_slugs.add(p_slug)
+
+    # 5. Handle Priority Products
+    if not query == "":
+        priority_products = list(Product.objects.filter(chatbot_priority=True).values(
+            'id', 'title', 'price', 'slug', 'short_description', 'original_price', 'stock_quantity', 'category__name'
+        ))
+        matched_priority = [p for p in priority_products if any(t in p['title'].lower() for t in tokens)]
+        for mp in matched_priority:
+            if mp['slug'] not in seen_slugs:
+                mp['compare_at_price'] = mp.pop('original_price')
+                mp['category_name'] = mp.pop('category__name')
+                unified_products.insert(0, mp)
+                seen_slugs.add(mp['slug'])
+
+    # 6. Generate Context String
+    if not unified_products:
+        return "❌ I couldn't find specific products matching your query. However, Al Barakah Mart sources the freshest organic items daily. Try asking for Rice, Fish, Meat, or Honey!", []
+    
+    branding_ctx = "🌟 BRAND KNOWLEDGE: Al Barakah Mart sources directly from organic farms. 100% Chemical-free. Return-on-delivery if quality fails.\n"
+    context = branding_ctx + "📦 Available Products:\n"
+    for p in unified_products[:5]:
         context += f"\n🛒 **{p['title']}**\n   💰 Price: **{p['price']} BDT**"
-        if p.get('compare_at_price') and float(p['compare_at_price']) > float(p['price']):
-            discount = ((float(p['compare_at_price']) - float(p['price'])) / float(p['compare_at_price'])) * 100
+        
+        compare_price = p.get('compare_at_price')
+        if compare_price and float(compare_price) > float(p['price']):
+            discount = ((float(compare_price) - float(p['price'])) / float(compare_price)) * 100
             context += f" (🔥 **{discount:.0f}% OFF!**)"
-        context += f"\n   📂 Category: {p.get('category_name', 'N/A')}"
+            
+        context += f"\n   📂 Status: {'✅ In Stock' if int(p.get('stock_quantity', 0)) > 0 else '❌ Out of Stock'}"
         if p.get('short_description'):
             context += f"\n   📝 {p['short_description']}"
-        stock_qty = int(p.get('stock_quantity', 0))
-        if stock_qty > 10:
-            context += "\n   ✅ **In Stock**"
-        elif stock_qty > 0:
-            context += f"\n   ⚠️ **Only {stock_qty} left!**"
-        else:
-            context += "\n   ❌ **Out of Stock**"
-        if intent == 'buying' and stock_qty > 0:
-            context += "\n   🚀 **Order now!**"
-        context += f"\n   🔗 /products/{p['slug']}/\n"
-    return context, products_list
+        
+        context += f"\n   🔗 Product URL: /products/{p['slug']}/\n"
+        
+    return context, unified_products[:5]
 
 def get_chat_history_from_db(session_id):
     db = get_mongodb_db()
@@ -273,6 +391,15 @@ def chatbot_response(request):
         data = json.loads(request.body)
         user_message = data.get('message', '')
         session_id = data.get('session_id', 'default')
+        
+        # Track session metrics
+        metric, created = ChatbotMetric.objects.get_or_create(
+            session_id=session_id,
+            defaults={'user': request.user if request.user.is_authenticated else None}
+        )
+        metric.messages_count += 1
+        metric.save()
+        
         if not user_message:
             return JsonResponse({"response": "I didn't catch that. Could you repeat?", "status": "error"})
         history = get_chat_history_from_db(session_id)
@@ -308,30 +435,129 @@ def chatbot_response(request):
         if faq_answer:
             save_chat_interaction(session_id, user_message, faq_answer)
             return JsonResponse({"response": faq_answer, "status": "success", "suggestions": ["🛒 Browse Products", "📦 Track Order"]})
-        intent = detect_intent(user_message)
-        if intent == 'track_order':
+        # Get session memory for context
+        user_prefs, greeting_count = get_session_memory(session_id)
+        
+        # Detect user's language
+        user_language = detect_language(user_message)
+        
+        # Advanced intent detection
+        intent = detect_intent_advanced(user_message)
+        
+        # Handle greeting with flow control
+        if intent == 'greeting':
+            greeting_resp = get_greeting_response(session_id, greeting_count)
+            save_conversation_memory(session_id, user_message, greeting_resp, intent)
+            save_chat_interaction(session_id, user_message, greeting_resp)
+            return JsonResponse({"response": greeting_resp, "status": "success", "suggestions": get_random_suggestions()})
+        
+        # Check training data for quick responses
+        training_resp = get_training_response(intent, user_message)
+        if training_resp:
+            save_conversation_memory(session_id, user_message, training_resp, intent)
+            save_chat_interaction(session_id, user_message, training_resp)
+            return JsonResponse({"response": training_resp, "status": "success", "suggestions": get_random_suggestions()})
+        
+        # Handle order tracking
+        if intent == 'order_tracking':
             tracking_response = handle_order_tracking(user_message, session_id)
+            save_conversation_memory(session_id, user_message, tracking_response, intent)
             save_chat_interaction(session_id, user_message, tracking_response)
             return JsonResponse({"response": tracking_response, "status": "success", "suggestions": [{"text": "⬅ Back to Menu", "action": "message"}]})
         product_context, products_list = get_product_context(user_message, intent)
+        
+        # Get logged-in user info for auto-fill
+        user_info = get_user_info(request.user)
+        
+        # Get AI recommendations
+        recommendation_context = ""
+        if request.user and request.user.is_authenticated:
+            recommendation_context = get_recommendation_context(request.user)
+        
+        # Get discount offers
+        discount_context = ""
+        if request.user and request.user.is_authenticated:
+            discount_context = get_discount_context(request.user)
+        
+        user_context = ""
+        if user_info and user_info['has_complete_info']:
+            user_context = f"""\n\n🔐 LOGGED-IN USER INFO (Auto-detected):
+- Name: {user_info['name']}
+- Phone: {user_info['phone']}
+- Address: {user_info['address']}
+
+ORDERING RULES FOR LOGGED-IN USER:
+- Use the above information automatically for orders
+- Only confirm with user before placing order
+- If user wants to change info, allow them to provide new details
+- Format: ORDER_READY|{user_info['name']}|{user_info['phone']}|{user_info['address']}
+"""
+        elif user_info and not user_info['has_complete_info']:
+            missing = []
+            if not user_info.get('phone'): missing.append('Phone')
+            if not user_info.get('address'): missing.append('Address')
+            user_context = f"\n\n🔐 USER LOGGED IN: {user_info['name']}\nMISSING INFO: {', '.join(missing)}\nAsk user for missing information only.\n"
+        
         sys_prompt = bot_settings.system_prompt if bot_settings else "You are 'Al Barakah Assistant'."
         promo_ctx = f"\n🔥 PROMO: {bot_settings.promo_message}" if bot_settings and bot_settings.is_promo_active else ""
-        system_instructions = f"{sys_prompt}{promo_ctx}\nRULES: 1. NO HALLUCINATIONS. 2. ORDERING: Need Name, Phone, Address. 3. TOKEN: ORDER_READY|Name|Phone|Address. DATA:\n{product_context}"
+        system_instructions = f"{sys_prompt}{promo_ctx}{user_context}{recommendation_context}{discount_context}\nRULES: 1. NO HALLUCINATIONS. 2. ORDERING: Need Name, Phone, Address. 3. TOKEN: ORDER_READY|Name|Phone|Address. DATA:\n{product_context}"
         try:
-            if is_openrouter: response = chat.send_message(user_message)
+            if is_openrouter: response = chat.send_message(user_message, system_instructions=system_instructions)
             else: response = chat.send_message(f"{system_instructions}\n\nCustomer: {user_message}")
             ai_text = response.text
+            
+            # Process ORDER_READY token
             if "ORDER_READY|" in ai_text:
-                parts = ai_text.split("|")
-                if len(parts) >= 4:
-                    order_obj, confirm_msg = create_order_from_chat(session_id, parts[2].strip(), parts[3].strip(), history)
-                    if order_obj:
-                        order_obj.full_name = parts[1].strip()
-                        order_obj.save()
-                        ai_text = confirm_msg
+                print(f"DEBUG: ORDER_READY detected in response: {ai_text}")
+                
+                # Extract ORDER_READY line
+                lines = ai_text.split('\n')
+                order_line = None
+                for line in lines:
+                    if "ORDER_READY|" in line:
+                        order_line = line.strip()
+                        break
+                
+                if order_line:
+                    parts = order_line.split("|")
+                    print(f"DEBUG: ORDER_READY parts: {parts}")
+                    
+                    if len(parts) >= 4:
+                        name = parts[1].strip()
+                        phone = parts[2].strip()
+                        address = parts[3].strip()
+                        
+                        # Create order
+                        order_obj, confirm_msg = create_order_from_chat(session_id, phone, address, history)
+                        
+                        if order_obj:
+                            # Update order with name
+                            order_obj.full_name = name
+                            order_obj.save()
+                            
+                            print(f"DEBUG: Order created successfully: {order_obj.order_reference}")
+                            
+                            # Remove ORDER_READY line from response
+                            ai_text = ai_text.replace(order_line, '').strip()
+                            
+                            # Add confirmation message
+                            ai_text = f"{confirm_msg}\n\n{ai_text}" if ai_text else confirm_msg
+                        else:
+                            print(f"DEBUG: Order creation failed: {confirm_msg}")
+                            # Remove ORDER_READY line and show error
+                            ai_text = ai_text.replace(order_line, '').strip()
+                            ai_text = f"{confirm_msg}\n\n{ai_text}" if ai_text else confirm_msg
+                    else:
+                        print(f"DEBUG: Invalid ORDER_READY format, expected 4+ parts, got {len(parts)}")
+            
+            # Save to conversation memory for learning
+            save_conversation_memory(session_id, user_message, ai_text, intent)
             save_chat_interaction(session_id, user_message, ai_text)
             return JsonResponse({"response": ai_text, "status": "success", "suggestions": get_random_suggestions()})
         except Exception as e:
+            print(f"ERROR in chatbot response: {e}")
+            import traceback
+            traceback.print_exc()
             return JsonResponse({"response": "Sorry, try again!", "status": "error"})
     except Exception as e:
         return JsonResponse({"response": "Encountered an error.", "status": "error"})
