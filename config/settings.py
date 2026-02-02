@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'products',
     'orders',
     'analytics',
+    'chatbot',
     'whitenoise.runserver_nostatic',
     'marketing',
     'django.contrib.sites',
