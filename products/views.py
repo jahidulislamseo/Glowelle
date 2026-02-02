@@ -1,7 +1,7 @@
 from django.core.cache import cache
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Category, Product, Review, Wishlist, StockAlert
-from marketing.models import HomeSlider, DealOfTheDay
+from marketing.models import HomeSlider, DealOfTheDay, SellingNote
 from django.db.models import Q, Count
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
@@ -25,6 +25,7 @@ def home(request):
         on_sale_products = list(Product.objects.select_related('category', 'brand').filter(original_price__isnull=False)[:4])
         best_products = list(Product.objects.select_related('category', 'brand').order_by('-rating', '-reviews_count')[:10])
         sliders = list(HomeSlider.objects.filter(is_active=True).order_by('sort_order'))
+        selling_notes = list(SellingNote.objects.filter(is_active=True).order_by('sort_order'))
         
         # Deal of the Day
         deal_of_the_day = DealOfTheDay.objects.filter(is_active=True, end_date__gt=timezone.now()).first()
@@ -54,6 +55,7 @@ def home(request):
             'categorized_products': categorized_products,
             'deal_of_the_day': deal_of_the_day,
             'best_products': best_products,
+            'selling_notes': selling_notes,
         }
         # Cache for 15 minutes (900 seconds)
         cache.set('home_page_data', home_data, 900)

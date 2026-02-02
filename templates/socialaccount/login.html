@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load socialaccount %}
+
+{% block head_title %}{% trans "Sign In" %}{% endblock %}
+
+{% block content %}
+<div class="min-h-[80vh] flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="w-full max-w-md space-y-8 bg-white p-8 rounded-2xl shadow-lg border border-gray-100 text-center">
+        <div>
+            <div class="flex justify-center mb-4">
+                <div class="h-12 w-12 bg-green-100 rounded-full flex items-center justify-center text-green-600">
+                    <i data-lucide="shield-check" class="h-6 w-6"></i>
+                </div>
+            </div>
+            <h2 class="text-3xl font-bold text-gray-900 border-b pb-4 mb-4">
+            {% if process == "connect" %}
+                {% blocktrans with provider_name=account.get_provider.name %}Connect {{ provider_name }}{% endblocktrans %}
+            {% else %}
+                {% blocktrans with provider_name=account.get_provider.name %}Sign In Via {{ provider_name }}{% endblocktrans %}
+            {% endif %}
+            </h2>
+
+            <p class="text-gray-600 mb-8">
+            {% if process == "connect" %}
+                {% blocktrans with provider_name=account.get_provider.name %}You are about to connect a new third-party account from {{ provider_name }}.{% endblocktrans %}
+            {% else %}
+                {% blocktrans with provider_name=account.get_provider.name %}You are about to sign in using a third-party account from {{ provider_name }}.{% endblocktrans %}
+            {% endif %}
+            </p>
+        </div>
+
+        <form method="post" action="{{ login_url }}">
+            {% csrf_token %}
+            <button type="submit" class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 shadow-md transition-all hover:shadow-lg transform active:scale-[0.98]">
+                {% trans "Continue" %}
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

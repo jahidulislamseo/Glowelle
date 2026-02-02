@@ -47,13 +47,61 @@
         </ol>
     </nav>
 
-    <!-- Mobile Filter Toggle (Hidden logic for now) -->
-    <div class="flex items-center justify-between md:hidden mb-6">
-        <h1 class="text-2xl font-bold">Shop</h1>
-        <button
-            class="flex items-center gap-2 border border-gray-200 px-4 py-3 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors">
-            <i data-lucide="filter" class="h-5 w-5"></i> Filters
-        </button>
+    <!-- Mobile View: Summary and Filter Trigger -->
+    <div class="md:hidden flex flex-col gap-4 mb-8">
+        <h1 class="text-3xl font-extrabold text-gray-900">Shop</h1>
+        <div class="flex items-center gap-3">
+            <button id="mobile-filter-btn"
+                class="flex-1 flex items-center justify-center gap-3 bg-white border-2 border-gray-100 py-3.5 rounded-2xl font-bold text-gray-700 hover:bg-gray-50 active:scale-95 transition-all shadow-sm">
+                <i data-lucide="filter" class="h-5 w-5 text-green-600"></i> Filters
+            </button>
+            <form action="{% url 'shop' %}" class="flex-[2] relative">
+                <select name="sort" class="w-full bg-white border-2 border-gray-100 py-3.5 pl-4 pr-10 rounded-2xl font-bold text-gray-700 appearance-none focus:border-green-500 outline-none">
+                    <option value="newest">Newest</option>
+                    <option value="price_low">Price: Low-High</option>
+                    <option value="price_high">Price: High-Low</option>
+                </select>
+                <i data-lucide="chevron-down" class="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400"></i>
+            </form>
+        </div>
+    </div>
+
+    <!-- Mobile Filter Drawer -->
+    <div id="filter-drawer-overlay" class="fixed inset-0 bg-black/50 z-[70] hidden opacity-0 transition-opacity"></div>
+    <div id="filter-drawer" class="fixed inset-y-0 left-0 w-80 bg-white z-[80] transform -translate-x-full transition-transform duration-300 ease-in-out shadow-2xl">
+        <div class="p-6 border-b flex items-center justify-between">
+            <h2 class="text-xl font-black text-gray-900">Filters</h2>
+            <button id="filter-drawer-close" class="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                <i data-lucide="x" class="h-6 w-6"></i>
+            </button>
+        </div>
+        <div class="p-6 overflow-y-auto h-[calc(100vh-80px)] space-y-8">
+            <!-- Categories -->
+            <div>
+                <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">Categories</h3>
+                <div class="space-y-2">
+                    <a href="{% url 'shop' %}" class="flex items-center gap-3 p-3 rounded-xl {% if not current_category %}bg-green-50 text-green-700 font-bold{% else %}text-gray-600 hover:bg-gray-50{% endif %}">
+                        View All
+                    </a>
+                    {% for cat in categories %}
+                    <a href="{% url 'shop' %}?category={{ cat.slug }}" class="flex items-center gap-3 p-3 rounded-xl {% if current_category == cat.slug %}bg-green-50 text-green-700 font-bold{% else %}text-gray-600 hover:bg-gray-50{% endif %}">
+                        <span class="text-lg">{{ cat.icon|default:"📦" }}</span>
+                        {{ cat.name }}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Price Range -->
+            <div>
+                <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">Price Range</h3>
+                <div class="grid grid-cols-2 gap-3">
+                    <input type="number" placeholder="Min" class="w-full p-3 rounded-xl border-2 border-gray-100 font-bold text-sm focus:border-green-500 outline-none">
+                    <input type="number" placeholder="Max" class="w-full p-3 rounded-xl border-2 border-gray-100 font-bold text-sm focus:border-green-500 outline-none">
+                </div>
+                <button class="w-full mt-4 bg-gray-900 text-white py-3 rounded-xl font-bold hover:bg-black transition-all">Apply Price</button>
+            </div>
+        </div>
     </div>
 
     <div class="flex flex-col md:flex-row gap-8">
@@ -110,7 +158,7 @@
         <!-- Product Grid -->
         <main class="flex-1">
             {% if products %}
-            <div id="product-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 reveal">
+            <div id="product-grid" class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
                 {% include 'products/partials/product_list.html' %}
             </div>
 
@@ -129,6 +177,33 @@
 
             <script>
                 document.addEventListener('DOMContentLoaded', function () {
+                    // Mobile Filter Drawer Logic
+                    const mobileFilterBtn = document.getElementById('mobile-filter-btn');
+                    const filterDrawer = document.getElementById('filter-drawer');
+                    const filterDrawerOverlay = document.getElementById('filter-drawer-overlay');
+                    const filterDrawerClose = document.getElementById('filter-drawer-close');
+
+                    if (mobileFilterBtn && filterDrawer) {
+                        const openFilters = () => {
+                            filterDrawer.classList.remove('-translate-x-full');
+                            filterDrawerOverlay.classList.remove('hidden');
+                            setTimeout(() => filterDrawerOverlay.classList.add('opacity-100'), 10);
+                            document.body.style.overflow = 'hidden';
+                        };
+
+                        const closeFilters = () => {
+                            filterDrawer.classList.add('-translate-x-full');
+                            filterDrawerOverlay.classList.remove('opacity-100');
+                            setTimeout(() => filterDrawerOverlay.classList.add('hidden'), 300);
+                            document.body.style.overflow = '';
+                        };
+
+                        mobileFilterBtn.addEventListener('click', openFilters);
+                        filterDrawerClose.addEventListener('click', closeFilters);
+                        filterDrawerOverlay.addEventListener('click', closeFilters);
+                    }
+
+                    // Load More Logic
                     const loadMoreBtn = document.getElementById('load-more-btn');
                     const productGrid = document.getElementById('product-grid');
                     const loadMoreContainer = document.getElementById('load-more-container');

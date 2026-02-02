@@ -26,11 +26,11 @@ class SEOModel(models.Model):
             # Strip HTML and truncate
             from django.utils.html import strip_tags
             return strip_tags(desc)[:160]
-        return 'Fresh organic groceries delivered to your doorstep in Dhaka.'
+        return 'Your one-stop shop for fresh organic fruits, vegetables, meat, and daily essentials.'
 
 class SiteSettings(models.Model):
     site_title = models.CharField(max_length=200, default="Al Barakah Mart")
-    meta_description = models.TextField(blank=True, help_text="SEO description for the homepage")
+    meta_description = models.TextField(default="Your one-stop shop for fresh organic fruits, vegetables, meat, and daily essentials.", blank=True, help_text="SEO description for the homepage")
     
     # Analytics
     ga4_tracking_id = models.CharField(max_length=50, blank=True, help_text="e.g., G-XXXXXXXXXX")

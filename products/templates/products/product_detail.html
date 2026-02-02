@@ -17,8 +17,7 @@
       <li>
         <div class="flex items-center">
           <i data-lucide="chevron-right" class="h-4 w-4 text-gray-400"></i>
-          <a href="{% url 'shop' %}?category={{ product.category.slug }}" class="ml-1 md:ml-2 hover:text-green-600">{{
-            product.category.name }}</a>
+          <a href="{% url 'shop' %}?category={{ product.category.slug }}" class="ml-1 md:ml-2 hover:text-green-600">{{ product.category.name }}</a>
         </div>
       </li>
       <li aria-current="page">
@@ -147,19 +146,21 @@
         <form action="{% url 'cart_add' product.id %}" method="post" class="space-y-4">
           {% csrf_token %}
           <input type="hidden" name="quantity" value="1" id="qty-input" />
-          <div class="flex gap-3">
+          <div class="flex flex-col sm:flex-row gap-3">
             <button type="submit" name="checkout" value="true"
-              class="flex-[2] btn-primary rounded-xl px-8 text-lg h-14 font-bold">
+              class="flex-[2] btn-primary rounded-xl px-8 text-lg h-14 font-bold active:scale-[0.98] transition-transform">
               Buy Now
             </button>
-            <button type="submit"
-              class="flex-1 inline-flex items-center justify-center whitespace-nowrap font-bold rounded-xl px-4 text-green-700 border-2 border-green-200 hover:bg-green-50 transition-all active:scale-95">
-              Add to Cart
-            </button>
-            <a href="{% url 'toggle_wishlist' product.id %}"
-              class="flex items-center justify-center w-14 h-14 rounded-xl border border-gray-200 hover:bg-gray-50 transition-all text-gray-400 hover:text-red-500 {% if is_in_wishlist %}text-red-500 bg-red-50 border-red-100{% endif %}">
-              <i data-lucide="heart" class="h-6 w-6 {% if is_in_wishlist %}fill-current{% endif %}"></i>
-            </a>
+            <div class="flex gap-3 flex-1">
+              <button type="submit"
+                class="flex-1 inline-flex items-center justify-center whitespace-nowrap font-bold rounded-xl px-4 text-green-700 border-2 border-green-200 hover:bg-green-50 transition-all active:scale-[0.98]">
+                Add to Cart
+              </button>
+              <a href="{% url 'toggle_wishlist' product.id %}"
+                class="flex items-center justify-center w-14 h-14 rounded-xl border border-gray-200 hover:bg-gray-50 transition-all text-gray-400 hover:text-red-500 {% if is_in_wishlist %}text-red-500 bg-red-50 border-red-100{% endif %} active:scale-[0.98]">
+                <i data-lucide="heart" class="h-6 w-6 {% if is_in_wishlist %}fill-current{% endif %}"></i>
+              </a>
+            </div>
           </div>
         </form>
         {% else %}

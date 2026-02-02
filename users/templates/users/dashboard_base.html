@@ -6,52 +6,55 @@
     <div class="flex flex-col md:flex-row gap-8">
         <!-- Sidebar -->
         <aside class="w-full md:w-64 shrink-0">
-            <div class="bg-white border rounded-lg p-4 sticky top-24">
-                <div class="flex items-center gap-3 mb-6 pb-4 border-b">
+            <div class="bg-white md:border rounded-2xl p-2 md:p-6 sticky top-24 shadow-sm md:shadow-none overflow-hidden">
+                <div class="hidden md:flex items-center gap-4 mb-8 pb-6 border-b border-gray-100">
                     <div
-                        class="h-10 w-10 bg-green-100 rounded-full flex items-center justify-center text-green-600 font-bold overflow-hidden border border-gray-200">
+                        class="h-12 w-12 bg-green-50 rounded-2xl flex items-center justify-center text-green-600 font-bold overflow-hidden border-2 border-white shadow-sm">
                         {% if user.image %}
                         <img src="{{ user.image.url }}" alt="{{ user.username }}" class="h-full w-full object-cover">
                         {% else %}
                         {{ user.username|make_list|first|upper }}
                         {% endif %}
                     </div>
-                    <div>
-                        <p class="font-medium truncate max-w-[150px]">{{ user.username }}</p>
-                        <p class="text-xs text-gray-500 truncate max-w-[150px]">{{ user.email }}</p>
+                    <div class="min-w-0">
+                        <p class="font-black text-gray-900 truncate">{{ user.username }}</p>
+                        <p class="text-xs text-gray-400 font-bold truncate">Member Since 2025</p>
                     </div>
                 </div>
-                <nav class="space-y-1">
+
+                <!-- Navigation - Horizontal on mobile, Vertical on MD+ -->
+                <nav class="flex md:flex-col overflow-x-auto md:overflow-visible pb-2 md:pb-0 gap-1 md:gap-2 no-scrollbar">
                     <a href="{% url 'dashboard' %}"
-                        class="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md {% if request.resolver_match.url_name == 'dashboard' %}bg-green-50 text-green-700{% else %}text-gray-600 hover:bg-gray-50 hover:text-gray-900{% endif %}">
-                        <i data-lucide="layout-dashboard" class="h-4 w-4"></i> Dashboard
+                        class="flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-xl whitespace-nowrap transition-all {% if request.resolver_match.url_name == 'dashboard' %}bg-green-600 text-white shadow-lg shadow-green-200{% else %}text-gray-500 hover:bg-gray-50 hover:text-gray-900{% endif %}">
+                        <i data-lucide="layout-dashboard" class="h-5 w-5 shrink-0"></i> <span>Overview</span>
                     </a>
                     <a href="{% url 'order_history' %}"
-                        class="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md {% if request.resolver_match.url_name == 'order_history' %}bg-green-50 text-green-700{% else %}text-gray-600 hover:bg-gray-50 hover:text-gray-900{% endif %}">
-                        <i data-lucide="package" class="h-4 w-4"></i> Orders
+                        class="flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-xl whitespace-nowrap transition-all {% if request.resolver_match.url_name == 'order_history' %}bg-green-600 text-white shadow-lg shadow-green-200{% else %}text-gray-500 hover:bg-gray-50 hover:text-gray-900{% endif %}">
+                        <i data-lucide="shopping-bag" class="h-5 w-5 shrink-0"></i> <span>Orders</span>
                     </a>
                     <a href="{% url 'address_list' %}"
-                        class="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md {% if request.resolver_match.url_name == 'address_list' %}bg-green-50 text-green-700{% else %}text-gray-600 hover:bg-gray-50 hover:text-gray-900{% endif %}">
-                        <i data-lucide="map-pin" class="h-4 w-4"></i> Addresses
+                        class="flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-xl whitespace-nowrap transition-all {% if request.resolver_match.url_name == 'address_list' %}bg-green-600 text-white shadow-lg shadow-green-200{% else %}text-gray-500 hover:bg-gray-50 hover:text-gray-900{% endif %}">
+                        <i data-lucide="map-pin" class="h-5 w-5 shrink-0"></i> <span>Addresses</span>
                     </a>
                     <a href="{% url 'wallet' %}"
-                        class="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md {% if request.resolver_match.url_name == 'wallet' %}bg-green-50 text-green-700{% else %}text-gray-600 hover:bg-gray-50 hover:text-gray-900{% endif %}">
-                        <i data-lucide="wallet" class="h-4 w-4"></i> Wallet
+                        class="flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-xl whitespace-nowrap transition-all {% if request.resolver_match.url_name == 'wallet' %}bg-green-600 text-white shadow-lg shadow-green-200{% else %}text-gray-500 hover:bg-gray-50 hover:text-gray-900{% endif %}">
+                        <i data-lucide="wallet" class="h-5 w-5 shrink-0"></i> <span>Wallet</span>
                     </a>
                     <a href="{% url 'support_tickets' %}"
-                        class="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md {% if request.resolver_match.url_name == 'support_tickets' %}bg-green-50 text-green-700{% else %}text-gray-600 hover:bg-gray-50 hover:text-gray-900{% endif %}">
-                        <i data-lucide="life-buoy" class="h-4 w-4"></i> Support
+                        class="flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-xl whitespace-nowrap transition-all {% if request.resolver_match.url_name == 'support_tickets' %}bg-green-600 text-white shadow-lg shadow-green-200{% else %}text-gray-500 hover:bg-gray-50 hover:text-gray-900{% endif %}">
+                        <i data-lucide="help-circle" class="h-5 w-5 shrink-0"></i> <span>Support</span>
                     </a>
                     <a href="{% url 'profile' %}"
-                        class="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md {% if request.resolver_match.url_name == 'profile' %}bg-green-50 text-green-700{% else %}text-gray-600 hover:bg-gray-50 hover:text-gray-900{% endif %}">
-                        <i data-lucide="user" class="h-4 w-4"></i> Profile Settings
+                        class="flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-xl whitespace-nowrap transition-all {% if request.resolver_match.url_name == 'profile' %}bg-green-600 text-white shadow-lg shadow-green-200{% else %}text-gray-500 hover:bg-gray-50 hover:text-gray-900{% endif %}">
+                        <i data-lucide="settings" class="h-5 w-5 shrink-0"></i> <span>Profile</span>
                     </a>
 
-                    <form action="{% url 'logout' %}" method="post" class="mt-4 pt-4 border-t">
+                    <!-- Logout Button for Mobile (In the same line) -->
+                    <form action="{% url 'logout' %}" method="post" class="md:mt-4 md:pt-4 md:border-t border-gray-100">
                         {% csrf_token %}
                         <button type="submit"
-                            class="w-full flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md text-red-600 hover:bg-red-50">
-                            <i data-lucide="log-out" class="h-4 w-4"></i> Logout
+                            class="flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-xl whitespace-nowrap text-red-500 hover:bg-red-50 transition-all">
+                            <i data-lucide="log-out" class="h-5 w-5 shrink-0"></i> <span class="md:inline">Logout</span>
                         </button>
                     </form>
                 </nav>

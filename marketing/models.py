@@ -36,3 +36,18 @@ class DealOfTheDay(models.Model):
 
     def __str__(self):
         return self.title
+
+class SellingNote(models.Model):
+    title = models.CharField(max_length=100)
+    subtitle = models.CharField(max_length=255, blank=True, null=True, help_text="e.g. On orders over ৳1000")
+    icon = models.CharField(max_length=50, help_text="Lucide icon name (e.g., truck, headset, shield-check, undo-2, leaf, award)")
+    sort_order = models.IntegerField(default=0, help_text="Lower numbers appear first")
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['sort_order']
+        verbose_name = "Selling Note"
+        verbose_name_plural = "Selling Notes"
+
+    def __str__(self):
+        return self.title
