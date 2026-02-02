@@ -16,6 +16,7 @@ def home(request):
         featured_products = list(Product.objects.select_related('category', 'brand').all()[:8])
         new_arrivals = list(Product.objects.select_related('category', 'brand').order_by('-created_at')[:4])
         on_sale_products = list(Product.objects.select_related('category', 'brand').filter(original_price__isnull=False)[:4])
+        best_products = list(Product.objects.select_related('category', 'brand').order_by('-rating', '-reviews_count')[:10])
         sliders = list(HomeSlider.objects.filter(is_active=True).order_by('sort_order'))
         
         # Deal of the Day
@@ -45,6 +46,7 @@ def home(request):
             'sliders': sliders,
             'categorized_products': categorized_products,
             'deal_of_the_day': deal_of_the_day,
+            'best_products': best_products,
         }
         # Cache for 15 minutes (900 seconds)
         cache.set('home_page_data', home_data, 900)

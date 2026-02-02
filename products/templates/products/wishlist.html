@@ -67,22 +67,24 @@
             </div>
 
             <div class="flex items-center p-4 pt-0">
-                <form action="{% url 'cart_add' product.id %}" method="post" class="w-full">
-                    {% csrf_token %}
-                    <input type="hidden" name="quantity" value="1">
-                    <button type="submit"
-                        class="btn-primary inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium h-10 px-4 py-2 w-full gap-2 shadow-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            class="lucide lucide-shopping-cart h-4 w-4">
-                            <circle cx="8" cy="21" r="1"></circle>
-                            <circle cx="19" cy="21" r="1"></circle>
-                            <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12">
-                            </path>
-                        </svg>
-                        Add to Cart
-                    </button>
-                </form>
+                <div class="flex items-center gap-2 w-full">
+                    <form action="{% url 'cart_add' product.id %}" method="post" class="flex-1">
+                        {% csrf_token %}
+                        <input type="hidden" name="quantity" value="1">
+                        <button type="submit" name="checkout" value="true"
+                            class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-bold h-10 px-2 w-full bg-orange-50 text-orange-600 hover:bg-orange-100 transition-colors shadow-sm">
+                            Buy Now
+                        </button>
+                    </form>
+                    <form action="{% url 'cart_add' product.id %}" method="post" class="flex-1">
+                        {% csrf_token %}
+                        <input type="hidden" name="quantity" value="1">
+                        <button type="submit"
+                            class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-bold h-10 px-2 w-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors shadow-sm">
+                            Add to Cart
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
         {% endfor %}

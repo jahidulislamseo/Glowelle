@@ -2,7 +2,7 @@
 
 {% block content %}
 <!-- Shop Banner -->
-<div class="relative h-64 bg-gradient-to-r from-green-50 to-emerald-50 overflow-hidden mb-8">
+<div class="relative h-64 bg-gradient-to-r from-primary/20 via-primary/5 to-transparent overflow-hidden mb-8">
     <div class="absolute inset-0">
         <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1000"
             alt="Shop Fresh Groceries" class="w-full h-full object-cover opacity-80">
@@ -98,8 +98,8 @@
                     <h3 class="font-semibold mb-3">Sort By</h3>
                     <select class="w-full h-10 px-3 rounded-md border border-gray-200 bg-white text-sm">
                         <option>Newest Arrivals</option>
-                        <option>Price: Low to High</option>
-                        <option>Price: High to Low</option>
+                        <option>Price:Low to High</option>
+                        <option>Price:High to Low</option>
                         <option>Best Selling</option>
                     </select>
                 </div>
@@ -119,20 +119,21 @@
                     class="group relative inline-flex items-center gap-3 bg-white border-2 border-green-600 text-green-600 px-12 py-4 rounded-full font-bold hover:bg-green-600 hover:text-white transition-all transform active:scale-95 shadow-lg overflow-hidden">
                     <span class="relative z-10 flex items-center gap-2">
                         Load More Products
-                        <i data-lucide="chevron-down" class="h-5 w-5 group-hover:translate-y-1 transition-transform"></i>
+                        <i data-lucide="chevron-down"
+                            class="h-5 w-5 group-hover:translate-y-1 transition-transform"></i>
                     </span>
                 </button>
             </div>
             {% endif %}
 
             <script>
-                document.addEventListener('DOMContentLoaded', function() {
+                document.addEventListener('DOMContentLoaded', function () {
                     const loadMoreBtn = document.getElementById('load-more-btn');
                     const productGrid = document.getElementById('product-grid');
                     const loadMoreContainer = document.getElementById('load-more-container');
 
                     if (loadMoreBtn) {
-                        loadMoreBtn.addEventListener('click', function() {
+                        loadMoreBtn.addEventListener('click', function () {
                             const nextPage = loadMoreBtn.getAttribute('data-page');
                             const currentUrl = new URL(window.location.href);
                             currentUrl.searchParams.set('page', nextPage);
@@ -152,44 +153,44 @@
                                     'X-Requested-With': 'XMLHttpRequest'
                                 }
                             })
-                            .then(response => response.json())
-                            .then(data => {
-                                const tempDiv = document.createElement('div');
-                                tempDiv.innerHTML = data.html;
-                                
-                                // Append new items
-                                while (tempDiv.firstChild) {
-                                    const item = tempDiv.firstChild;
-                                    if (item.nodeType === 1) { // Element node
-                                        productGrid.appendChild(item);
-                                        // Trigger reveal animation for new items
-                                        setTimeout(() => {
-                                            item.classList.add('active');
-                                        }, 50);
-                                    } else {
-                                        tempDiv.removeChild(item);
-                                    }
-                                }
+                                .then(response => response.json())
+                                .then(data => {
+                                    const tempDiv = document.createElement('div');
+                                    tempDiv.innerHTML = data.html;
 
-                                // Update button or hide it
-                                if (data.has_next) {
-                                    loadMoreBtn.setAttribute('data-page', data.next_page);
+                                    // Append new items
+                                    while (tempDiv.firstChild) {
+                                        const item = tempDiv.firstChild;
+                                        if (item.nodeType === 1) { // Element node
+                                            productGrid.appendChild(item);
+                                            // Trigger reveal animation for new items
+                                            setTimeout(() => {
+                                                item.classList.add('active');
+                                            }, 50);
+                                        } else {
+                                            tempDiv.removeChild(item);
+                                        }
+                                    }
+
+                                    // Update button or hide it
+                                    if (data.has_next) {
+                                        loadMoreBtn.setAttribute('data-page', data.next_page);
+                                        loadMoreBtn.disabled = false;
+                                        loadMoreBtn.innerHTML = originalContent;
+                                    } else {
+                                        loadMoreContainer.remove();
+                                    }
+
+                                    // Re-initialize icons
+                                    if (typeof lucide !== 'undefined') {
+                                        lucide.createIcons();
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error loading more products:', error);
                                     loadMoreBtn.disabled = false;
                                     loadMoreBtn.innerHTML = originalContent;
-                                } else {
-                                    loadMoreContainer.remove();
-                                }
-
-                                // Re-initialize icons
-                                if (typeof lucide !== 'undefined') {
-                                    lucide.createIcons();
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error loading more products:', error);
-                                loadMoreBtn.disabled = false;
-                                loadMoreBtn.innerHTML = originalContent;
-                            });
+                                });
                         });
                     }
                 });

@@ -56,8 +56,8 @@ class LowStockFilter(admin.SimpleListFilter):
 @admin.register(Product)
 # class ProductAdmin(admin.ModelAdmin, ImportExportModelAdmin): # ImportExport might be compatible, trying without first to be safe
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['title', 'price', 'in_stock', 'stock_quantity', 'category', 'brand', 'display_image', 'rating', 'is_best_seller']
-    list_filter = ['category', 'brand', LowStockFilter, 'in_stock', 'is_new', 'is_best_seller']
+    list_display = ['title', 'price', 'in_stock', 'stock_quantity', 'category', 'brand', 'display_image', 'rating', 'chatbot_priority']
+    list_filter = ['category', 'brand', LowStockFilter, 'in_stock', 'is_new', 'is_best_seller', 'chatbot_priority']
     search_fields = ['title', 'description', 'sku']
     prepopulated_fields = {'slug': ('title',)}
     inlines = [ProductImageInline, ProductVideoInline, ProductVariantInline]
@@ -83,7 +83,7 @@ class ProductAdmin(admin.ModelAdmin):
             'fields': ('title', 'slug', 'category', 'brand', 'short_description', 'description', 'price', 'original_price', 'image')
         }),
         ('Status & Visibility', {
-            'fields': ('in_stock', 'stock_quantity', 'is_new', 'is_best_seller')
+            'fields': ('in_stock', 'stock_quantity', 'is_new', 'is_best_seller', 'chatbot_priority')
         }),
         ('SEO Settings', {
             'fields': ('meta_title', 'meta_description', 'meta_keywords', 'og_image'),

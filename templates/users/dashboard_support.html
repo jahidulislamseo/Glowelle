@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="bg-gray-50 min-h-screen py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row gap-8">
+            <!-- Sidebar -->
+            <aside class="w-full md:w-64 space-y-2">
+                <nav class="space-y-1">
+                    <a href="{% url 'dashboard' %}"
+                        class="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-100">
+                        <i data-lucide="layout-dashboard" class="h-4 w-4"></i>
+                        Overview
+                    </a>
+                    <a href="{% url 'order_history' %}"
+                        class="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-100">
+                        <i data-lucide="shopping-bag" class="h-4 w-4"></i>
+                        Orders
+                    </a>
+                    <a href="{% url 'wallet' %}"
+                        class="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-100">
+                        <i data-lucide="wallet" class="h-4 w-4"></i>
+                        Wallet
+                    </a>
+                    <a href="{% url 'address_list' %}"
+                        class="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-100">
+                        <i data-lucide="map-pin" class="h-4 w-4"></i>
+                        Addresses
+                    </a>
+                    <a href="{% url 'profile' %}"
+                        class="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-100">
+                        <i data-lucide="user" class="h-4 w-4"></i>
+                        Profile
+                    </a>
+                    <a href="{% url 'support_tickets' %}"
+                        class="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg bg-green-600 text-white">
+                        <i data-lucide="help-circle" class="h-4 w-4"></i>
+                        Support
+                    </a>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="flex-1 space-y-6">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-2xl font-bold text-gray-900">Support Tickets</h2>
+                    <a href="{% url 'ticket_create' %}"
+                        class="btn-primary px-4 py-2 rounded-lg text-sm font-bold shadow-md flex items-center gap-2">
+                        <i data-lucide="plus" class="h-4 w-4"></i>
+                        New Ticket
+                    </a>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                <tr>
+                                    <th class="px-6 py-3">Ticket ID</th>
+                                    <th class="px-6 py-3">Subject</th>
+                                    <th class="px-6 py-3">Status</th>
+                                    <th class="px-6 py-3">Last Updated</th>
+                                    <th class="px-6 py-3 text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                {% for ticket in tickets %}
+                                <tr>
+                                    <td class="px-6 py-4 text-sm font-bold text-gray-900">#{{ ticket.id }}</td>
+                                    <td class="px-6 py-4">
+                                        <p class="text-sm font-medium text-gray-900">{{ ticket.subject }}</p>
+                                        <p class="text-xs text-gray-500 truncate max-w-xs">{{ ticket.message }}</p>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-2 py-1 text-xs font-medium rounded-full 
+                                            {% if ticket.status == 'open' %}bg-blue-50 text-blue-700
+                                            {% elif ticket.status == 'in_progress' %}bg-yellow-50 text-yellow-700
+                                            {% else %}bg-gray-50 text-gray-700{% endif %}">
+                                            {{ ticket.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-gray-500">{{ ticket.updated_at|date:"M d, Y" }}
+                                    </td>
+                                    <td class="px-6 py-4 text-right">
+                                        <a href="#"
+                                            class="text-sm font-medium text-green-600 hover:text-green-700">View</a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="px-6 py-12 text-center text-gray-500">
+                                        <i data-lucide="life-buoy" class="mx-auto h-12 w-12 text-gray-200 mb-4"></i>
+                                        <p>No support tickets yet.</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</div>
+{% endblock %}

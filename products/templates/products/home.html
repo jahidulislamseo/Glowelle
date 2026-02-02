@@ -17,7 +17,7 @@
 
     <div class="container mx-auto px-4 relative z-10">
         <div class="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-            <!-- Left: Text Content -->
+            <!-- Left:Text Content -->
             <div class="space-y-8 max-w-2xl mx-auto lg:mx-0 text-center lg:text-left">
                 <!-- Badge -->
                 <div
@@ -34,7 +34,7 @@
                 <h1
                     class="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold text-gray-900 tracking-tight leading-[1.1]">
                     Nature's Best <br class="hidden lg:block" />
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-500">
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-green-400">
                         Delivered Fresh
                     </span>
                 </h1>
@@ -76,7 +76,7 @@
                 </div>
             </div>
 
-            <!-- Right: Hero Visual (Slider) -->
+            <!-- Right:Hero Visual (Slider) -->
             <div class="relative mx-auto w-full max-w-lg lg:max-w-none">
                 <!-- Floating Elements -->
                 <div
@@ -342,10 +342,10 @@
             </a>
         </div>
 
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div class="flex flex-wrap justify-center gap-6">
             {% for product in featured_products %}
             <div
-                class="rounded-lg border bg-card text-card-foreground group relative overflow-hidden border-none shadow-sm hover:shadow-md transition-all bg-white">
+                class="w-[calc(50%-12px)] md:w-[calc(33.333%-16px)] lg:w-[calc(20%-20px)] flex-shrink-0 rounded-lg border bg-card text-card-foreground group relative overflow-hidden border-none shadow-sm hover:shadow-md transition-all bg-white">
                 <!-- Wishlist Button -->
                 <a href="{% url 'toggle_wishlist' product.id %}"
                     class="wishlist-btn absolute top-2 right-2 z-20 p-2.5 rounded-full bg-white/90 shadow-sm {% if product.id in wishlist_product_ids %}text-red-500{% else %}text-gray-500{% endif %} hover:text-red-500 hover:bg-white transition-all duration-300 group-hover:opacity-100 {% if product.id in wishlist_product_ids %}opacity-100{% else %}opacity-0{% endif %} min-w-[44px] min-h-[44px] flex items-center justify-center">
@@ -395,15 +395,122 @@
 
                 <div class="flex items-center p-4 pt-0">
                     {% if product.stock_quantity > 0 %}
-                    <form action="{% url 'cart_add' product.id %}" method="post" class="w-full">
-                        {% csrf_token %}
-                        <input type="hidden" name="quantity" value="1">
-                        <button type="submit"
-                            class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 cursor-pointer bg-green-800 text-white hover:bg-green-800/80 h-10 px-4 py-2 w-full gap-2 shadow-sm">
-                            <i data-lucide="shopping-cart" class="h-4 w-4"></i>
-                            Add to Cart
-                        </button>
-                    </form>
+                    <div class="flex items-center gap-2 w-full">
+                        <form action="{% url 'cart_add' product.id %}" method="post" class="flex-1">
+                            {% csrf_token %}
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" name="checkout" value="true"
+                                class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-bold h-10 px-2 w-full bg-orange-500 text-white hover:bg-orange-600 transition-all shadow-md hover:shadow-lg active:scale-95">
+                                Buy Now
+                            </button>
+                        </form>
+                        <form action="{% url 'cart_add' product.id %}" method="post" class="flex-1">
+                            {% csrf_token %}
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit"
+                                class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-bold h-10 px-2 w-full bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 transition-all shadow-sm hover:shadow-md active:scale-95">
+                                Add to Cart
+                            </button>
+                        </form>
+                    </div>
+                    {% else %}
+                    <button disabled
+                        class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors bg-gray-200 text-gray-500 cursor-not-allowed h-10 px-4 py-2 w-full gap-2 shadow-sm">
+                        Out of Stock
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Best Selling Products -->
+<section class="py-20 bg-white border-t border-gray-100">
+    <div class="container mx-auto px-4">
+        <div class="flex justify-between items-end mb-12">
+            <div class="max-w-2xl">
+                <h2 class="text-3xl font-bold mb-2">Best Selling Products</h2>
+                <p class="text-gray-500">Our customer favorites based on ratings</p>
+            </div>
+            <a href="{% url 'shop' %}"
+                class="text-green-600 font-medium hover:underline flex items-center bg-green-50 px-4 py-2 rounded-full hover:bg-green-100 transition-colors">
+                View All <i data-lucide="arrow-right" class="ml-1 h-4 w-4"></i>
+            </a>
+        </div>
+
+        <div class="flex flex-wrap justify-center gap-6">
+            {% for product in best_products %}
+            <div
+                class="w-[calc(50%-12px)] md:w-[calc(33.333%-16px)] lg:w-[calc(20%-20px)] flex-shrink-0 rounded-lg border bg-card text-card-foreground group relative overflow-hidden border-none shadow-sm hover:shadow-md transition-all bg-white">
+                <!-- Wishlist Button -->
+                <a href="{% url 'toggle_wishlist' product.id %}"
+                    class="wishlist-btn absolute top-2 right-2 z-20 p-2.5 rounded-full bg-white/90 shadow-sm {% if product.id in wishlist_product_ids %}text-red-500{% else %}text-gray-500{% endif %} hover:text-red-500 hover:bg-white transition-all duration-300 group-hover:opacity-100 {% if product.id in wishlist_product_ids %}opacity-100{% else %}opacity-0{% endif %} min-w-[44px] min-h-[44px] flex items-center justify-center">
+                    <i data-lucide="heart"
+                        class="h-5 w-5 {% if product.id in wishlist_product_ids %}fill-current{% endif %}"></i>
+                </a>
+
+                <!-- Product Image -->
+                <div class="relative aspect-square w-full overflow-hidden bg-gray-100 skeleton">
+                    <a href="{% url 'product_detail' product.slug %}">
+                        <img src="{% if product.image %}{{ product.image.url }}{% else %}https://placehold.co/600?text=No+Image{% endif %}"
+                            alt="{{ product.title }}"
+                            onload="this.classList.remove('opacity-0'); this.closest('.skeleton').classList.remove('skeleton')"
+                            onerror="this.closest('.skeleton').classList.remove('skeleton')"
+                            class="h-full w-full object-cover transition-all duration-500 group-hover:scale-105 opacity-0">
+                    </a>
+                    <!-- Quick View Button -->
+                    <button onclick="openQuickView('{{ product.id }}')"
+                        class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/90 text-gray-800 px-4 py-2 rounded-full text-xs font-bold shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-green-600 hover:text-white transform translate-y-4 group-hover:translate-y-0 z-20 flex items-center gap-2 whitespace-nowrap">
+                        <i data-lucide="eye" class="h-3 w-3"></i> Quick View
+                    </button>
+                    {% if product.discount_percentage %}
+                    <div class="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
+                        -{{ product.discount_percentage }}%
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="p-4">
+                    <div class="text-sm text-muted-foreground mb-1">{{ product.category.name }}</div>
+                    <a href="{% url 'product_detail' product.slug %}">
+                        <h3 class="font-semibold truncate group-hover:text-green-600 transition-colors text-gray-900">
+                            {{ product.title }}</h3>
+                    </a>
+                    <div class="flex items-center gap-1 mt-1 mb-2">
+                        <i data-lucide="star" class="h-3 w-3 fill-yellow-400 text-yellow-400"></i>
+                        <span class="text-xs font-medium">{{ product.rating|default:"5.0" }}</span>
+                        <span class="text-xs text-gray-500">({{ product.reviews_count }})</span>
+                    </div>
+                    <div class="flex items-baseline gap-2">
+                        <span class="font-bold text-lg text-green-600">৳{{ product.price }}</span>
+                        {% if product.original_price %}
+                        <span class="text-sm text-gray-400 line-through">৳{{ product.original_price }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="flex items-center p-4 pt-0">
+                    {% if product.stock_quantity > 0 %}
+                    <div class="flex items-center gap-2 w-full">
+                        <form action="{% url 'cart_add' product.id %}" method="post" class="flex-1">
+                            {% csrf_token %}
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" name="checkout" value="true"
+                                class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-bold h-10 px-2 w-full bg-orange-50 text-orange-600 hover:bg-orange-100 transition-colors shadow-sm">
+                                Buy Now
+                            </button>
+                        </form>
+                        <form action="{% url 'cart_add' product.id %}" method="post" class="flex-1">
+                            {% csrf_token %}
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit"
+                                class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-bold h-10 px-2 w-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors shadow-sm">
+                                Add to Cart
+                            </button>
+                        </form>
+                    </div>
                     {% else %}
                     <button disabled
                         class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors bg-gray-200 text-gray-500 cursor-not-allowed h-10 px-4 py-2 w-full gap-2 shadow-sm">
@@ -512,7 +619,7 @@
             {% for product in new_arrivals %}
             <div class="flex items-center gap-4 p-4 border rounded-xl hover:shadow-lg transition-shadow">
                 <div class="w-32 h-32 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 skeleton relative group/img">
-                        <img src="{% if product.image %}{{ product.image.url }}{% else %}https://placehold.co/200?text=No+Image{% endif %}"
+                    <img src="{% if product.image %}{{ product.image.url }}{% else %}https://placehold.co/200?text=No+Image{% endif %}"
                         alt="{{ product.title }}"
                         onload="this.classList.remove('opacity-0'); this.closest('.skeleton').classList.remove('skeleton')"
                         onerror="this.closest('.skeleton').classList.remove('skeleton')"
@@ -590,7 +697,7 @@
             <div class="flex flex-wrap justify-center gap-3 mb-10 overflow-x-auto pb-4 no-scrollbar" id="category-tabs">
                 {% for category_data in categorized_products %}
                 <button onclick="switchTab('{{ category_data.category.slug }}')"
-                    class="category-tab whitespace-nowrap px-6 py-2.5 rounded-full border border-gray-200 font-bold transition-all duration-300 hover:shadow-md {% if forloop.first %}bg-green-600 border-green-600 text-white active-tab{% else %}text-gray-600 bg-white hover:border-green-300 hover:text-green-600{% endif %}"
+                    class="category-tab whitespace-nowrap px-6 py-2.5 rounded-full border border-gray-200 font-bold transition-all duration-300 hover:shadow-md {% if forloop.first %}bg-primary border-primary text-white active-tab{% else %}text-gray-600 bg-white hover:border-primary/30 hover:text-primary{% endif %}"
                     data-category="{{ category_data.category.slug }}">
                     {{ category_data.category.name }}
                 </button>
@@ -602,10 +709,10 @@
             {% for category_data in categorized_products %}
             <div id="tab-{{ category_data.category.slug }}"
                 class="category-panel transition-all duration-500 transform {% if not forloop.first %}hidden opacity-0 translate-y-4{% else %}opacity-100 translate-y-0{% endif %}">
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <div class="flex flex-wrap justify-center gap-6">
                     {% for product in category_data.products %}
                     <div
-                        class="rounded-lg border bg-card text-card-foreground group relative overflow-hidden border-none shadow-sm hover:shadow-md transition-all bg-white">
+                        class="w-[calc(50%-12px)] md:w-[calc(33.333%-16px)] lg:w-[calc(20%-20px)] flex-shrink-0 rounded-lg border bg-card text-card-foreground group relative overflow-hidden border-none shadow-sm hover:shadow-md transition-all bg-white">
                         <!-- Wishlist Button -->
                         <a href="{% url 'toggle_wishlist' product.id %}"
                             class="wishlist-btn absolute top-2 right-2 z-20 p-2.5 rounded-full bg-white/90 shadow-sm {% if product.id in wishlist_product_ids %}text-red-500{% else %}text-gray-500{% endif %} hover:text-red-500 hover:bg-white transition-all duration-300 group-hover:opacity-100 {% if product.id in wishlist_product_ids %}opacity-100{% else %}opacity-0{% endif %} min-w-[44px] min-h-[44px] flex items-center justify-center">
@@ -657,18 +764,27 @@
 
                         <div class="flex items-center p-4 pt-0">
                             {% if product.stock_quantity > 0 %}
-                            <form action="{% url 'cart_add' product.id %}" method="post" class="w-full">
-                                {% csrf_token %}
-                                <input type="hidden" name="quantity" value="1">
-                                <button type="submit"
-                                    class="btn-primary inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium h-10 px-4 py-2 w-full gap-2 shadow-sm">
-                                    <i data-lucide="shopping-cart" class="h-4 w-4"></i>
-                                    Add to Cart
-                                </button>
-                            </form>
+                            <div class="flex items-center gap-2 w-full">
+                                <form action="{% url 'cart_add' product.id %}" method="post" class="flex-1">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="quantity" value="1">
+                                    <button type="submit" name="checkout" value="true"
+                                        class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-bold h-10 px-2 w-full bg-orange-50 text-orange-600 hover:bg-orange-100 transition-colors shadow-sm">
+                                        Buy Now
+                                    </button>
+                                </form>
+                                <form action="{% url 'cart_add' product.id %}" method="post" class="flex-1">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="quantity" value="1">
+                                    <button type="submit"
+                                        class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-bold h-10 px-2 w-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors shadow-sm">
+                                        Add to Cart
+                                    </button>
+                                </form>
+                            </div>
                             {% else %}
                             <button type="button" disabled
-                                class="btn-primary inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium h-10 px-4 py-2 w-full gap-2 shadow-sm">
+                                class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium h-10 px-4 py-2 w-full gap-2 shadow-sm bg-gray-100 text-gray-400 cursor-not-allowed">
                                 Out of Stock
                             </button>
                             {% endif %}
@@ -747,10 +863,10 @@
             </a>
         </div>
 
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div class="flex flex-wrap justify-center gap-6">
             {% for product in on_sale_products %}
             <div
-                class="bg-white rounded-lg p-4 relative border border-gray-100 group hover:border-green-200 transition-colors">
+                class="w-[calc(50%-12px)] md:w-[calc(20%-20px)] lg:w-[calc(20%-20px)] flex-shrink-0 bg-white rounded-lg p-4 relative border border-gray-100 group hover:border-green-200 transition-colors">
                 <a href="{% url 'product_detail' product.slug %}"
                     class="block mb-4 overflow-hidden rounded-lg aspect-square skeleton relative group/savers">
                     <img src="{% if product.image %}{{ product.image.url }}{% else %}https://placehold.co/600?text=No+Image{% endif %}"
@@ -758,8 +874,9 @@
                         onload="this.classList.remove('opacity-0'); this.closest('.skeleton').classList.remove('skeleton')"
                         onerror="this.closest('.skeleton').classList.remove('skeleton')"
                         class="w-full h-full object-cover group-hover:scale-105 transition-all duration-500 opacity-0 px-2 lg:px-4">
-                    
-                    <div class="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm z-10">
+
+                    <div
+                        class="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm z-10">
                         SALE
                     </div>
 
@@ -783,14 +900,24 @@
                     </div>
 
                     {% if product.stock_quantity > 0 %}
-                    <form action="{% url 'cart_add' product.id %}" method="post">
-                        {% csrf_token %}
-                        <input type="hidden" name="quantity" value="1">
-                        <button type="submit"
-                            class="w-full bg-green-100 text-green-700 font-bold py-2 rounded-lg hover:bg-green-600 hover:text-white transition-all">
-                            Add to Cart
-                        </button>
-                    </form>
+                    <div class="flex items-center gap-2 w-full">
+                        <form action="{% url 'cart_add' product.id %}" method="post" class="flex-1">
+                            {% csrf_token %}
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" name="checkout" value="true"
+                                class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-bold h-10 px-2 w-full bg-orange-50 text-orange-600 hover:bg-orange-100 transition-colors shadow-sm">
+                                Buy Now
+                            </button>
+                        </form>
+                        <form action="{% url 'cart_add' product.id %}" method="post" class="flex-1">
+                            {% csrf_token %}
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit"
+                                class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-bold h-10 px-2 w-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors shadow-sm">
+                                Add to Cart
+                            </button>
+                        </form>
+                    </div>
                     {% else %}
                     <button disabled
                         class="w-full bg-gray-200 text-gray-500 font-bold py-2 rounded-lg cursor-not-allowed">

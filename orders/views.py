@@ -1,14 +1,17 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.db import transaction
+from django.db import transaction, models
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from products.models import Product
+from django.utils import timezone
+from django.http import JsonResponse, HttpResponse
+
+from products.models import Product, StockLog
+from analytics.models import AnalyticsEvent, VisitorSession
+from marketing.models import Coupon
 from .cart import Cart
 from .forms import OrderCreateForm
 from .models import Order, OrderItem, PaymentGateway
-from products.models import StockLog
-from analytics.models import AnalyticsEvent, VisitorSession
 
 def log_analytics_event(request, event_type, value=None, metadata=None):
     session_key = request.session.session_key
@@ -31,6 +34,9 @@ def cart_add(request, product_id):
     
     # [ANALYTICS]
     log_analytics_event(request, 'add_to_cart', product_id)
+    
+    if request.POST.get('checkout') == 'true':
+        return redirect('order_create')
     
     return redirect('cart_detail')
 
@@ -170,10 +176,11 @@ def order_create(request):
                             quantity=item['quantity']
                         )
                         
-                        # Deduct Stock
-                        product = item['product']
-                        product.stock_quantity -= item['quantity']
-                        product.save()
+                        # Deduct Stock (Atomic update using F expression)
+                        Product.objects.filter(id=product.id).update(stock_quantity=models.F('stock_quantity') - item['quantity'])
+                        
+                        # Refresh product instance for logging or other needs if necessary, 
+                        # but StockLog just needs the reference.
                         
                         # Create Stock Log
                         StockLog.objects.create(

@@ -7,8 +7,13 @@ class User(AbstractUser):
         ('admin', 'Admin'),
     )
     email = models.EmailField(unique=True)
+    phone_number = models.CharField(max_length=15, unique=True, null=True, blank=True)
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='user')
     image = models.ImageField(upload_to='profile_pics', default='default.jpg')
+    
+    # OTP Fields
+    otp_code = models.CharField(max_length=6, null=True, blank=True)
+    otp_expires_at = models.DateTimeField(null=True, blank=True)
     
     # Resolving conflicts with default auth.User
     groups = models.ManyToManyField(
@@ -37,7 +42,8 @@ class Address(models.Model):
     city = models.CharField(max_length=100)
     phone = models.CharField(max_length=20)
     is_default = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        verbose_name_plural = "Addresses"
 
     def __str__(self):
         return f"{self.street}, {self.city}"

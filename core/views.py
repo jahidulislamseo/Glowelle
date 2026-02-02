@@ -1,27 +1,21 @@
+from datetime import timedelta
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.cache import cache
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.contrib.admin.views.decorators import staff_member_required
 from django.utils import timezone
-from django.db.models import Sum, Count, F, Avg
-from django.db.models.functions import TruncDate, TruncHour
+from django.db.models import Sum, Count, F, Avg, Q, ExpressionWrapper, fields
+from django.db.models.functions import TruncDate
+from django.contrib import messages
+
+from django.contrib.auth import get_user_model
 from orders.models import Order, OrderItem
-from users.models import User
-from datetime import timedelta
 from products.models import Product
 from analytics.models import VisitorSession, PageView, AnalyticsEvent
-from django.contrib.auth import get_user_model
-
-
-
-# PDF Generation Imports
-from django.http import HttpResponse
-from django.template.loader import get_template
-from xhtml2pdf import pisa
-from django.contrib.admin.views.decorators import staff_member_required
-from orders.models import Order
 from .models import ContactMessage
-from django.contrib import messages
+from .utils import generate_pdf_response
+
+User = get_user_model()
 
 def contact(request):
     if request.method == 'POST':
@@ -42,26 +36,15 @@ def contact(request):
 def admin_order_invoice(request, order_id):
     order = get_object_or_404(Order, pk=order_id)
     
-    # Increment download count
-    order.invoice_download_count += 1
-    order.save(update_fields=['invoice_download_count'])
+    # Increment download count (Atomic update)
+    Order.objects.filter(pk=order_id).update(invoice_download_count=F('invoice_download_count') + 1)
     
-    template_path = 'pdf/invoice.html'
-    context = {'order': order}
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="invoice_{order.invoice_number}.pdf"'
-    
-    template = get_template(template_path)
-    html = template.render(context)
-
-    # Create PDF
-    pisa_status = pisa.CreatePDF(
-       html, dest=response
+    return generate_pdf_response(
+        template_src='pdf/invoice.html',
+        context_dict={'order': order},
+        filename=f"invoice_{order.invoice_number}.pdf",
+        download=request.GET.get('download') == 'true'
     )
-    
-    if pisa_status.err:
-       return HttpResponse('We had some errors <pre>' + html + '</pre>')
-    return response
 
 @staff_member_required
 def analytics_dashboard(request):
@@ -87,7 +70,6 @@ def analytics_dashboard(request):
     bounce_rate = (bounces / total_sessions * 100) if total_sessions > 0 else 0
     
     # Avg Session Duration (Database Aggregation)
-    from django.db.models import ExpressionWrapper, fields, Q
     avg_duration_data = sessions.annotate(
         duration=ExpressionWrapper(F('last_seen') - F('start_time'), output_field=fields.DurationField())
     ).aggregate(avg_duration=Avg('duration'))
@@ -169,6 +151,32 @@ def analytics_dashboard(request):
     # User Conversion Rate
     user_conversion_rate = (stats['payments'] / total_visitors * 100) if total_visitors > 0 else 0
 
+    # 7. Sales Metrics (For Charts)
+    order_data = Order.objects.filter(created_at__gte=start_date)
+    
+    # Daily Revenue & Order Count
+    sales_trend = order_data.annotate(date=TruncDate('created_at')) \
+        .values('date') \
+        .annotate(revenue=Sum('total'), orders=Count('id')) \
+        .order_by('date')
+    
+    sales_labels = [s['date'].strftime('%b %d') for s in sales_trend]
+    revenue_data = [float(s['revenue']) for s in sales_trend]
+    orders_data = [s['orders'] for s in sales_trend]
+
+    # Order Status Breakdown
+    status_counts = order_data.values('status').annotate(count=Count('id'))
+    status_data = {s['status']: s['count'] for s in status_counts}
+
+    # Category-wise Sales
+    category_sales_data = OrderItem.objects.filter(order__created_at__gte=start_date) \
+        .values('product__category__name') \
+        .annotate(total_qty=Sum('quantity'), total_revenue=Sum(F('price') * F('quantity'))) \
+        .order_by('-total_revenue')
+    
+    category_labels = [c['product__category__name'] or 'Unknown' for c in category_sales_data]
+    category_revenue = [float(c['total_revenue']) for c in category_sales_data]
+
     context = {
         'days': days,
         'total_sessions': total_sessions,
@@ -178,11 +186,22 @@ def analytics_dashboard(request):
         'avg_load_time': int(avg_load_time),
         'device_data': device_data,
         'browser_data': browser_data,
+        'sales_chart': {
+            'labels': sales_labels,
+            'revenue': revenue_data,
+            'orders': orders_data,
+        },
+        'status_chart': status_data,
+        'category_chart': {
+            'labels': category_labels,
+            'revenue': category_revenue,
+        },
         'funnel': {
+            'sessions': total_sessions,
             'adds': stats['adds'],
             'starts': stats['starts'],
             'sales': stats['payments'],
-            'rate': round(user_conversion_rate, 2) if total_users > 0 else 0,
+            'rate': round(user_conversion_rate, 2) if total_visitors > 0 else 0,
             'drop_off': round(drop_off_rate, 1)
         },
         'auth_stats': {
@@ -213,27 +232,48 @@ def analytics_dashboard(request):
 @staff_member_required
 def admin_stats_api(request):
     # Time window (Last 30 days)
-    last_30_days = timezone.now() - timedelta(days=30)
+    now = timezone.now()
+    last_30_days = now - timedelta(days=30)
+    prev_30_days_start = now - timedelta(days=60)
+    prev_30_days_end = last_30_days
     
     # 1. Headline KPIs
     total_revenue_30d = Order.objects.filter(created_at__gte=last_30_days).exclude(status__in=['cancelled', 'returned']).aggregate(total=Sum('total'))['total'] or 0
     total_orders_30d = Order.objects.filter(created_at__gte=last_30_days).count()
     total_users = User.objects.count()
     
+    # 1b. Trend Calculation (Comparison with prev 30 days)
+    rev_prev = Order.objects.filter(created_at__gte=prev_30_days_start, created_at__lt=prev_30_days_end).exclude(status__in=['cancelled', 'returned']).aggregate(total=Sum('total'))['total'] or 0
+    ord_prev = Order.objects.filter(created_at__gte=prev_30_days_start, created_at__lt=prev_30_days_end).count()
+    
+    def calc_trend(current, previous):
+        if previous == 0:
+            return 100 if current > 0 else 0
+        return round(((float(current) - float(previous)) / float(previous)) * 100, 1)
+
+    rev_trend = calc_trend(total_revenue_30d, rev_prev)
+    ord_trend = calc_trend(total_orders_30d, ord_prev)
+    
     # Today's stats
-    today_start = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
+    today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
     today_orders = Order.objects.filter(created_at__gte=today_start).count()
     today_revenue = Order.objects.filter(created_at__gte=today_start).exclude(status__in=['cancelled', 'returned']).aggregate(total=Sum('total'))['total'] or 0
     
-    # 2. Sales Chart (Daily Revenue last 30 days)
-    sales_data = Order.objects.filter(created_at__gte=last_30_days).exclude(status__in=['cancelled', 'returned']) \
+    # 2. Sales Chart (Daily Revenue last 30 days) - PROPER TIMELINE
+    raw_sales_data = Order.objects.filter(created_at__gte=last_30_days).exclude(status__in=['cancelled', 'returned']) \
         .annotate(date=TruncDate('created_at')) \
         .values('date') \
         .annotate(daily_revenue=Sum('total')) \
         .order_by('date')
     
-    labels = [s['date'].strftime('%Y-%m-%d') for s in sales_data]
-    revenue_points = [s['daily_revenue'] for s in sales_data]
+    sales_map = {s['date'].strftime('%Y-%m-%d'): float(s['daily_revenue']) for s in raw_sales_data}
+    
+    labels = []
+    revenue_points = []
+    for i in range(30, -1, -1):
+        day = (now - timedelta(days=i)).strftime('%Y-%m-%d')
+        labels.append(day)
+        revenue_points.append(sales_map.get(day, 0.0))
 
     # 3. Order Status Breakdown
     status_counts = Order.objects.values('status').annotate(count=Count('id'))
@@ -241,11 +281,11 @@ def admin_stats_api(request):
 
     # 3b. Payment Method Breakdown
     payment_counts = Order.objects.values('payment_method').annotate(count=Count('id'))
-    payment_map = {p['payment_method']: p['count'] for p in payment_counts}
+    payment_map = {p['payment_method']: p['count'] for p in payment_counts if p['payment_method']}
 
-    # 3c. Courier Breakdown
-    courier_counts = Order.objects.values('courier__name').annotate(count=Count('id'))
-    courier_map = {c['courier__name']: c['count'] for c in courier_counts if c['courier__name']}
+    # 3c. City Breakdown (New)
+    city_counts = Order.objects.values('city').annotate(count=Count('id')).order_by('-count')
+    city_map = {c['city'].title() if c['city'] else "Unknown": c['count'] for c in city_counts[:5]}
 
     # 4. Top Selling Products
     top_products = OrderItem.objects.filter(order__status__in=['processing', 'shipped', 'delivered']) \
@@ -253,8 +293,27 @@ def admin_stats_api(request):
         .annotate(total_qty=Sum('quantity')) \
         .order_by('-total_qty')[:5]
 
-    # 5. Live Stats (New)
-    from django.core.cache import cache
+    # 4b. Top Customers (New)
+    top_customers = Order.objects.exclude(user__isnull=True) \
+        .values('user__username', 'full_name') \
+        .annotate(total_spent=Sum('total')) \
+        .order_by('-total_spent')[:5]
+    top_customers_data = [{
+        'name': c['full_name'] or c['user__username'],
+        'total': float(c['total_spent'])
+    } for c in top_customers]
+
+    # 5. Recent Activity
+    recent_orders = Order.objects.select_related('user').order_by('-created_at')[:5]
+    recent_orders_data = [{
+        'id': o.id,
+        'customer': o.full_name or (o.user.username if o.user else "Guest"),
+        'amount': float(o.total),
+        'status': o.status,
+        'time': o.created_at.strftime('%H:%M') if o.created_at.date() == now.date() else o.created_at.strftime('%b %d')
+    } for o in recent_orders]
+
+    # Live Stats
     online_users_dict = cache.get('online_users', {})
     live_users_count = len(online_users_dict)
     
@@ -262,26 +321,20 @@ def admin_stats_api(request):
     purchasing_users_count = Order.objects.filter(status__in=['processing', 'shipped', 'delivered']).values('user').distinct().count()
 
     # 6. Average Order Value (AOV)
-    aov = total_revenue_30d / total_orders_30d if total_orders_30d > 0 else 0
+    aov = float(total_revenue_30d) / total_orders_30d if total_orders_30d > 0 else 0.0
 
-    # 7. Low Stock Products (< 10)
-    from products.models import Product
+    # 7. Low Stock Products
     low_stock_products = Product.objects.filter(stock_quantity__lt=10, in_stock=True).values('title', 'stock_quantity')[:5]
-
-    # 8. Sales by Category
-    category_sales = OrderItem.objects.filter(order__status__in=['processing', 'shipped', 'delivered']) \
-        .values('product__category__name') \
-        .annotate(total_qty=Sum('quantity')) \
-        .order_by('-total_qty')
-    category_map = {c['product__category__name']: c['total_qty'] for c in category_sales if c['product__category__name']}
 
     data = {
         'kpi': {
-            'revenue_30d': total_revenue_30d,
+            'revenue_30d': float(total_revenue_30d),
             'orders_30d': total_orders_30d,
+            'rev_trend': rev_trend,
+            'ord_trend': ord_trend,
             'users': total_users,
             'orders_today': today_orders,
-            'revenue_today': today_revenue,
+            'revenue_today': float(today_revenue),
             'live_users': live_users_count,
             'purchasing_users': purchasing_users_count,
             'aov': round(aov, 2),
@@ -291,17 +344,16 @@ def admin_stats_api(request):
             'data': revenue_points,
         },
         'status_chart': {
-            'pending': status_map.get('pending', 0),
-            'processing': status_map.get('processing', 0),
-            'shipped': status_map.get('shipped', 0),
-            'delivered': status_map.get('delivered', 0),
-            'cancelled': status_map.get('cancelled', 0),
+            'labels': list(status_map.keys()),
+            'data': list(status_map.values()),
+            'map': status_map, # For backwards compatibility if any
         },
         'payment_chart': payment_map,
-        'courier_chart': courier_map,
-        'category_chart': category_map,
+        'city_chart': city_map,
         'top_products': list(top_products),
+        'top_customers': top_customers_data,
         'low_stock': list(low_stock_products),
+        'recent_orders': recent_orders_data,
     }
 
     return JsonResponse(data)

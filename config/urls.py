@@ -35,7 +35,7 @@ urlpatterns = [
     path('admin/analytics/', core_views.analytics_dashboard, name='analytics_dashboard'), 
     path('admin/chatbot/history/', chatbot_views.admin_chat_history, name='admin_chat_history'), # New Chat History
     path('admin/orders/invoice/<int:order_id>/', core_views.admin_order_invoice, name='order_invoice'),
-    # path('accounts/', include('allauth.urls')),
+    path('accounts/', include('allauth.urls')),
     path('accounts/login/', RedirectView.as_view(pattern_name='login', permanent=True)), # Redirect legacy/default login URL
     path('admin/', admin.site.urls),
     # Legacy/Template URLs (Keep them for now, or comment out if we valid strictly API only)
@@ -62,6 +62,7 @@ urlpatterns = [
     # AI Chatbot
     path('chatbot-test/', TemplateView.as_view(template_name='chatbot_test.html'), name='chatbot_test'),
     path('api/chatbot/', chatbot_views.chatbot_response, name='chatbot_api'),
+    path('api/cart-status/', chatbot_views.cart_status, name='cart_status'),
 
     # Admin API
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

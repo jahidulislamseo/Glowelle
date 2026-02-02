@@ -6,7 +6,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- SEO & Meta Tags -->
-    <title>{% if product %}{{ product.get_meta_title }} | Al Barakah Mart{% elif category %}{{ category.get_meta_title }} | Al Barakah Mart{% else %}{{ site_settings.site_title|default:"Al Barakah Mart" }} | Premium Organic Grocery{% endif %}</title>
+    <title>{% if product %}{{ product.get_meta_title }} | Al Barakah Mart{% elif category %}{{ category.get_meta_title
+        }} | Al Barakah Mart{% else %}{{ site_settings.site_title|default:"Al Barakah Mart" }} | Premium Organic
+        Grocery{% endif %}</title>
     <meta name="description"
         content="{% if product %}{{ product.get_meta_description }}{% elif category %}{{ category.get_meta_description }}{% else %}{{ site_settings.meta_description|default:'Your one-stop shop for fresh organic fruits, vegetables, meat, and daily essentials in Dhaka.' }}{% endif %}">
     <link rel="canonical" href="{{ request.build_absolute_uri }}">
@@ -66,60 +68,65 @@
     <!-- Organization Schema -->
     <script type="application/ld+json">
     {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      "name": "{{ site_settings.site_title|default:'Al Barakah Mart' }}",
-      "url": "{{ request.scheme }}://{{ request.get_host }}",
-      "logo": "{% if site_settings.logo %}{{ request.scheme }}://{{ request.get_host }}{{ site_settings.logo.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo.png' %}{% endif %}",
-      "contactPoint": {
-        "@type": "ContactPoint",
-        "telephone": "{{ site_settings.support_phone|default:'+880 1234 567890' }}",
-        "contactType": "Customer Service",
-        "email": "{{ site_settings.support_email|default:'contact@albarakah.bd' }}"
+      "@context":"https://schema.org",
+      "@type":"Organization",
+      "name":"{{ site_settings.site_title|default:'Al Barakah Mart' }}",
+      "url":"{{ request.scheme }}://{{ request.get_host }}",
+      "logo":"{% if site_settings.logo %}{{ request.scheme }}://{{ request.get_host }}{{ site_settings.logo.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo.png' %}{% endif %}",
+      "contactPoint":{
+        "@type":"ContactPoint",
+        "telephone":"{{ site_settings.support_phone|default:'+880 1234 567890' }}",
+        "contactType":"Customer Service",
+        "email":"{{ site_settings.support_email|default:'contact@albarakah.bd' }}"
       }
     }
     </script>
     <!-- Breadcrumb Schema -->
     <script type="application/ld+json">
     {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [{
-        "@type": "ListItem",
-        "position": 1,
-        "name": "Home",
-        "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'home' %}"
+      "@context":"https://schema.org",
+      "@type":"BreadcrumbList",
+      "itemListElement":[{
+        "@type":"ListItem",
+        "position":1,
+        "name":"Home",
+        "item":"{{ request.scheme }}://{{ request.get_host }}{% url 'home' %}"
       }
-      {% if request.resolver_match.url_name == 'shop' %}
+      {% if product %}
       ,{
-        "@type": "ListItem",
-        "position": 2,
-        "name": "Shop",
-        "item": "{{ request.build_absolute_uri }}"
-      }
-      {% elif product %}
-      ,{
-        "@type": "ListItem",
-        "position": 2,
-        "name": "Shop",
-        "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'shop' %}"
+        "@type":"ListItem",
+        "position":2,
+        "name":"Shop",
+        "item":"{{ request.scheme }}://{{ request.get_host }}{% url 'shop' %}"
       },{
-        "@type": "ListItem",
-        "position": 3,
-        "name": "{{ product.title }}",
-        "item": "{{ request.build_absolute_uri }}"
-      }
-       {% elif category %}
-      ,{
-        "@type": "ListItem",
-        "position": 2,
-        "name": "Shop",
-        "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'shop' %}"
+        "@type":"ListItem",
+        "position":3,
+        "name":"{{ product.category.name|escapejs }}",
+        "item":"{{ request.scheme }}://{{ request.get_host }}{% url 'shop' %}?category={{ product.category.slug }}"
       },{
-        "@type": "ListItem",
-        "position": 3,
-        "name": "{{ category.name }}",
-        "item": "{{ request.build_absolute_uri }}"
+        "@type":"ListItem",
+        "position":4,
+        "name":"{{ product.title|escapejs }}",
+        "item":"{{ request.build_absolute_uri }}"
+      }
+      {% elif category %}
+      ,{
+        "@type":"ListItem",
+        "position":2,
+        "name":"Shop",
+        "item":"{{ request.scheme }}://{{ request.get_host }}{% url 'shop' %}"
+      },{
+        "@type":"ListItem",
+        "position":3,
+        "name":"{{ category.name|escapejs }}",
+        "item":"{{ request.build_absolute_uri }}"
+      }
+      {% elif request.resolver_match.url_name == 'shop' %}
+      ,{
+        "@type":"ListItem",
+        "position":2,
+        "name":"Shop",
+        "item":"{{ request.build_absolute_uri }}"
       }
       {% endif %}
       ]
@@ -147,17 +154,40 @@
                             200: '#bbf7d0',
                             300: '#86efac',
                             400: '#4ade80',
-                            500: '#22c55e',
-                            600: '#16a34a',
-                            700: '#15803d',
-                            800: '#166534',
-                            900: '#14532d',
+                            500: '#10b981', // More vibrant emerald
+                            600: '#059669', // Premium forest green
+                            700: '#047857',
+                            800: '#065f46',
+                            900: '#064e3b',
+                        },
+                        primary: {
+                            light: '#10b981',
+                            DEFAULT: '#059669',
+                            dark: '#047857',
+                        },
+                        accent: {
+                            light: '#fbbf24',
+                            DEFAULT: '#f59e0b',
+                            dark: '#d97706',
                         }
+                    },
+                    borderRadius: {
+                        'xl': '1rem',
+                        '2xl': '1.5rem',
+                        '3xl': '2rem',
+                    },
+                    boxShadow: {
+                        'premium': '0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05)',
+                        'hover': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
                     }
                 }
             }
         }
     </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -224,13 +254,11 @@
             bottom: 0;
             left: 0;
             transform: translateX(-100%);
-            background-image: linear-gradient(
-                90deg,
-                rgba(255, 255, 255, 0) 0,
-                rgba(255, 255, 255, 0.1) 20%,
-                rgba(255, 255, 255, 0.3) 60%,
-                rgba(255, 255, 255, 0)
-            );
+            background-image: linear-gradient(90deg,
+                    rgba(255, 255, 255, 0) 0,
+                    rgba(255, 255, 255, 0.1) 20%,
+                    rgba(255, 255, 255, 0.3) 60%,
+                    rgba(255, 255, 255, 0));
             animation: shimmer 2.5s infinite;
         }
 
@@ -242,7 +270,7 @@
 
         /* Bottom Nav Styles */
         .mobile-bottom-nav {
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
             padding-bottom: env(safe-area-inset-bottom);
         }
 
@@ -253,22 +281,41 @@
 
         /* Primary Button Standard */
         .btn-primary {
-            background-color: #16a34a;
-            /* green-600 */
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .btn-primary:hover {
-            background-color: #15803d;
-            /* green-700 */
+            transform: translateY(-1px);
+            box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.2), 0 4px 6px -2px rgba(16, 185, 129, 0.1);
+            filter: brightness(1.05);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
         }
 
         .btn-primary:disabled {
-            background-color: #d1d5db;
-            /* gray-300 */
+            background: #d1d5db;
             cursor: not-allowed;
             opacity: 0.7;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Glassmorphism Effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .dark .glass {
+            background: rgba(17, 24, 39, 0.8);
+            border-color: rgba(255, 255, 255, 0.1);
         }
 
         /* Better Typography for Prose */
@@ -278,40 +325,80 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .animate-fade-in {
             animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af;
+        }
+
+        .dark ::-webkit-scrollbar-track {
+            background: #1f2937;
+        }
+
+        .dark ::-webkit-scrollbar-thumb {
+            background: #4b5563;
         }
     </style>
 </head>
 
 <body class="bg-gray-50 font-sans antialiased min-h-screen flex flex-col">
     <!-- Mobile Bottom Navigation (Visible only on mobile) -->
-    <div class="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-lg border-t border-gray-100 z-50 mobile-bottom-nav">
+    <div
+        class="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-lg border-t border-gray-100 z-50 mobile-bottom-nav">
         <div class="flex justify-around items-center h-16">
-            <a href="{% url 'home' %}" class="flex flex-col items-center justify-center w-full h-full text-gray-500 hover:text-green-600 transition-colors {% if request.resolver_match.url_name == 'home' %}text-green-600{% endif %}">
+            <a href="{% url 'home' %}"
+                class="flex flex-col items-center justify-center w-full h-full text-gray-500 hover:text-green-600 transition-colors {% if request.resolver_match.url_name == 'home' %}text-green-600{% endif %}">
                 <i data-lucide="home" class="h-6 w-6"></i>
                 <span class="text-[10px] font-bold mt-1">Home</span>
             </a>
-            <a href="{% url 'shop' %}" class="flex flex-col items-center justify-center w-full h-full text-gray-500 hover:text-green-600 transition-colors {% if request.resolver_match.url_name == 'shop' %}text-green-600{% endif %}">
+            <a href="{% url 'shop' %}"
+                class="flex flex-col items-center justify-center w-full h-full text-gray-500 hover:text-green-600 transition-colors {% if request.resolver_match.url_name == 'shop' %}text-green-600{% endif %}">
                 <i data-lucide="shopping-bag" class="h-6 w-6"></i>
                 <span class="text-[10px] font-bold mt-1">Shop</span>
             </a>
-            <a href="{% url 'cart_detail' %}" class="flex flex-col items-center justify-center w-full h-full text-gray-500 hover:text-green-600 transition-colors relative {% if request.resolver_match.url_name == 'cart_detail' %}text-green-600{% endif %}">
+            <a href="{% url 'cart_detail' %}"
+                class="flex flex-col items-center justify-center w-full h-full text-gray-500 hover:text-green-600 transition-colors relative {% if request.resolver_match.url_name == 'cart_detail' %}text-green-600{% endif %}">
                 <i data-lucide="shopping-cart" class="h-6 w-6"></i>
                 <span class="text-[10px] font-bold mt-1">Cart</span>
                 {% if request.session.cart|length > 0 %}
-                <span class="absolute top-2 right-4 h-4 w-4 flex items-center justify-center rounded-full bg-red-500 text-white text-[8px] font-bold">{{ request.session.cart|length }}</span>
+                <span
+                    class="absolute top-2 right-4 h-4 w-4 flex items-center justify-center rounded-full bg-red-500 text-white text-[8px] font-bold">{{ request.session.cart|length }}</span>
                 {% endif %}
             </a>
-            <a href="{% url 'wishlist' %}" class="flex flex-col items-center justify-center w-full h-full text-gray-500 hover:text-green-600 transition-colors {% if request.resolver_match.url_name == 'wishlist' %}text-green-600{% endif %}">
+            <a href="{% url 'wishlist' %}"
+                class="flex flex-col items-center justify-center w-full h-full text-gray-500 hover:text-green-600 transition-colors {% if request.resolver_match.url_name == 'wishlist' %}text-green-600{% endif %}">
                 <i data-lucide="heart" class="h-6 w-6"></i>
                 <span class="text-[10px] font-bold mt-1">Wishlist</span>
             </a>
-            <a href="{% url 'dashboard' %}" class="flex flex-col items-center justify-center w-full h-full text-gray-500 hover:text-green-600 transition-colors {% if request.resolver_match.url_name == 'dashboard' %}text-green-600{% endif %}">
+            <a href="{% url 'dashboard' %}"
+                class="flex flex-col items-center justify-center w-full h-full text-gray-500 hover:text-green-600 transition-colors {% if request.resolver_match.url_name == 'dashboard' %}text-green-600{% endif %}">
                 <i data-lucide="user" class="h-6 w-6"></i>
                 <span class="text-[10px] font-bold mt-1">Account</span>
             </a>
@@ -319,10 +406,10 @@
     </div>
 
     <!-- Navbar (Matching Header.tsx) -->
-    <header
-        class="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur shadow-sm dark:bg-gray-900/95 dark:border-gray-800 transition-colors duration-200">
+    <header class="sticky top-0 z-50 w-full border-b glass shadow-sm transition-all duration-300">
         <!-- Benefit Bar Section -->
-        <div class="bg-green-600 text-white text-[10px] sm:text-xs py-1.5 overflow-hidden">
+        <div
+            class="bg-gradient-to-r from-green-600 via-emerald-600 to-green-700 text-white text-[10px] sm:text-xs py-1.5 overflow-hidden">
             <div class="container mx-auto px-4">
                 <div class="flex items-center justify-center sm:justify-between gap-4">
                     <div class="flex items-center gap-2">
@@ -361,13 +448,15 @@
                         <div class="p-6 border-b bg-green-600 text-white">
                             <div class="flex items-center justify-between mb-4">
                                 <span class="font-bold text-xl">Al Barakah Mart</span>
-                                <button id="mobile-menu-close" class="p-1 hover:bg-white/20 rounded-full transition-colors">
+                                <button id="mobile-menu-close"
+                                    class="p-1 hover:bg-white/20 rounded-full transition-colors">
                                     <i data-lucide="x" class="h-6 w-6"></i>
                                 </button>
                             </div>
                             {% if user.is_authenticated %}
                             <div class="flex items-center gap-3">
-                                <div class="h-12 w-12 rounded-full border-2 border-white/50 overflow-hidden bg-white/20 flex items-center justify-center">
+                                <div
+                                    class="h-12 w-12 rounded-full border-2 border-white/50 overflow-hidden bg-white/20 flex items-center justify-center shadow-inner">
                                     {% if user.image %}
                                     <img src="{{ user.image.url }}" class="h-full w-full object-cover">
                                     {% else %}
@@ -380,7 +469,8 @@
                                 </div>
                             </div>
                             {% else %}
-                            <a href="{% url 'login' %}" class="inline-flex items-center gap-2 bg-white text-green-600 px-4 py-2 rounded-full font-bold text-sm">
+                            <a href="{% url 'login' %}"
+                                class="inline-flex items-center gap-2 bg-white text-green-600 px-6 py-2.5 rounded-full font-bold text-sm shadow-lg hover:shadow-xl transition-all">
                                 <i data-lucide="log-in" class="h-4 w-4"></i> Login / Register
                             </a>
                             {% endif %}
@@ -393,7 +483,8 @@
                             </a>
                             <a href="{% url 'shop' %}"
                                 class="flex items-center gap-4 px-4 py-3.5 text-gray-700 hover:bg-green-50 hover:text-green-600 rounded-xl transition-all group {% if request.resolver_match.url_name == 'shop' %}bg-green-50 text-green-600{% endif %}">
-                                <i data-lucide="shopping-bag" class="h-5 w-5 transition-transform group-hover:scale-110"></i>
+                                <i data-lucide="shopping-bag"
+                                    class="h-5 w-5 transition-transform group-hover:scale-110"></i>
                                 <span class="font-medium">Shop All Products</span>
                             </a>
                             <a href="{% url 'wishlist' %}"
@@ -403,21 +494,32 @@
                             </a>
                             <a href="{% url 'cart_detail' %}"
                                 class="flex items-center gap-4 px-4 py-3.5 text-gray-700 hover:bg-green-50 hover:text-green-600 rounded-xl transition-all group">
-                                <i data-lucide="shopping-cart" class="h-5 w-5 transition-transform group-hover:scale-110"></i>
+                                <i data-lucide="shopping-cart"
+                                    class="h-5 w-5 transition-transform group-hover:scale-110"></i>
                                 <span class="font-medium">Shopping Cart</span>
                                 {% if request.session.cart|length > 0 %}
-                                <span class="ml-auto bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">{{ request.session.cart|length }}</span>
+                                <span
+                                    class="ml-auto bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">{{ request.session.cart|length }}</span>
                                 {% endif %}
                             </a>
 
                             <div class="h-px bg-gray-100 my-4 mx-4"></div>
 
                             <div class="px-4 py-2">
-                                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Account & Support</p>
-                                <a href="{% url 'dashboard' %}" class="block py-2.5 text-gray-600 hover:text-green-600 transition-colors">My Account</a>
-                                <a href="{% url 'about' %}" class="block py-2.5 text-gray-600 hover:text-green-600 transition-colors">About Al Barakah</a>
-                                <a href="{% url 'contact' %}" class="block py-2.5 text-gray-600 hover:text-green-600 transition-colors">Contact Support</a>
-                                <a href="{% url 'terms' %}" class="block py-2.5 text-gray-600 hover:text-green-600 transition-colors">Terms & Privacy</a>
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Account &
+                                    Support</p>
+                                <a href="{% url 'dashboard' %}"
+                                    class="block py-2.5 text-gray-600 hover:text-green-600 transition-colors">My
+                                    Account</a>
+                                <a href="{% url 'about' %}"
+                                    class="block py-2.5 text-gray-600 hover:text-green-600 transition-colors">About Al
+                                    Barakah</a>
+                                <a href="{% url 'contact' %}"
+                                    class="block py-2.5 text-gray-600 hover:text-green-600 transition-colors">Contact
+                                    Support</a>
+                                <a href="{% url 'terms' %}"
+                                    class="block py-2.5 text-gray-600 hover:text-green-600 transition-colors">Terms &
+                                    Privacy</a>
                             </div>
                         </nav>
                     </div>
@@ -425,7 +527,8 @@
 
                     <a href="{% url 'home' %}" class="flex items-center gap-2">
                         {% if site_settings.logo %}
-                        <img src="{{ site_settings.logo.url }}" alt="{{ site_settings.site_title }}" class="h-12 w-auto">
+                        <img src="{{ site_settings.logo.url }}" alt="{{ site_settings.site_title }}"
+                            class="h-12 w-auto">
                         {% else %}
                         <img src="{% static 'images/logo.png' %}" alt="Al Barakah Mart" class="h-12 w-auto">
                         {% endif %}
@@ -553,32 +656,32 @@
                 <!-- Brand Info -->
                 <div class="space-y-4">
                     {% if site_settings.logo %}
-                        <img src="{{ site_settings.logo.url }}" alt="{{ site_settings.site_title }}" class="h-10 w-auto">
+                    <img src="{{ site_settings.logo.url }}" alt="{{ site_settings.site_title }}" class="h-10 w-auto">
                     {% else %}
-                        <h3 class="text-xl font-bold text-green-600">{{ site_settings.site_title }}</h3>
+                    <h3 class="text-xl font-bold text-green-600">{{ site_settings.site_title }}</h3>
                     {% endif %}
-                    
+
                     <p class="text-sm text-gray-500">{{ site_settings.meta_description|default:"Your one-stop shop for fresh organic fruits, vegetables, meat, and daily essentials." }}</p>
-                    
+
                     <div class="flex space-x-4">
                         {% if site_settings.facebook_url %}
                         <a href="{{ site_settings.facebook_url }}" target="_blank"
                             class="h-11 w-11 text-gray-500 hover:text-green-600 flex items-center justify-center transition-colors border border-gray-200 rounded-lg hover:border-green-200 hover:bg-green-50"><i
                                 data-lucide="facebook" class="h-5 w-5"></i></a>
                         {% endif %}
-                        
+
                         {% if site_settings.instagram_url %}
                         <a href="{{ site_settings.instagram_url }}" target="_blank"
                             class="h-11 w-11 text-gray-500 hover:text-green-600 flex items-center justify-center transition-colors border border-gray-200 rounded-lg hover:border-green-200 hover:bg-green-50"><i
                                 data-lucide="instagram" class="h-5 w-5"></i></a>
                         {% endif %}
-                        
+
                         {% if site_settings.twitter_url %}
                         <a href="{{ site_settings.twitter_url }}" target="_blank"
                             class="h-11 w-11 text-gray-500 hover:text-green-600 flex items-center justify-center transition-colors border border-gray-200 rounded-lg hover:border-green-200 hover:bg-green-50"><i
                                 data-lucide="twitter" class="h-5 w-5"></i></a>
                         {% endif %}
-                        
+
                         {% if site_settings.youtube_url %}
                         <a href="{{ site_settings.youtube_url }}" target="_blank"
                             class="h-11 w-11 text-gray-500 hover:text-green-600 flex items-center justify-center transition-colors border border-gray-200 rounded-lg hover:border-green-200 hover:bg-green-50"><i
@@ -649,7 +752,8 @@
         <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeQuickView()"></div>
         <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl p-4">
             <div class="bg-white rounded-2xl shadow-2xl overflow-hidden relative">
-                <button onclick="closeQuickView()" class="absolute top-4 right-4 z-10 p-2 hover:bg-gray-100 rounded-full transition-colors">
+                <button onclick="closeQuickView()"
+                    class="absolute top-4 right-4 z-10 p-2 hover:bg-gray-100 rounded-full transition-colors">
                     <i data-lucide="x" class="h-6 w-6 text-gray-500"></i>
                 </button>
                 <div id="quick-view-content" class="min-h-[400px]">
@@ -666,16 +770,16 @@
         function openQuickView(productId) {
             const modal = document.getElementById('quick-view-modal');
             const content = document.getElementById('quick-view-content');
-            
+
             modal.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
-            
+
             content.innerHTML = `
                 <div class="flex items-center justify-center min-h-[400px]">
                     <div class="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-b-green-600"></div>
                 </div>
             `;
-            
+
             fetch(`/product/quick-view/${productId}/`)
                 .then(response => response.json())
                 .then(data => {
@@ -698,7 +802,7 @@
         const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
 
         // Check for saved theme
-        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme:dark)').matches)) {
             document.documentElement.classList.add('dark');
             themeToggleLightIcon.classList.remove('hidden');
         } else {
@@ -776,3 +880,6 @@
 </body>
 
 </html>
+
+
+

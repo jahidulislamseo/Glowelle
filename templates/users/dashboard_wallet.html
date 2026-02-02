@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="bg-gray-50 min-h-screen py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row gap-8">
+            <!-- Sidebar -->
+            <aside class="w-full md:w-64 space-y-2">
+                <nav class="space-y-1">
+                    <a href="{% url 'dashboard' %}"
+                        class="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-100">
+                        <i data-lucide="layout-dashboard" class="h-4 w-4"></i>
+                        Overview
+                    </a>
+                    <a href="{% url 'order_history' %}"
+                        class="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-100">
+                        <i data-lucide="shopping-bag" class="h-4 w-4"></i>
+                        Orders
+                    </a>
+                    <a href="{% url 'wallet' %}"
+                        class="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg bg-green-600 text-white">
+                        <i data-lucide="wallet" class="h-4 w-4"></i>
+                        My Wallet
+                    </a>
+                    <a href="{% url 'address_list' %}"
+                        class="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-100">
+                        <i data-lucide="map-pin" class="h-4 w-4"></i>
+                        Addresses
+                    </a>
+                    <a href="{% url 'profile' %}"
+                        class="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-100">
+                        <i data-lucide="user" class="h-4 w-4"></i>
+                        Profile
+                    </a>
+                    <a href="{% url 'support_tickets' %}"
+                        class="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-100">
+                        <i data-lucide="help-circle" class="h-4 w-4"></i>
+                        Support
+                    </a>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="flex-1 space-y-6">
+                <!-- Wallet Card -->
+                <div
+                    class="bg-gradient-to-br from-green-600 to-green-700 rounded-2xl p-8 text-white shadow-xl flex flex-col md:flex-row justify-between items-center gap-8 relative overflow-hidden">
+                    <div class="relative z-10">
+                        <p class="text-green-100 text-sm font-medium uppercase tracking-wider mb-2">Total Balance</p>
+                        <h2 class="text-5xl font-extrabold">{{ wallet.currency }} {{ wallet.balance }}</h2>
+                        <div class="mt-6 flex gap-4">
+                            <button
+                                class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg text-sm font-bold backdrop-blur-sm transition-standard">Add
+                                Funds</button>
+                            <button
+                                class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg text-sm font-bold backdrop-blur-sm transition-standard">Withdraw</button>
+                        </div>
+                    </div>
+                    <div class="relative z-10 hidden md:block opacity-20 transform -rotate-12 translate-x-8">
+                        <i data-lucide="wallet" class="h-32 w-32"></i>
+                    </div>
+                    <!-- Decor -->
+                    <div class="absolute -right-8 -bottom-8 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+                </div>
+
+                <!-- Transaction History -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                        <h3 class="text-lg font-bold text-gray-900">Transaction History</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                <tr>
+                                    <th class="px-6 py-3">Transaction ID</th>
+                                    <th class="px-6 py-3">Type</th>
+                                    <th class="px-6 py-3">Amount</th>
+                                    <th class="px-6 py-3">Description</th>
+                                    <th class="px-6 py-3">Date</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                {% for tx in transactions %}
+                                <tr>
+                                    <td class="px-6 py-4 text-sm text-gray-500">#{{ tx.id }}</td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-2 py-1 text-xs font-medium rounded-full 
+                                            {% if tx.transaction_type == 'credit' %}bg-green-50 text-green-700
+                                            {% else %}bg-red-50 text-red-700{% endif %}">
+                                            {{ tx.transaction_type|title }}
+                                        </span>
+                                    </td>
+                                    <td
+                                        class="px-6 py-4 text-sm font-bold {% if tx.transaction_type == 'credit' %}text-green-600{% else %}text-red-600{% endif %}">
+                                        {% if tx.transaction_type == 'credit' %}+{% else %}-{% endif %}৳{{ tx.amount }}
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-gray-900">{{ tx.description }}</td>
+                                    <td class="px-6 py-4 text-sm text-gray-500">{{ tx.created_at|date:"M d, Y H:i" }}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="px-6 py-12 text-center text-gray-500">
+                                        <i data-lucide="history" class="mx-auto h-12 w-12 text-gray-200 mb-4"></i>
+                                        <p>No transactions found.</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</div>
+{% endblock %}

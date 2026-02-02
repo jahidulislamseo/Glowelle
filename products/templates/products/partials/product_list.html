@@ -1,5 +1,6 @@
 {% for product in products %}
-<div class="rounded-lg border bg-card text-card-foreground group relative overflow-hidden border-none shadow-sm hover:shadow-md transition-standard bg-white reveal">
+<div
+    class="rounded-lg border bg-card text-card-foreground group relative overflow-hidden border-none shadow-sm hover:shadow-md transition-standard bg-white reveal">
     <!-- Wishlist Button -->
     <a href="{% url 'toggle_wishlist' product.id %}"
         class="wishlist-btn absolute top-2 right-2 z-20 p-2.5 rounded-full bg-white/90 shadow-sm {% if product.id in wishlist_product_ids %}text-red-500{% else %}text-gray-500{% endif %} hover:text-red-500 hover:bg-white transition-all duration-300 group-hover:opacity-100 {% if product.id in wishlist_product_ids %}opacity-100{% else %}opacity-0{% endif %} min-w-[44px] min-h-[44px] flex items-center justify-center">
@@ -48,18 +49,27 @@
 
     <div class="flex items-center p-4 pt-0">
         {% if product.stock_quantity > 0 %}
-        <form action="{% url 'cart_add' product.id %}" method="post" class="w-full">
-            {% csrf_token %}
-            <input type="hidden" name="quantity" value="1">
-            <button type="submit"
-                class="btn-primary inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium h-10 px-4 py-2 w-full gap-2 shadow-sm">
-                <i data-lucide="shopping-cart" class="h-4 w-4"></i>
-                Add to Cart
-            </button>
-        </form>
+        <div class="flex items-center gap-2 w-full">
+            <form action="{% url 'cart_add' product.id %}" method="post" class="flex-1">
+                {% csrf_token %}
+                <input type="hidden" name="quantity" value="1">
+                <button type="submit" name="checkout" value="true"
+                    class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-bold h-10 px-2 w-full bg-orange-500 text-white hover:bg-orange-600 transition-all shadow-md hover:shadow-lg active:scale-95">
+                    Buy Now
+                </button>
+            </form>
+            <form action="{% url 'cart_add' product.id %}" method="post" class="flex-1">
+                {% csrf_token %}
+                <input type="hidden" name="quantity" value="1">
+                <button type="submit"
+                    class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-bold h-10 px-2 w-full bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 transition-all shadow-sm hover:shadow-md active:scale-95">
+                    Add to Cart
+                </button>
+            </form>
+        </div>
         {% else %}
         <button type="button" disabled
-            class="btn-primary inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium h-10 px-4 py-2 w-full gap-2 shadow-sm">
+            class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium h-10 px-4 py-2 w-full gap-2 shadow-sm bg-gray-100 text-gray-400 cursor-not-allowed">
             Out of Stock
         </button>
         {% endif %}

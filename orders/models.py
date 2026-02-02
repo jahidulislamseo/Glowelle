@@ -195,14 +195,11 @@ class Order(models.Model):
             
         # Check if status changed to 'cancelled' or 'returned' from a non-refunded state
         if self.pk and self.status in ['cancelled', 'returned'] and self._original_status not in ['cancelled', 'returned']:
-            from products.models import StockLog
-            
-            # Restore stock
+            # Restore stock (Atomic update)
             for item in self.items.all():
-                product = item.product
-                product.stock_quantity += item.quantity
-                # product.in_stock = True # Optional: Auto re-enable
-                product.save()
+                from products.models import Product, StockLog
+                
+                Product.objects.filter(id=item.product.id).update(stock_quantity=models.F('stock_quantity') + item['quantity'])
                 
                 # Log the restoration
                 StockLog.objects.create(
@@ -266,6 +263,8 @@ class OrderStatusHistory(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+        verbose_name = "Order Status History"
+        verbose_name_plural = "Order Status History"
 
     def __str__(self):
         return f"{self.order.id} - {self.status}"
@@ -273,6 +272,7 @@ class OrderStatusHistory(models.Model):
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    variant = models.ForeignKey('products.ProductVariant', on_delete=models.SET_NULL, null=True, blank=True)
     quantity = models.IntegerField()
     price = models.DecimalField(max_digits=12, decimal_places=2) # Changed to Decimal
     stock_at_order = models.IntegerField(null=True, blank=True, help_text="Stock quantity at the time of order")

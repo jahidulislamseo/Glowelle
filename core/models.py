@@ -77,3 +77,82 @@ class ContactMessage(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+
+class ChatbotFAQ(models.Model):
+    question = models.CharField(max_length=255, help_text="Common user question")
+    keywords = models.CharField(max_length=255, help_text="Comma-separated keywords to trigger this answer")
+    answer = models.TextField(help_text="The response the chatbot should give")
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.question
+
+    class Meta:
+        verbose_name = "Chatbot FAQ"
+        verbose_name_plural = "Chatbot FAQs"
+        ordering = ['question']
+
+class ChatbotSettings(models.Model):
+    welcome_message = models.TextField(
+        default="👋 Hi! Welcome to Al Barakah Mart! How can I help you today?",
+        help_text="First message shown when the chat opens"
+    )
+    system_prompt = models.TextField(
+        default="You are 'Al Barakah Assistant'. Be helpful, confident, and professional. Use product data provided. Guarantee 100% freshness.",
+        help_text="Global instructions for the AI brain"
+    )
+    not_found_message = models.TextField(
+        default="I couldn't find a specific answer for that. Would you like to talk to a human agent?",
+        help_text="Fall-back message when no FAQ or product matches"
+    )
+
+    # Working Hours
+    working_hours_start = models.TimeField(default="09:00", help_text="Support start time (e.g., 09:00)")
+    working_hours_end = models.TimeField(default="22:00", help_text="Support end time (e.g., 22:00)")
+    offline_message = models.TextField(
+        default="Our support team is currently offline. Please leave your message and we will get back to you during working hours (9 AM - 10 PM).",
+        help_text="Message shown when user asks for human support outside working hours"
+    )
+
+    # Promotions
+    promo_message = models.TextField(blank=True, help_text="Special offer or announcement (e.g., '10% off on all fruits today!')")
+    is_promo_active = models.BooleanField(default=False)
+    
+    class Meta:
+        verbose_name = "Chatbot Settings"
+        verbose_name_plural = "Chatbot Settings"
+
+    def __str__(self):
+        return "Chatbot Configuration"
+
+    def save(self, *args, **kwargs):
+        if not self.pk and ChatbotSettings.objects.exists():
+            return
+        super(ChatbotSettings, self).save(*args, **kwargs)
+
+class ChatbotSuggestion(models.Model):
+    text = models.CharField(max_length=50, help_text="Button text (e.g., 'Popular Items')")
+    action = models.CharField(max_length=50, default="message", help_text="Action type (message/url)")
+    value = models.CharField(max_length=255, blank=True, help_text="Value for the action (e.g., the message to send)")
+    order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['order']
+        verbose_name = "Chatbot Suggestion"
+
+    def __str__(self):
+        return self.text
+
+class ChatbotIntent(models.Model):
+    intent_key = models.CharField(max_length=50, unique=True, help_text="The internal key (e.g., 'buying', 'support')")
+    display_name = models.CharField(max_length=100)
+    keywords = models.TextField(help_text="Comma-separated keywords to trigger this intent")
+    class Meta:
+        verbose_name = "Chatbot Intent"
+        verbose_name_plural = "Chatbot Intents"
+
+    def __str__(self):
+        return self.display_name

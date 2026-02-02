@@ -9,12 +9,13 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import render
+import re
+import datetime
+import google.generativeai as genai
+from openai import OpenAI
 from decouple import config
 from .mongodb_utils import get_mongodb_db
-import google.generativeai as genai
-import re
-from openai import OpenAI
-import datetime # Added for datetime.datetime.now()
+from .models import ChatbotFAQ, ChatbotSettings, SiteSettings, ChatbotSuggestion, ChatbotIntent
 
 # Initialize API Clients
 gemini_key = config('GEMINI_API_KEY', default=None)
@@ -22,15 +23,15 @@ is_openrouter = gemini_key and gemini_key.startswith('sk-or-v1')
 chat_client = None
 
 if is_openrouter:
-    print("🚀 Configuring OpenRouter API...")
+    # print("🚀 Configuring OpenRouter API...")
     try:
         chat_client = OpenAI(
             base_url="https://openrouter.ai/api/v1",
             api_key=gemini_key,
         )
-        print("✅ OpenRouter Client Configured!")
+        print("OpenRouter Client Configured!")
     except Exception as e:
-        print(f"❌ OpenRouter Error: {e}")
+        print(f"OpenRouter Error: {e}")
         chat_client = None
 elif gemini_key and gemini_key != 'your-gemini-api-key-here':
     genai.configure(api_key=gemini_key)
@@ -44,9 +45,9 @@ elif gemini_key and gemini_key != 'your-gemini-api-key-here':
             "max_output_tokens": 300,
         }
     )
-    print("✅ Gemini 1.5 Flash (Stable) loaded successfully!")
+    print("Gemini 1.5 Flash (Stable) loaded successfully!")
 else:
-    print("❌ API Key missing or invalid")
+    print("API Key missing or invalid")
 
 # Wrapper for OpenRouter to mimic Gemini ChatSession
 class OpenRouterSession:
@@ -181,57 +182,50 @@ def create_order_from_chat(session_id, phone, address, chat_history):
         return None, "❌ Sorry, I couldn't place the order due to a technical error."
 
 def detect_intent(message):
-    """Detect user intent from their message."""
+    """Detect user intent from their message using database keywords."""
     message_lower = message.lower()
     
     # Check for Phone Number (Strong indicator of order confirmation)
     if re.search(r'(?:\+88|88)?01[3-9]\d{8}', message):
         return 'buying_confirmed'
 
+    # Fetch intents from database
+    intents = ChatbotIntent.objects.all()
+    for intent in intents:
+        keywords = [k.strip().lower() for k in intent.keywords.split(',')]
+        if any(keyword in message_lower for keyword in keywords):
+            return intent.intent_key
+    
+    # Fallback to defaults if DB is empty
     buying_keywords = ['order', 'buy', 'purchase', 'কিনতে', 'অর্ডার', 'নিতে চাই', 'কিনব']
     if any(keyword in message_lower for keyword in buying_keywords):
         return 'buying'
     
-    compare_keywords = ['compare', 'difference', 'better', 'তুলনা', 'কোনটা ভালো']
-    if any(keyword in message_lower for keyword in compare_keywords):
-        return 'comparing'
-    
-    price_keywords = ['discount', 'ছাড়', 'কম দাম', 'cheap', 'সস্তা']
-    if any(keyword in message_lower for keyword in price_keywords):
-        return 'price_negotiation'
-    
-    support_keywords = ['help', 'problem', 'সমস্যা', 'delivery', 'return']
-    if any(keyword in message_lower for keyword in support_keywords):
-        return 'support'
-    
-    confused_keywords = ['confused', 'বুঝতে পারছি না', 'কোনটা']
-    if any(keyword in message_lower for keyword in confused_keywords):
-        return 'confused'
-    
-    # Track Order intent
-    if any(keyword in message_lower for keyword in ['track', 'ট্র্যাক', 'order status', 'অর্ডার স্ট্যাটাস', 'where is my order', 'আমার অর্ডার']):
+    # ... (rest of old logic as backup)
+    if any(keyword in message_lower for keyword in ['track', 'ট্র্যাক', 'status']):
         return 'track_order'
-    
-    return 'browsing'
 
+    return 'browsing'
 def check_faq(message):
     """Check if message matches any FAQ and return instant answer."""
-    import os
-    import json
-    
-    faq_path = os.path.join(os.path.dirname(__file__), 'faq_data.json')
-    
     try:
-        with open(faq_path, 'r', encoding='utf-8') as f:
-            faq_data = json.load(f)
-        
+        # Check database FAQs first
+        faqs = ChatbotFAQ.objects.filter(is_active=True)
         message_lower = message.lower()
         
-        # Check each FAQ
-        for faq in faq_data.get('faqs', []):
-            # Check if any keyword matches
-            if any(keyword in message_lower for keyword in faq['keywords']):
-                return faq['answer']
+        for faq in faqs:
+            keywords = [k.strip().lower() for k in faq.keywords.split(',')]
+            if any(keyword in message_lower for keyword in keywords):
+                return faq.answer
+
+        # Fallback to local JSON if it exists (legacy support)
+        faq_path = os.path.join(os.path.dirname(__file__), 'faq_data.json')
+        if os.path.exists(faq_path):
+            with open(faq_path, 'r', encoding='utf-8') as f:
+                faq_data = json.load(f)
+            for faq in faq_data.get('faqs', []):
+                if any(keyword in message_lower for keyword in faq['keywords']):
+                    return faq['answer']
         
         return None  # No match found
         
@@ -305,7 +299,11 @@ def get_product_context(query, intent='browsing'):
     db = get_mongodb_db()
     if db is None:
         return "", []
+
+    # Boost priority products
+    priority_products = list(Product.objects.filter(chatbot_priority=True).values('id', 'title', 'price', 'slug', 'short_description'))
     
+    # Text search in MongoDB
     products = db['products'].find({
         "$or": [
             {"title": {"$regex": query, "$options": "i"}},
@@ -316,6 +314,12 @@ def get_product_context(query, intent='browsing'):
     }).limit(5)
     
     products_list = list(products)
+    
+    # Merge priority products at the top if they match query or simply as suggestions
+    if priority_products and not query == "":
+        # Simple string match for priority products too
+        matched_priority = [p for p in priority_products if query.lower() in p['title'].lower()]
+        products_list = matched_priority + products_list
     
     if not products_list:
         return "❌ No specific products found.", []
@@ -449,21 +453,51 @@ def chatbot_response(request):
 
         # 0.⚡ INSTANT FAST REPLY (Bypass AI for speed)
         # Simple/Common phrases should be instant
+        # Get dynamic settings and contact info
+        bot_settings = ChatbotSettings.objects.first()
+        site_settings = SiteSettings.objects.first()
+        
+        support_phone = site_settings.support_phone if site_settings and site_settings.support_phone else "+880 1609132361"
+        welcome_msg = bot_settings.welcome_message if bot_settings else "👋 Hi! Welcome to Al Barakah Mart! How can I help you today?"
+
         fast_replies = {
-            "hi": "Hello! 👋 Welcome to Al Barakah Mart. How can I help you today?",
-            "hello": "Hi there! 👋 Welcome to Al Barakah Mart.",
-            "saalam": "Walaikum Assalam! 🌙 How can I assist you?",
-            "salam": "Walaikum Assalam! 🌙 Welcome to Al Barakah Mart.",
-            "thanks": "You're welcome! 😊 Happy Shopping!",
-            "thank you": "Anytime! Let me know if you need anything else. 🛍️",
-            "ok": "Great! 👍",
-            "bye": "Goodbye! See you soon. 👋",
-            "call me": "Sure! Please provide your phone number. 📞"
+            "hi": welcome_msg,
+            "hello": welcome_msg,
+            "saalam": "Walaikum Assalam! 🌙 Welcome to Al Barakah Mart. How can I assist you today?",
+            "salam": "Walaikum Assalam! 🌙 Welcome to Al Barakah Mart. How can I assist you today?",
+            "thanks": "You're very welcome! 😊 Always here to help. Happy Shopping! 🛍️",
+            "thank you": "My pleasure! Let me know if there's anything else you need. ✨",
+            "ok": "Got it! 👍 Is there anything else I can help with?",
+            "bye": "Goodbye! Have a wonderful day. See you soon! 👋",
+            "menu": "Here is our main menu! How can I help you today? 😊",
+            "human": f"I'm connecting you to our support team. Please leave your message or call us at {support_phone}. 📞",
+            "delivery": "🚚 **Delivery Information**\n\n• **Inside Dhaka:** Same Day / Next Day delivery (80 BDT)\n• **Outside Dhaka:** 2-3 Days delivery (150 BDT)\n\nWe guarantee 100% freshness on all organic items! 🥦"
         }
         
         clean_msg = user_message.lower().strip()
-        if clean_msg in fast_replies:
-            response_text = fast_replies[clean_msg]
+        # Keyword mapping for fast replies
+        if 'delivery' in clean_msg or 'ডেলিভারি' in clean_msg:
+            clean_msg = 'delivery'
+        elif 'support' in clean_msg or 'human' in clean_msg or 'মানুষ' in clean_msg:
+            clean_msg = 'human'
+            
+        if clean_msg in fast_replies or clean_msg == 'back to menu':
+            # Special check for human handover working hours
+            if clean_msg == 'human':
+                from django.utils import timezone
+                now = timezone.localtime().time()
+                
+                if bot_settings:
+                    is_outside_hours = now < bot_settings.working_hours_start or now > bot_settings.working_hours_end
+                    if is_outside_hours:
+                        response_text = bot_settings.offline_message
+                    else:
+                        response_text = fast_replies.get(clean_msg, fast_replies['menu'])
+                else:
+                    response_text = fast_replies.get(clean_msg, fast_replies['menu'])
+            else:
+                response_text = fast_replies.get(clean_msg, fast_replies['menu'])
+
             save_chat_interaction(session_id, user_message, response_text)
             return JsonResponse({
                 "response": response_text, 
@@ -492,8 +526,18 @@ def chatbot_response(request):
                 return JsonResponse({
                     "response": tracking_response,
                     "status": "success",
-                    "suggestions": [{"text": "💬 Chat More", "action": "message"}]
+                    "suggestions": [{"text": "⬅ Back to Menu", "action": "message"}]
                 })
+
+        # 3.🚚 DELIVERY INFO
+        if intent == 'delivery_info':
+            delivery_response = "🚚 **Delivery Information**\n\n• **Inside Dhaka:** Same Day / Next Day delivery (80 BDT)\n• **Outside Dhaka:** 2-3 Days delivery (150 BDT)\n\nWe guarantee 100% freshness on all organic items! 🥦"
+            save_chat_interaction(session_id, user_message, delivery_response)
+            return JsonResponse({
+                "response": delivery_response,
+                "status": "success",
+                "suggestions": get_random_suggestions()
+            })
         
         # Handle Order Confirmation Logic (Moved to AI Token Parser below)
         # We removed the regex-based 'buying_confirmed' so logic flows to LLM
@@ -504,8 +548,14 @@ def chatbot_response(request):
         # Get Quick Suggestions (Buttons)
         suggestions = get_intent_suggestions(intent, products_list)
 
-        # Build system context - SMART SALES V3 (STRICT ORDER MODE + IMAGES)
-        system_instructions = f"""You are 'Al Barakah Assistant'.
+        # Build system context - SMART SALES V4 (HUMANIZED)
+        sys_prompt = bot_settings.system_prompt if bot_settings else "You are 'Al Barakah Assistant'. Be helpful, confident, and professional."
+        
+        promo_ctx = ""
+        if bot_settings and bot_settings.is_promo_active and bot_settings.promo_message:
+            promo_ctx = f"\n🔥 CURRENT PROMOTION: {bot_settings.promo_message}\n(Mention this to the customer if relevant!)"
+
+        system_instructions = f"""{sys_prompt}{promo_ctx}
 
 🧠 CORE RULES:
 1. **NO HALLUCINATIONS:** Use ONLY product data below.
@@ -532,6 +582,14 @@ def chatbot_response(request):
 {product_context}
 
 🎯 USER INTENT: {intent}
+
+💡 STYLE GUIDE:
+- Be confident, expert, and helpful.
+- **Trust Signals:** Mention that we are trusted by 5,000+ customers and guarantee 100% freshness.
+- Never mention being an AI or having limitations.
+- Keep responses short and mobile-friendly.
+- Use emojis subtly to feel friendly.
+- Suggest today's best items if the user is unsure.
 """
 
         # For first message in session, send system context
@@ -603,15 +661,30 @@ def chatbot_response(request):
         })
 
 
+@csrf_exempt
+def cart_status(request):
+    """API to check if the cart has items (used for chatbot reminders)."""
+    from orders.cart import Cart
+    cart = Cart(request)
+    return JsonResponse({
+        "item_count": len(cart),
+        "total": float(cart.get_total_price())
+    })
+
 def get_random_suggestions():
-    """Return random helpful suggestions for users."""
-    import random
-    suggestions_pool = [
-        [{"text": "🐟 Fresh Fish", "action": "message"}, {"text": "🥩 Meat", "action": "message"}, {"text": "🍉 Fruits", "action": "message"}],
-        [{"text": "🔥 Today's Deals", "action": "message"}, {"text": "📦 Track Order", "action": "message"}],
-        [{"text": "💰 Check Prices", "action": "message"}, {"text": "🚚 Delivery Info", "action": "message"}]
+    """Return standardized main menu suggestions from database."""
+    suggestions = ChatbotSuggestion.objects.filter(is_active=True).order_by('order')
+    if suggestions.exists():
+        return [{"text": s.text, "action": s.action, "value": s.value} for s in suggestions]
+        
+    return [
+        {"text": "🔥 Popular Items", "action": "message"},
+        {"text": "🐟 Fresh Fish", "action": "message"},
+        {"text": "🥩 Meat", "action": "message"},
+        {"text": "🚚 Delivery Time", "action": "message"},
+        {"text": "📦 Track Order", "action": "message"},
+        {"text": "🙋 Talk to a Human", "action": "message"}
     ]
-    return random.choice(suggestions_pool)
 
 
 def get_intent_suggestions(intent, products):
@@ -634,31 +707,35 @@ def get_intent_suggestions(intent, products):
     
     # Intent-based suggestions
     if intent == 'buying':
-        return [
+        suggestions = [
             {"text": "🛒 Order Now", "action": "message"},
             {"text": "💰 Check Price", "action": "message"},
             {"text": "🚚 Delivery Info", "action": "message"}
         ]
     
-    if intent == 'price_negotiation':
-        return [
+    elif intent == 'price_negotiation':
+        suggestions = [
             {"text": "🔥 Best Deals", "action": "message"},
             {"text": "📦 Combo Offer", "action": "message"}
         ]
     
-    if intent == 'confused' or intent == 'browsing':
-        return [
+    elif intent == 'confused' or intent == 'browsing':
+        suggestions = [
             {"text": "🐟 Fresh Fish", "action": "message"},
             {"text": "🥩 Meat", "action": "message"},
             {"text": "🍉 Fruits", "action": "message"}
         ]
         
-    return [
-        {"text": "📦 Track Order", "action": "message"},
-        {"text": "📞 Human Support", "action": "message"}
-    ]
+    else:
+        suggestions = [
+            {"text": "📦 Track Order", "action": "message"},
+            {"text": "📞 Human Support", "action": "message"}
+        ]
 
-import datetime
+    # Add standard navigation to any intent-based suggestions
+    suggestions.append({"text": "⬅ Back to Menu", "action": "message"})
+    return suggestions
+
 
 @staff_member_required
 def admin_chat_history(request):

@@ -8,11 +8,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .animate-bounce {
-            animation: bounce 1s infinite;
+            animation:bounce 1s infinite;
         }
         @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+            0%, 100% { transform:translateY(0); }
+            50% { transform:translateY(-10px); }
         }
     </style>
 </head>
@@ -27,8 +27,7 @@
             <ol class="list-decimal list-inside space-y-2 text-gray-700">
                 <li>Look for the <strong class="text-green-600">green chat button</strong> in the bottom-right corner</li>
                 <li>Click it to open the chatbot window</li>
-                <li>Try these test messages:
-                    <ul class="ml-8 mt-2 space-y-1">
+                <li>Try these test messages:<ul class="ml-8 mt-2 space-y-1">
                         <li>• "আপনার কাছে কলা আছে?" (Bangla test)</li>
                         <li>• "Do you have bananas?" (English test)</li>
                         <li>• "কলা অর্ডার করতে চাই" (Buying intent test)</li>
@@ -77,11 +76,11 @@
             
             try {
                 const response = await fetch('/api/chatbot/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
+                    method:'POST',
+                    headers:{
+                        'Content-Type':'application/json',
                     },
-                    body: JSON.stringify({ message: 'hello' })
+                    body:JSON.stringify({ message:'hello' })
                 });
                 
                 const data = await response.json();

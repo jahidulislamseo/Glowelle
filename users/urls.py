@@ -20,4 +20,7 @@ urlpatterns = [
     path('dashboard/support/new/', views.ticket_create, name='ticket_create'),
     path('profile/', views.profile_view, name='profile'),
     path('profile/password/', views.change_password_view, name='change_password'),
+    # OTP Login
+    path('otp/request/', views.request_otp, name='request_otp'),
+    path('otp/verify/', views.verify_otp, name='verify_otp'),
 ]

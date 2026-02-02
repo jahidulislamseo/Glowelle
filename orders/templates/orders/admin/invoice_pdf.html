@@ -5,83 +5,83 @@
     <title>Invoice #{{ order.id }}</title>
     <style type="text/css">
         @page {
-            size: A4;
-            margin: 1cm;
+            size:A4;
+            margin:1cm;
         }
         body {
-            font-family: Helvetica, sans-serif;
-            font-size: 12px;
-            color: #333;
+            font-family:Helvetica, sans-serif;
+            font-size:12px;
+            color:#333;
         }
         .header {
-            margin-bottom: 20px;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 10px;
+            margin-bottom:20px;
+            border-bottom:2px solid #eee;
+            padding-bottom:10px;
         }
         .header h1 {
-            color: #2c3e50;
-            margin: 0;
-            font-size: 24px;
+            color:#2c3e50;
+            margin:0;
+            font-size:24px;
         }
         .meta {
-            margin-bottom: 20px;
+            margin-bottom:20px;
         }
         .meta table {
-            width: 100%;
+            width:100%;
         }
         .meta td {
-            vertical-align: top;
+            vertical-align:top;
         }
         .bill-to {
-            margin-top: 10px;
+            margin-top:10px;
         }
         table.items {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
+            width:100%;
+            border-collapse:collapse;
+            margin-bottom:20px;
         }
         table.items th {
-            background-color: #f8f9fa;
-            border-bottom: 2px solid #dee2e6;
-            padding: 8px;
-            text-align: left;
-            font-weight: bold;
+            background-color:#f8f9fa;
+            border-bottom:2px solid #dee2e6;
+            padding:8px;
+            text-align:left;
+            font-weight:bold;
         }
         table.items td {
-            border-bottom: 1px solid #dee2e6;
-            padding: 8px;
+            border-bottom:1px solid #dee2e6;
+            padding:8px;
         }
         .totals {
-            width: 300px;
-            float: right;
+            width:300px;
+            float:right;
         }
         .totals table {
-            width: 100%;
-            border-collapse: collapse;
+            width:100%;
+            border-collapse:collapse;
         }
         .totals td {
-            padding: 5px;
-            text-align: right;
+            padding:5px;
+            text-align:right;
         }
         .totals .total-row {
-            font-weight: bold;
-            font-size: 14px;
-            border-top: 2px solid #333;
+            font-weight:bold;
+            font-size:14px;
+            border-top:2px solid #333;
         }
         .footer {
-            margin-top: 50px;
-            text-align: center;
-            font-size: 10px;
-            color: #777;
-            border-top: 1px solid #eee;
-            padding-top: 10px;
+            margin-top:50px;
+            text-align:center;
+            font-size:10px;
+            color:#777;
+            border-top:1px solid #eee;
+            padding-top:10px;
         }
         .status-badge {
-            padding: 3px 8px;
-            border-radius: 4px;
-            color: white;
-            font-weight: bold;
-            display: inline-block;
+            padding:3px 8px;
+            border-radius:4px;
+            color:white;
+            font-weight:bold;
+            display:inline-block;
         }
     </style>
 </head>
@@ -91,8 +91,8 @@
             <tr>
                 <td width="60%">
                     <h1>INVOICE</h1>
-                    <p>Invoice #: INV-{{ order.id }}</p>
-                    <p>Date: {{ order.created_at|date:"F j, Y" }}</p>
+                    <p>Invoice #:INV-{{ order.id }}</p>
+                    <p>Date:{{ order.created_at|date:"F j, Y" }}</p>
                 </td>
                 <td width="40%" align="right">
                     <h2>Al Barakah Mart</h2>
@@ -113,16 +113,16 @@
                         {{ order.full_name }}<br>
                         {{ order.address }}<br>
                         {{ order.city }} {{ order.zip_code }}<br>
-                        Phone: {{ order.phone }}<br>
-                        Email: {{ order.email }}
+                        Phone:{{ order.phone }}<br>
+                        Email:{{ order.email }}
                     </div>
                 </td>
                 <td width="50%">
                     <strong>Order Info:</strong>
                     <div class="bill-to">
-                        Order ID: #{{ order.id }}<br>
-                        Payment Method: {{ order.get_payment_method_display }}<br>
-                        Status: {{ order.get_status_display }}
+                        Order ID:#{{ order.id }}<br>
+                        Payment Method:{{ order.get_payment_method_display }}<br>
+                        Status:{{ order.get_status_display }}
                     </div>
                 </td>
             </tr>
@@ -173,7 +173,7 @@
         </table>
     </div>
 
-    <div style="clear: both;"></div>
+    <div style="clear:both;"></div>
 
     <div class="footer">
         <p>Thank you for shopping with Al Barakah Mart!</p>

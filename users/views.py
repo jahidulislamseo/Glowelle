@@ -1,21 +1,22 @@
-from django.contrib import messages
-from django_ratelimit.decorators import ratelimit
-from .forms import RegisterForm, UserUpdateForm, AddressForm, SupportTicketForm
+import random
+from datetime import timedelta
+
 from django.shortcuts import get_object_or_404, render, redirect
+from django.utils import timezone
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import PasswordChangeForm, AuthenticationForm
 from django.contrib.auth import update_session_auth_hash, login, authenticate, logout
-from io import BytesIO
+from django.contrib.auth.forms import PasswordChangeForm, AuthenticationForm
 from django.http import HttpResponse
-from django.template.loader import get_template
-from xhtml2pdf import pisa
-from orders.models import Order, OrderItem
+
+from django_ratelimit.decorators import ratelimit
+
+from core.utils import generate_pdf_response, generate_otp
+from orders.models import Order
 from orders.cart import Cart
+from products.models import Product
 from .models import User, Address, Wallet, SupportTicket
-
-# ... (existing imports)
-
-# ... (existing views)
+from .forms import RegisterForm, UserUpdateForm, AddressForm, SupportTicketForm
 
 @login_required
 def address_add(request):
@@ -116,16 +117,14 @@ def login_view(request):
                 
                 # Merge guest cart with authenticated session
                 if guest_cart_data:
-                    from orders.cart import Cart
                     cart = Cart(request)
-                    from products.models import Product
                     
                     for product_id, item_data in guest_cart_data.items():
                         try:
                             product = Product.objects.get(id=int(product_id))
                             # Add to cart (will merge quantities if item already exists)
                             cart.add(product, quantity=item_data['quantity'], update_quantity=False)
-                        except Product.DoesNotExist:
+                        except (Product.DoesNotExist, ValueError):
                             pass
                 
                 # Handle Remember Me - Moved inside successful auth
@@ -220,36 +219,15 @@ def change_password_view(request):
         form = PasswordChangeForm(request.user)
     return render(request, 'users/password_change.html', {'form': form})
 
-# PDF Invoice & Order Features
-from io import BytesIO
-from django.http import HttpResponse
-from django.template.loader import get_template
-from xhtml2pdf import pisa
-from orders.models import Order, OrderItem
-from orders.cart import Cart
-
-def render_to_pdf(template_src, context_dict={}):
-    template = get_template(template_src)
-    html  = template.render(context_dict)
-    result = BytesIO()
-    pdf = pisa.pisaDocument(BytesIO(html.encode("UTF-8")), result)
-    if not pdf.err:
-        return HttpResponse(result.getvalue(), content_type='application/pdf')
-    return None
-
 @login_required
 def invoice_view(request, pk):
     order = get_object_or_404(Order, pk=pk, user=request.user)
-    pdf = render_to_pdf('users/order_invoice.html', {'order': order})
-    if pdf:
-        response = HttpResponse(pdf, content_type='application/pdf')
-        filename = "Invoice_%s.pdf" % (order.id)
-        content = "inline; filename='%s'" % (filename)
-        if request.GET.get("download"):
-            content = "attachment; filename='%s'" % (filename)
-        response['Content-Disposition'] = content
-        return response
-    return HttpResponse("Error generating PDF", status=500)
+    return generate_pdf_response(
+        template_src='users/order_invoice.html',
+        context_dict={'order': order},
+        filename=f"Invoice_{order.id}.pdf",
+        download=request.GET.get("download") == "true"
+    )
 
 @login_required
 def reorder_view(request, pk):
@@ -264,3 +242,66 @@ def reorder_view(request, pk):
 def tracking_view(request, pk):
     order = get_object_or_404(Order, pk=pk, user=request.user)
     return render(request, 'users/order_tracking.html', {'order': order})
+
+# --- OTP Authentication Views ---
+
+@ratelimit(key='ip', rate='3/m', method='POST', block=True)
+def request_otp(request):
+    if request.method == 'POST':
+        phone = request.POST.get('phone_number')
+        if not phone:
+            messages.error(request, "Phone number is required.")
+            return render(request, 'users/otp_request.html')
+        
+        # Clean phone number (simple version)
+        phone = phone.strip()
+        
+        # Find or create user
+        user, created = User.objects.get_or_create(phone_number=phone, defaults={
+            'username': f'user_{phone[-4:]}_{random.randint(1000, 9999)}',
+            'email': f'{phone}@example.com' # Placeholder email
+        })
+        
+        # Generate 6-digit OTP
+        otp = generate_otp(6)
+        user.otp_code = otp
+        user.otp_expires_at = timezone.now() + timedelta(minutes=5)
+        user.save()
+        
+        # SIMULATION: Log OTP to console (since we don't have an SMS gateway yet)
+        print(f"DEBUG: OTP for {phone} is {otp}")
+        
+        request.session['otp_phone'] = phone
+        messages.success(request, f"OTP sent to {phone} (Check console for debug)")
+        return redirect('verify_otp')
+        
+    return render(request, 'users/otp_request.html')
+
+@ratelimit(key='ip', rate='5/m', method='POST', block=True)
+def verify_otp(request):
+    phone = request.session.get('otp_phone')
+    if not phone:
+        return redirect('request_otp')
+        
+    if request.method == 'POST':
+        code = request.POST.get('otp_code')
+        user = User.objects.filter(phone_number=phone).first()
+        
+        if user and user.otp_code == code and user.otp_expires_at > timezone.now():
+            # SUCCESS
+            user.otp_code = None # Clear after use
+            user.otp_expires_at = None
+            user.save()
+            
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+            messages.success(request, "Logged in successfully!")
+            
+            # Clean session
+            del request.session['otp_phone']
+            
+            next_url = request.GET.get('next') or 'dashboard'
+            return redirect(next_url)
+        else:
+            messages.error(request, "Invalid or expired OTP.")
+            
+    return render(request, 'users/otp_verify.html', {'phone': phone})

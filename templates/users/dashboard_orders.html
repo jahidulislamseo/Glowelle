@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="bg-gray-50 min-h-screen py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row gap-8">
+            <!-- Sidebar (Same as overview) -->
+            <aside class="w-full md:w-64 space-y-2">
+                <nav class="space-y-1">
+                    <a href="{% url 'dashboard' %}"
+                        class="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-100">
+                        <i data-lucide="layout-dashboard" class="h-4 w-4"></i>
+                        Overview
+                    </a>
+                    <a href="{% url 'order_history' %}"
+                        class="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg bg-green-600 text-white">
+                        <i data-lucide="shopping-bag" class="h-4 w-4"></i>
+                        Orders
+                    </a>
+                    <a href="{% url 'wallet' %}"
+                        class="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-100">
+                        <i data-lucide="wallet" class="h-4 w-4"></i>
+                        Wallet
+                    </a>
+                    <a href="{% url 'address_list' %}"
+                        class="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-100">
+                        <i data-lucide="map-pin" class="h-4 w-4"></i>
+                        Addresses
+                    </a>
+                    <a href="{% url 'profile' %}"
+                        class="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-100">
+                        <i data-lucide="user" class="h-4 w-4"></i>
+                        Profile
+                    </a>
+                    <a href="{% url 'support_tickets' %}"
+                        class="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-100">
+                        <i data-lucide="help-circle" class="h-4 w-4"></i>
+                        Support
+                    </a>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="flex-1 space-y-6">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-2xl font-bold text-gray-900">My Orders</h2>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                <tr>
+                                    <th class="px-6 py-3">Order ID</th>
+                                    <th class="px-6 py-3">Date</th>
+                                    <th class="px-6 py-3">Payment</th>
+                                    <th class="px-6 py-3">Total</th>
+                                    <th class="px-6 py-3">Status</th>
+                                    <th class="px-6 py-3 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                {% for order in orders %}
+                                <tr>
+                                    <td class="px-6 py-4 font-bold text-gray-900">#{{ order.id }}</td>
+                                    <td class="px-6 py-4 text-sm text-gray-500">{{ order.created_at|date:"M d, Y" }}
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-gray-500 uppercase">{{ order.payment_method }}
+                                    </td>
+                                    <td class="px-6 py-4 text-sm font-bold text-gray-900">৳{{ order.total_price }}</td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-2 py-1 text-xs font-medium rounded-full 
+                                            {% if order.status == 'delivered' %}bg-green-50 text-green-700
+                                            {% elif order.status == 'pending' %}bg-yellow-50 text-yellow-700
+                                            {% elif order.status == 'cancelled' %}bg-red-50 text-red-700
+                                            {% else %}bg-gray-50 text-gray-700{% endif %}">
+                                            {{ order.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 text-right space-x-3">
+                                        <a href="{% url 'order_tracking' order.id %}"
+                                            class="text-sm font-medium text-blue-600 hover:text-blue-700">Track</a>
+                                        <a href="{% url 'order_invoice' order.id %}?download=1"
+                                            class="text-sm font-medium text-green-600 hover:text-green-700">Invoice</a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="px-6 py-12 text-center text-gray-500">
+                                        <i data-lucide="shopping-bag" class="mx-auto h-12 w-12 text-gray-200 mb-4"></i>
+                                        <p>You haven't placed any orders yet.</p>
+                                        <a href="{% url 'home' %}"
+                                            class="mt-4 inline-block text-green-600 font-medium">Start Shopping</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</div>
+{% endblock %}

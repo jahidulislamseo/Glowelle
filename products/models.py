@@ -41,6 +41,7 @@ class Product(SEOModel):
     stock_quantity = models.PositiveIntegerField(default=0)
     is_new = models.BooleanField(default=False)
     is_best_seller = models.BooleanField(default=False)
+    chatbot_priority = models.BooleanField(default=False, help_text="Prioritize this product in chatbot responses")
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
     brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null=True, blank=True, related_name='products')
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
