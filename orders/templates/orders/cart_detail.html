@@ -30,7 +30,7 @@
         {% if cart|length > 0 %}
         <div class="grid lg:grid-cols-12 gap-10 items-start">
             <!-- Cart Items List -->
-            <div class="lg:col-span-8 space-y-6">
+            <div class="lg:col-span-8 space-y-6 reveal-on-scroll reveal-left">
                 <!-- Cart Items Header (Hidden on Mobile) -->
                 <div
                     class="hidden md:grid grid-cols-12 gap-4 px-6 py-4 bg-white rounded-2xl border border-gray-100 shadow-sm text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">
@@ -41,7 +41,7 @@
 
                 {% for item in cart %}
                 <div
-                    class="group relative bg-white rounded-3xl p-6 border border-gray-100 shadow-sm hover:shadow-xl hover:shadow-green-500/5 transition-all duration-300">
+                    class="group relative bg-white rounded-3xl p-6 border border-gray-100 shadow-sm hover:shadow-xl hover:shadow-green-500/5 transition-all duration-300 reveal-on-scroll reveal-up hover-lift">
                     <div class="grid md:grid-cols-12 gap-6 items-center">
                         <!-- Product Info -->
                         <div class="col-span-12 md:col-span-6 flex items-center gap-5">
@@ -122,7 +122,7 @@
             </div>
 
             <!-- Sidebar Summary -->
-            <div class="lg:col-span-4 sticky top-28">
+            <div class="lg:col-span-4 sticky top-28 reveal-on-scroll reveal-right delay-200">
                 <div
                     class="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-xl shadow-green-900/5 relative overflow-hidden">
                     <!-- Background Accent -->

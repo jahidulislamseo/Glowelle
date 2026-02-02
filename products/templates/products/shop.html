@@ -2,12 +2,13 @@
 
 {% block content %}
 <!-- Shop Banner -->
-<div class="relative h-64 bg-gradient-to-r from-primary/20 via-primary/5 to-transparent overflow-hidden mb-8">
+<div
+    class="relative h-64 bg-gradient-to-r from-primary/20 via-primary/5 to-transparent overflow-hidden mb-8 reveal-on-scroll reveal-down">
     <div class="absolute inset-0">
         <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1000"
             alt="Shop Fresh Groceries" class="w-full h-full object-cover opacity-80">
     </div>
-    <div class="relative container mx-auto px-4 h-full flex items-center">
+    <div class="relative container mx-auto px-4 h-full flex items-center reveal-on-scroll reveal-up delay-100">
         <div class="max-w-2xl">
             <h1 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">Shop</h1>
             <p class="text-lg text-gray-700">Explore our wide range of premium organic products.</p>
@@ -60,19 +61,19 @@
         <aside class="w-full md:w-64 shrink-0 hidden md:block">
             <div class="space-y-6">
                 <!-- Categories -->
-                <div>
+                <div class="reveal-on-scroll reveal-right delay-200">
                     <h3 class="font-semibold mb-3">Categories</h3>
                     <ul class="space-y-2 text-sm">
                         <li>
                             <a href="{% url 'shop' %}"
-                                class="hover:text-green-600 {% if not current_category %}font-bold text-green-600{% else %}text-gray-500{% endif %}">
+                                class="hover:text-green-600 transition-colors {% if not current_category %}font-bold text-green-600{% else %}text-gray-500{% endif %}">
                                 View All
                             </a>
                         </li>
                         {% for cat in categories %}
                         <li>
                             <a href="{% url 'shop' %}?category={{ cat.slug }}"
-                                class="hover:text-green-600 flex items-center gap-2 {% if current_category == cat.slug %}font-bold text-green-600{% else %}text-gray-500{% endif %}">
+                                class="hover:text-green-600 flex items-center gap-2 transition-colors {% if current_category == cat.slug %}font-bold text-green-600{% else %}text-gray-500{% endif %}">
                                 <span>{{ cat.icon|default:"📦" }}</span>
                                 {{ cat.name }}
                             </a>
@@ -163,10 +164,14 @@
                                         const item = tempDiv.firstChild;
                                         if (item.nodeType === 1) { // Element node
                                             productGrid.appendChild(item);
-                                            // Trigger reveal animation for new items
-                                            setTimeout(() => {
-                                                item.classList.add('active');
-                                            }, 50);
+                                            // Observe new item for scroll reveal
+                                            if (item.classList.contains('reveal-on-scroll')) {
+                                                window.revealObserver.observe(item);
+                                            }
+                                            // Fallback for sub-elements
+                                            item.querySelectorAll('.reveal-on-scroll').forEach(el => {
+                                                window.revealObserver.observe(el);
+                                            });
                                         } else {
                                             tempDiv.removeChild(item);
                                         }

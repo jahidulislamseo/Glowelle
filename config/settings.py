@@ -115,6 +115,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'core.context_processors.site_settings',
+                'orders.context_processors.cart',
                 # allauth needs this from django
                 'django.template.context_processors.request',
             ],

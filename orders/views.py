@@ -5,14 +5,22 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
 from django.http import JsonResponse, HttpResponse
+import logging
+
+# Additional imports moved from functions
+from marketing.models import Coupon
+from django.template.loader import render_to_string
+from xhtml2pdf import pisa
+from django.contrib.admin.views.decorators import staff_member_required
 
 from products.models import Product, StockLog
 from analytics.models import AnalyticsEvent, VisitorSession
-from marketing.models import Coupon
 from .cart import Cart
 from .forms import OrderCreateForm
 from .models import Order, OrderItem, PaymentGateway
 from users.models import Wallet
+
+logger = logging.getLogger(__name__)
 
 def log_analytics_event(request, event_type, value=None, metadata=None):
     session_key = request.session.session_key
@@ -43,9 +51,6 @@ def cart_add(request, product_id):
 
 @require_POST
 def cart_add_ajax(request, product_id):
-    """AJAX endpoint for adding products to cart"""
-    from django.http import JsonResponse
-    
     cart = Cart(request)
     try:
         product = get_object_or_404(Product, id=product_id)
@@ -108,9 +113,6 @@ def cart_remove(request, product_id):
 def cart_detail(request):
     cart = Cart(request)
     return render(request, 'orders/cart_detail.html', {'cart': cart})
-
-from marketing.models import Coupon
-from django.utils import timezone
 
 @require_POST
 def coupon_apply(request):
@@ -198,6 +200,7 @@ def order_create(request):
             except ValueError:
                 return redirect('cart_detail')
             except Exception as e:
+                logger.error(f"Order creation failed: {str(e)}", exc_info=True)
                 messages.error(request, f"An error occurred: {str(e)}")
                 return redirect('cart_detail')
     else:
@@ -282,11 +285,6 @@ def order_detail(request, order_id):
         user=request.user
     )
     return render(request, 'orders/order_detail.html', {'order': order})
-
-from django.contrib.admin.views.decorators import staff_member_required
-from django.template.loader import render_to_string
-from django.http import HttpResponse
-from xhtml2pdf import pisa
 
 @staff_member_required
 def admin_order_pdf(request, order_id):

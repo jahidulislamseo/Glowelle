@@ -32,11 +32,11 @@
 
   <div class="grid md:grid-cols-2 gap-8 lg:gap-12 mb-16">
     <!-- Image Gallery -->
-    <div class="space-y-4">
+    <div class="space-y-4 reveal-on-scroll reveal-right">
       <div class="aspect-square relative bg-white border rounded-lg overflow-hidden group cursor-pointer">
         {% if product.is_new %}
         <span
-          class="absolute top-4 left-4 bg-green-600 text-white text-xs font-bold px-2 py-1 rounded-full z-10">New</span>
+          class="absolute top-4 left-4 bg-green-600 text-white text-xs font-bold px-2 py-1 rounded-full z-10 animate-float">New</span>
         {% endif %}
 
         <!-- Sliding Container -->
@@ -81,8 +81,8 @@
     </div>
 
     <!-- Product Info -->
-    <div class="space-y-6">
-      <div>
+    <div class="space-y-6 reveal-on-scroll reveal-left">
+      <div class="reveal-on-scroll reveal-up delay-100">
         <h1 class="text-3xl font-bold text-gray-900">{{ product.title }}</h1>
         <div class="flex items-center gap-4 mt-2">
           <div class="flex items-center gap-1">
@@ -198,7 +198,7 @@
         // Image Slideshow logic
         let currentImageIndex = 0;
         let autoplayInterval;
-        const totalImages = {{ product.additional_images.count| add: 1 }};
+        const totalImages = {{ product.additional_images.count|add:1 }};
 
         function startAutoplay() {
           if (totalImages <= 1) return;
@@ -317,7 +317,8 @@
       <!-- Description Content -->
       <div id="tab-desc-content" class="block animate-fade-in">
         <div class="grid md:grid-cols-3 gap-8 mb-12">
-          <div class="flex items-start gap-4 p-4 rounded-xl bg-green-50/30 border border-green-100">
+          <div
+            class="flex items-start gap-4 p-4 rounded-xl bg-green-50/30 border border-green-100 reveal-on-scroll reveal-up">
             <div class="h-10 w-10 flex items-center justify-center rounded-lg bg-green-600 text-white shadow-sm">
               <i data-lucide="leaf" class="h-5 w-5"></i>
             </div>
@@ -326,7 +327,8 @@
               <p class="text-xs text-gray-500 mt-1">Sourced from certified organic farms.</p>
             </div>
           </div>
-          <div class="flex items-start gap-4 p-4 rounded-xl bg-blue-50/30 border border-blue-100">
+          <div
+            class="flex items-start gap-4 p-4 rounded-xl bg-blue-50/30 border border-blue-100 reveal-on-scroll reveal-up delay-100">
             <div class="h-10 w-10 flex items-center justify-center rounded-lg bg-blue-600 text-white shadow-sm">
               <i data-lucide="shield-check" class="h-5 w-5"></i>
             </div>
@@ -335,7 +337,8 @@
               <p class="text-xs text-gray-500 mt-1">Rigorous quality standards applied.</p>
             </div>
           </div>
-          <div class="flex items-start gap-4 p-4 rounded-xl bg-orange-50/30 border border-orange-100">
+          <div
+            class="flex items-start gap-4 p-4 rounded-xl bg-orange-50/30 border border-orange-100 reveal-on-scroll reveal-up delay-200">
             <div class="h-10 w-10 flex items-center justify-center rounded-lg bg-orange-600 text-white shadow-sm">
               <i data-lucide="package-check" class="h-5 w-5"></i>
             </div>
@@ -378,7 +381,8 @@
 
         <div class="grid gap-6 mb-12">
           {% for review in reviews %}
-          <div class="p-6 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+          <div
+            class="p-6 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-shadow reveal-on-scroll reveal-up hover-lift">
             <div class="flex items-center justify-between mb-4">
               <div class="flex items-center gap-3">
                 <div

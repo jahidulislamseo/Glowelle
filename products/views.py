@@ -2,12 +2,18 @@ from django.core.cache import cache
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Category, Product, Review, Wishlist, StockAlert
 from marketing.models import HomeSlider, DealOfTheDay
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from analytics.models import AnalyticsEvent, VisitorSession
 from django.utils import timezone
-from orders.models import Order
+from orders.models import Order, OrderItem
+from django.core.paginator import Paginator
+from django.http import JsonResponse
+from django.template.loader import render_to_string
+from django.contrib import messages
+
+from orders.cart import Cart
 
 def home(request):
     # Try fetching from cache first
@@ -113,7 +119,6 @@ def shop(request):
                 )
     
     # Pagination
-    from django.core.paginator import Paginator
     paginator = Paginator(products, 12) # 12 products per page
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -133,8 +138,6 @@ def shop(request):
     }
 
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        from django.template.loader import render_to_string
-        from django.http import JsonResponse
         html = render_to_string('products/partials/product_list.html', context, request=request)
         return JsonResponse({
             'html': html,
@@ -161,8 +164,6 @@ def product_detail(request, slug):
     related_products = []
     
     # 1. Try "Bought Together" logic first (for all users, not just authenticated)
-    from orders.models import OrderItem
-    from django.db.models import Count
     
     # Find products frequently bought together with this product
     bought_together = OrderItem.objects.filter(
@@ -205,8 +206,6 @@ def product_detail(request, slug):
 
 def product_quick_view(request, product_id):
     """AJAX endpoint for quick view modal"""
-    from django.http import JsonResponse
-    from django.template.loader import render_to_string
     
     product = get_object_or_404(Product.objects.select_related('category', 'brand'), id=product_id)
     
@@ -284,7 +283,6 @@ def toggle_wishlist(request, product_id):
     
     # Check for AJAX request (X-Requested-With header or accepts JSON)
     if request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.accepts('application/json'):
-        from django.http import JsonResponse
         return JsonResponse({
             'status': 'success', 
             'action': action,
@@ -298,8 +296,6 @@ def wishlist_view(request):
     wishlist_items = Wishlist.objects.filter(user=request.user).select_related('product', 'product__category', 'product__brand')
     products = [item.product for item in wishlist_items]
     return render(request, 'products/wishlist.html', {'products': products})
-
-from orders.cart import Cart
 
 @login_required
 def wishlist_to_cart(request, product_id):
@@ -330,12 +326,8 @@ def create_stock_alert(request, product_id):
             # Actually, per my model, user is NOT null. 
             # I will only allow it for logged in users for now or ask user.
             # Wait, the implementation plan said 'track users waiting'.
-            # I'll stick to logged in users for now or fix model.
-            from django.contrib import messages
-            messages.info(request, "Please login to set stock alerts.")
             return redirect('login')
             
-        from django.contrib import messages
         messages.success(request, "We'll notify you when this item is back in stock!")
         return redirect('product_detail', slug=product.slug)
     return redirect('shop')

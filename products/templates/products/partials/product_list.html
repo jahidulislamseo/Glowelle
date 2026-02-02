@@ -1,6 +1,6 @@
 {% for product in products %}
 <div
-    class="rounded-lg border bg-card text-card-foreground group relative overflow-hidden border-none shadow-sm hover:shadow-md transition-standard bg-white reveal">
+    class="rounded-lg border bg-card text-card-foreground group relative overflow-hidden border-none shadow-sm hover:shadow-md transition-standard bg-white reveal-on-scroll reveal-up hover-lift">
     <!-- Wishlist Button -->
     <a href="{% url 'toggle_wishlist' product.id %}"
         class="wishlist-btn absolute top-2 right-2 z-20 p-2.5 rounded-full bg-white/90 shadow-sm {% if product.id in wishlist_product_ids %}text-red-500{% else %}text-gray-500{% endif %} hover:text-red-500 hover:bg-white transition-all duration-300 group-hover:opacity-100 {% if product.id in wishlist_product_ids %}opacity-100{% else %}opacity-0{% endif %} min-w-[44px] min-h-[44px] flex items-center justify-center">
