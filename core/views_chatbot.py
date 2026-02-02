@@ -208,7 +208,97 @@ def detect_intent(message):
     if any(keyword in message_lower for keyword in confused_keywords):
         return 'confused'
     
+    # Track Order intent
+    if any(keyword in message_lower for keyword in ['track', 'ট্র্যাক', 'order status', 'অর্ডার স্ট্যাটাস', 'where is my order', 'আমার অর্ডার']):
+        return 'track_order'
+    
     return 'browsing'
+
+def check_faq(message):
+    """Check if message matches any FAQ and return instant answer."""
+    import os
+    import json
+    
+    faq_path = os.path.join(os.path.dirname(__file__), 'faq_data.json')
+    
+    try:
+        with open(faq_path, 'r', encoding='utf-8') as f:
+            faq_data = json.load(f)
+        
+        message_lower = message.lower()
+        
+        # Check each FAQ
+        for faq in faq_data.get('faqs', []):
+            # Check if any keyword matches
+            if any(keyword in message_lower for keyword in faq['keywords']):
+                return faq['answer']
+        
+        return None  # No match found
+        
+    except Exception as e:
+        print(f"FAQ Error: {e}")
+        return None
+
+def handle_order_tracking(message, session_id):
+    """Extract order reference/phone and return tracking info."""
+    # Try to extract order reference (e.g., ORD-12345)
+    order_ref_match = re.search(r'(ORD-\d+|#\d+)', message, re.IGNORECASE)
+    
+    # Try to extract phone number
+    phone_match = re.search(r'(?:\+88|88)?01[3-9]\d{8}', message)
+    
+    try:
+        if order_ref_match:
+            # Search by order reference
+            order_ref = order_ref_match.group(1).upper().replace('#', 'ORD-')
+            order = Order.objects.filter(order_reference=order_ref).first()
+        elif phone_match:
+            # Search by phone number
+            phone = phone_match.group(0)
+            orders = Order.objects.filter(phone=phone).order_by('-created_at')
+            order = orders.first() if orders.exists() else None
+        else:
+            # No order identifier found
+            return "📦 **Order Tracking**\n\nPlease provide your:\n- Order Reference (e.g., ORD-12345)\n- OR Phone Number\n\nI'll help you track your order! 😊"
+        
+        if not order:
+            return "❌ **Order Not Found**\n\nI couldn't find any order with that information. Please check and try again, or contact support for help. 📞"
+        
+        # Format order status
+        status_emoji = {
+            'pending': '⏳',
+            'processing': '🔄',
+            'shipped': '🚚',
+            'delivered': '✅',
+            'cancelled': '❌'
+        }
+        
+        emoji = status_emoji.get(order.status, '📦')
+        
+        response = f"""📦 **Order Tracking**
+
+🔖 Order: **{order.order_reference}**
+{emoji} Status: **{order.get_status_display().upper()}**
+💰 Total: **{order.total} BDT**
+📅 Placed: {order.created_at.strftime('%d %b, %Y')}
+
+📍 **Delivery Address:**
+{order.address}, {order.city}
+
+"""
+        
+        if order.status == 'shipped':
+            response += "🚚 Your order is on the way! Expected delivery: 1-2 days.\n"
+        elif order.status == 'delivered':
+            response += "✅ Order delivered! Thank you for shopping with us! 🎉\n"
+        elif order.status == 'pending':
+            response += "⏳ We're processing your order. You'll receive an update soon!\n"
+        
+        return response
+        
+    except Exception as e:
+        print(f"Order Tracking Error: {e}")
+        return "❌ Sorry, I encountered an error while tracking your order. Please try again or contact support."
 
 def get_product_context(query, intent='browsing'):
     """Enhanced product search with intent-based results."""
@@ -381,8 +471,29 @@ def chatbot_response(request):
                 "suggestions": get_random_suggestions()
             })
 
+        # 1.❓ FAQ AUTO-RESPONSE (Check before AI)
+        faq_answer = check_faq(user_message)
+        if faq_answer:
+            save_chat_interaction(session_id, user_message, faq_answer)
+            return JsonResponse({
+                "response": faq_answer,
+                "status": "success",
+                "suggestions": ["🛒 Browse Products", "📦 Track Order", "💬 Chat More"]
+            })
+
         # Detect Intent
         intent = detect_intent(user_message)
+        
+        # 2.📦 ORDER TRACKING (Check before general AI)
+        if intent == 'track_order':
+            tracking_response = handle_order_tracking(user_message, session_id)
+            if tracking_response:
+                save_chat_interaction(session_id, user_message, tracking_response)
+                return JsonResponse({
+                    "response": tracking_response,
+                    "status": "success",
+                    "suggestions": [{"text": "💬 Chat More", "action": "message"}]
+                })
         
         # Handle Order Confirmation Logic (Moved to AI Token Parser below)
         # We removed the regex-based 'buying_confirmed' so logic flows to LLM
@@ -393,7 +504,7 @@ def chatbot_response(request):
         # Get Quick Suggestions (Buttons)
         suggestions = get_intent_suggestions(intent, products_list)
 
-        # Build system context - SMART SALES V3 (STRICT ORDER MODE)
+        # Build system context - SMART SALES V3 (STRICT ORDER MODE + IMAGES)
         system_instructions = f"""You are 'Al Barakah Assistant'.
 
 🧠 CORE RULES:
@@ -405,10 +516,15 @@ def chatbot_response(request):
      `ORDER_READY|Customer Name|Phone Number|Address`
      (Do not say anything else in that confirmed message).
 
-3. **STRUCTURED PRODUCTS:**
-   🍗 [Product Name]
-   💰 Price: [Price]
-   stock: available
+3. **STRUCTURED PRODUCTS WITH IMAGES:**
+   When suggesting products, ALWAYS use this format:
+   
+   🍗 **[Product Name]**
+   💰 Price: [Price] BDT
+   📦 Stock: available
+   
+   **IMPORTANT:** If a product has an image URL in the data, include it using markdown:
+   ![Product Image](image_url_here)
 
 4. **LANGUAGE:** Reply in User's Language.
 
@@ -487,18 +603,60 @@ def chatbot_response(request):
         })
 
 
+def get_random_suggestions():
+    """Return random helpful suggestions for users."""
+    import random
+    suggestions_pool = [
+        [{"text": "🐟 Fresh Fish", "action": "message"}, {"text": "🥩 Meat", "action": "message"}, {"text": "🍉 Fruits", "action": "message"}],
+        [{"text": "🔥 Today's Deals", "action": "message"}, {"text": "📦 Track Order", "action": "message"}],
+        [{"text": "💰 Check Prices", "action": "message"}, {"text": "🚚 Delivery Info", "action": "message"}]
+    ]
+    return random.choice(suggestions_pool)
+
+
 def get_intent_suggestions(intent, products):
-    """Generate smart quick reply buttons based on intent."""
-    if intent == 'buying' or (products and len(products) > 0):
-        return ["🛒 Order Now", "💰 Check Price", "🚚 Delivery Info"]
+    """Generate smart quick reply buttons with actionable data."""
+    suggestions = []
+    
+    # If products are available, add product-specific actions
+    if products and len(products) > 0:
+        # Take first product for quick actions
+        first_product = products[0]
+        product_id = first_product.get('_id') or first_product.get('id')
+        product_slug = first_product.get('slug', '')
+        
+        # Return action buttons with metadata
+        return [
+            {"text": "🛒 Add to Cart", "action": "add_to_cart", "product_id": str(product_id)},
+            {"text": "👁️ View Product", "action": "view_product", "slug": product_slug},
+            {"text": "⚡ Buy Now", "action": "buy_now", "product_id": str(product_id)}
+        ]
+    
+    # Intent-based suggestions
+    if intent == 'buying':
+        return [
+            {"text": "🛒 Order Now", "action": "message"},
+            {"text": "💰 Check Price", "action": "message"},
+            {"text": "🚚 Delivery Info", "action": "message"}
+        ]
     
     if intent == 'price_negotiation':
-        return ["🔥 Best Deals", "📦 Combo Offer"]
+        return [
+            {"text": "🔥 Best Deals", "action": "message"},
+            {"text": "📦 Combo Offer", "action": "message"}
+        ]
     
     if intent == 'confused' or intent == 'browsing':
-        return ["🐟 Fresh Fish", "🥩 Meat", "🍉 Fruits", "🍗 Chicken"]
+        return [
+            {"text": "🐟 Fresh Fish", "action": "message"},
+            {"text": "🥩 Meat", "action": "message"},
+            {"text": "🍉 Fruits", "action": "message"}
+        ]
         
-    return ["📦 Track Order", "📞 Human Support"]
+    return [
+        {"text": "📦 Track Order", "action": "message"},
+        {"text": "📞 Human Support", "action": "message"}
+    ]
 
 import datetime
 

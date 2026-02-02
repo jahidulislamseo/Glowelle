@@ -1,0 +1,44 @@
+{
+  "faqs": [
+    {
+      "keywords": ["delivery", "ডেলিভারি", "shipping", "পৌঁছাবে", "সময়"],
+      "question": "How long does delivery take?",
+      "answer": "🚚 **Delivery Time:**\n- Dhaka: 1-2 days\n- Outside Dhaka: 3-5 days\n\nWe deliver 7 days a week! 📦"
+    },
+    {
+      "keywords": ["return", "রিটার্ন", "exchange", "বদল", "ফেরত"],
+      "question": "What is your return policy?",
+      "answer": "🔄 **Return Policy:**\n- 7-day return guarantee\n- Product must be unused\n- Original packaging required\n\nContact us for easy returns! 📞"
+    },
+    {
+      "keywords": ["payment", "পেমেন্ট", "pay", "টাকা", "bkash", "nagad", "cash"],
+      "question": "What payment methods do you accept?",
+      "answer": "💳 **Payment Methods:**\n✅ Cash on Delivery (COD)\n✅ bKash\n✅ Nagad\n✅ Bank Transfer\n\nChoose what's convenient for you!"
+    },
+    {
+      "keywords": ["fresh", "তাজা", "quality", "মান", "guarantee"],
+      "question": "How do you ensure product freshness?",
+      "answer": "✨ **Quality Guarantee:**\n- Daily fresh stock\n- Cold chain maintained\n- 100% freshness guarantee\n\nYour satisfaction is our priority! 🌟"
+    },
+    {
+      "keywords": ["contact", "যোগাযোগ", "phone", "ফোন", "support"],
+      "question": "How can I contact support?",
+      "answer": "📞 **Contact Us:**\n- Phone: 01XXXXXXXXX\n- Email: support@albarakahmart.com\n- Live Chat: Right here!\n\nWe're here to help! 😊"
+    },
+    {
+      "keywords": ["minimum", "মিনিমাম", "order", "অর্ডার", "কত"],
+      "question": "Is there a minimum order amount?",
+      "answer": "💰 **Minimum Order:**\n- No minimum for Dhaka!\n- Outside Dhaka: 500 BDT\n\nOrder as much or as little as you need! 🛒"
+    },
+    {
+      "keywords": ["store", "দোকান", "location", "ঠিকানা", "address"],
+      "question": "Do you have a physical store?",
+      "answer": "🏪 **Our Store:**\nYes! Visit us at:\n📍 [Your Address Here]\n\n⏰ Open: 9 AM - 9 PM (Daily)\n\nOnline ordering available 24/7! 🌐"
+    },
+    {
+      "keywords": ["discount", "ছাড়", "offer", "অফার", "sale"],
+      "question": "Do you have any ongoing offers?",
+      "answer": "🎉 **Current Offers:**\nCheck our website for:\n- Daily deals\n- Combo offers\n- Seasonal discounts\n\nSave more, shop more! 💸"
+    }
+  ]
+}

@@ -44,22 +44,30 @@
     closeChatbot.addEventListener('click', toggleChatbot);
 
     // Add message to chat
-    function addMessage(message, isUser = false) {
+    function addMessage(text, isUser = false) {
         const messageDiv = document.createElement('div');
-        messageDiv.className = `flex ${isUser ? 'justify-end' : 'justify-start'}`;
+        messageDiv.className = `flex ${isUser ? 'justify-end' : 'justify-start'} mb-3`;
         
         const bubble = document.createElement('div');
-        bubble.className = `max-w-[80%] p-3 rounded-2xl shadow-sm text-sm ${
+        bubble.className = `max-w-[75%] px-4 py-2 rounded-2xl ${
             isUser 
-                ? 'bg-green-600 text-white rounded-tr-none' 
-                : 'bg-white text-gray-800 rounded-tl-none border border-gray-100'
+                ? 'bg-green-600 text-white rounded-br-none' 
+                : 'bg-gray-100 text-gray-800 rounded-bl-none'
         }`;
-        bubble.textContent = message;
         
+        // Enhanced markdown parsing with image support
+        let formattedText = text
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  // Bold
+            .replace(/\n/g, '<br>');  // Line breaks
+        
+        // Parse markdown images: ![alt](url)
+        formattedText = formattedText.replace(/!\[(.*?)\]\((.*?)\)/g, (match, alt, url) => {
+            return `<img src="${url}" alt="${alt}" class="max-w-full h-auto rounded-lg mt-2 mb-2" style="max-height: 200px; object-fit: cover;" loading="lazy" onerror="this.style.display='none'">`;
+        });
+        
+        bubble.innerHTML = formattedText;
         messageDiv.appendChild(bubble);
         chatbotMessages.appendChild(messageDiv);
-        
-        // Scroll to bottom
         chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
     }
 
@@ -123,18 +131,27 @@
             if (data.status === 'success') {
                 addMessage(data.response);
                 
-                // Render Suggested Actions (Buttons)
+                // Render Suggested Actions (Enhanced Buttons)
                 if (data.suggestions && data.suggestions.length > 0) {
                     const suggestionsDiv = document.createElement('div');
                     suggestionsDiv.className = 'flex flex-wrap gap-2 mt-2 ml-2';
                     
-                    data.suggestions.forEach(text => {
+                    data.suggestions.forEach(item => {
                         const btn = document.createElement('button');
                         btn.className = 'bg-gray-100 hover:bg-green-100 text-green-700 text-xs px-3 py-1.5 rounded-full transition-colors border border-gray-200';
-                        btn.textContent = text;
+                        
+                        // Handle both string and object suggestions
+                        const buttonText = typeof item === 'string' ? item : item.text;
+                        btn.textContent = buttonText;
+                        
                         btn.onclick = () => {
-                            chatbotInput.value = text;
-                            chatbotForm.dispatchEvent(new Event('submit'));
+                            if (typeof item === 'object' && item.action) {
+                                handleButtonAction(item);
+                            } else {
+                                // Simple text message
+                                chatbotInput.value = buttonText;
+                                chatbotForm.dispatchEvent(new Event('submit'));
+                            }
                         };
                         suggestionsDiv.appendChild(btn);
                     });
@@ -153,4 +170,78 @@
             chatbotInput.focus();
         }
     });
+    
+    // Handle action button clicks
+    function handleButtonAction(item) {
+        const action = item.action;
+        
+        if (action === 'add_to_cart') {
+            // Add to cart via AJAX
+            fetch('/cart/add/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({
+                    product_id: item.product_id,
+                    quantity: 1
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    addMessage('✅ Added to cart! You can continue shopping or checkout.', false);
+                } else {
+                    addMessage('❌ Could not add to cart. Please try again.', false);
+                }
+            })
+            .catch(error => {
+                addMessage('❌ Error adding to cart.', false);
+            });
+            
+        } else if (action === 'view_product') {
+            // Open product page in new tab
+            window.open(`/products/${item.slug}/`, '_blank');
+            addMessage('🔗 Product page opened in new tab!', false);
+            
+        } else if (action === 'buy_now') {
+            // Add to cart and redirect to checkout
+            fetch('/cart/add/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({
+                    product_id: item.product_id,
+                    quantity: 1
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/checkout/';
+                } else {
+                    addMessage('❌ Could not proceed to checkout.', false);
+                }
+            });
+        }
+    }
+    
+    // Helper to get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
 })();
