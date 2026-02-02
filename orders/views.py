@@ -12,6 +12,7 @@ from marketing.models import Coupon
 from .cart import Cart
 from .forms import OrderCreateForm
 from .models import Order, OrderItem, PaymentGateway
+from users.models import Wallet
 
 def log_analytics_event(request, event_type, value=None, metadata=None):
     session_key = request.session.session_key
@@ -252,7 +253,16 @@ def payment_success(request, order_id):
         
                 # Mark as paid and processing
                 order.status = 'processing'
+                order.payment_status = 'paid'
                 order.save()
+
+                # [LOYALTY POINTS] Award points to user
+                if order.user:
+                    wallet, created = Wallet.objects.get_or_create(user=order.user)
+                    points_earned = int(order.total / 100)
+                    if points_earned > 0:
+                        wallet.loyalty_points += points_earned
+                        wallet.save()
             
         except PaymentGateway.DoesNotExist:
             messages.error(request, "Selected payment gateway not found.")

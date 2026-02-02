@@ -4,17 +4,17 @@
 {% block content %}
 <style>
     :root {
-        --dash-primary: #6366f1;
-        --dash-bg: #f8fafc;
-        --dash-card-bg: #ffffff;
-        --dash-text: #1e293b;
-        --dash-text-muted: #64748b;
-        --dash-border: #f1f5f9;
-        --dash-emerald: #10b981;
+        --primary: #6366f1;
+        --surface: #ffffff;
+        --bg: #f8fafc;
+        --border: #f1f5f9;
+        --text-main: #1e293b;
+        --text-muted: #64748b;
+        --emerald: #10b981;
     }
 
     body {
-        background-color: var(--dash-bg) !important;
+        background-color: var(--bg) !important;
         font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
     }
 
@@ -39,7 +39,7 @@
         font-size: 32px !important;
         font-weight: 800 !important;
         letter-spacing: -1px;
-        color: var(--dash-text) !important;
+        color: var(--text-main) !important;
         margin: 0 !important;
     }
 
@@ -48,7 +48,7 @@
         background: white;
         padding: 6px;
         border-radius: 16px;
-        border: 1px solid var(--dash-border);
+        border: 1px solid var(--border);
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     }
 
@@ -57,13 +57,13 @@
         border-radius: 12px;
         font-size: 13px;
         font-weight: 700;
-        color: var(--dash-text-muted);
+        color: var(--text-muted);
         text-decoration: none !important;
         transition: all 0.3s;
     }
 
     .date-btn.active {
-        background: var(--dash-primary);
+        background: var(--primary);
         color: white;
         box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
     }
@@ -73,7 +73,7 @@
         display: flex;
         gap: 15px;
         margin-bottom: 35px;
-        border-bottom: 1px solid var(--dash-border);
+        border-bottom: 1px solid var(--border);
         padding-bottom: 2px;
     }
 
@@ -81,44 +81,38 @@
         padding: 14px 24px;
         font-size: 14px;
         font-weight: 700;
-        color: var(--dash-text-muted);
+        color: var(--text-muted);
         background: transparent;
         border: none;
-        border-bottom: 3px solid transparent;
+        border-bottom: 2px solid transparent;
         cursor: pointer;
-        transition: all 0.3s;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .tab-btn i {
-        width: 18px;
-        height: 18px;
+        transition: all 0.2s;
+        white-space: nowrap;
     }
 
     .tab-btn:hover {
-        color: var(--dash-primary);
+        color: var(--primary);
     }
 
     .tab-btn.active {
-        color: var(--dash-primary);
-        border-bottom-color: var(--dash-primary);
+        color: var(--primary);
+        border-bottom-color: var(--primary);
     }
 
     .tab-content {
         display: none;
-        animation: slideUp 0.4s ease-out;
+        /* Hidden by default */
+        animation: fadeIn 0.3s ease-in-out;
     }
 
     .tab-content.active {
         display: block;
     }
 
-    @keyframes slideUp {
+    @keyframes fadeIn {
         from {
             opacity: 0;
-            transform: translateY(15px);
+            transform: translateY(5px);
         }
 
         to {
@@ -127,72 +121,115 @@
         }
     }
 
-    /* --- Stat Cards --- */
-    .kpi-grid {
+    /* --- Cards & Grid --- */
+    .analytics-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .compact-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
         gap: 24px;
-        margin-bottom: 40px;
+        margin-bottom: 30px;
     }
 
-    .card-block {
-        background: var(--dash-card-bg);
-        border-radius: 24px;
-        padding: 32px;
-        border: 1px solid var(--dash-border);
-        height: 100%;
+    .stat-card {
+        background: var(--surface);
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        border: 1px solid var(--border);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+    }
+
+    .stat-header {
         display: flex;
-        flex-direction: column;
-        transition: all 0.3s;
-    }
-
-    .card-block:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 15px;
     }
 
     .stat-label {
         font-size: 13px;
-        font-weight: 700;
-        color: var(--dash-text-muted);
+        font-weight: 600;
+        color: var(--text-muted);
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        margin-bottom: 10px;
     }
 
     .stat-value {
-        font-size: 32px;
+        font-size: 28px;
         font-weight: 800;
-        color: var(--dash-text);
-        display: flex;
-        align-items: baseline;
-        gap: 8px;
+        color: var(--text-main);
     }
 
-    .stat-value span {
+    .stat-subtext {
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-top: 5px;
+    }
+
+    /* --- Colors --- */
+    .text-green {
+        color: #10b981;
+    }
+
+    .text-blue {
+        color: #3b82f6;
+    }
+
+    .text-purple {
+        color: #8b5cf6;
+    }
+
+    .text-red {
+        color: #ef4444;
+    }
+
+    .text-amber {
+        color: #f59e0b;
+    }
+
+    .bg-green {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .bg-blue {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+
+    .bg-red {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    /* --- Charts Box --- */
+    .chart-box {
+        background: white;
+        padding: 24px;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        margin-bottom: 24px;
+    }
+
+    .chart-title {
         font-size: 16px;
-        color: var(--dash-text-muted);
-        font-weight: 600;
+        font-weight: 700;
+        color: var(--text-main);
+        margin-bottom: 20px;
     }
 
-    .card-title {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 25px;
-    }
-
-    .card-title h3 {
-        font-size: 18px !important;
-        font-weight: 700 !important;
-        color: var(--dash-text) !important;
-        margin: 0 !important;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    /* --- Modern Table --- */
+    /* --- Tables --- */
     .modern-table {
         width: 100%;
         border-collapse: collapse;
@@ -201,23 +238,24 @@
     .modern-table th {
         text-align: left;
         padding: 12px;
-        font-size: 12px;
-        text-transform: uppercase;
-        color: var(--dash-text-muted);
-        border-bottom: 1px solid var(--dash-border);
+        background: #f8fafc;
+        color: #64748b;
+        font-size: 13px;
+        font-weight: 600;
+        border-bottom: 1px solid var(--border);
     }
 
     .modern-table td {
-        padding: 16px 12px;
+        padding: 12px;
+        border-bottom: 1px solid var(--border);
         font-size: 14px;
-        border-bottom: 1px solid var(--dash-border);
-        color: var(--dash-text);
+        color: #334155;
     }
 
     .pill {
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 11px;
+        padding: 4px 10px;
+        border-radius: 9999px;
+        font-size: 12px;
         font-weight: 700;
         text-transform: uppercase;
     }
@@ -250,207 +288,27 @@
         margin-bottom: 40px;
     }
 
-    .dash-secondary-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-        gap: 24px;
-        margin-bottom: 40px;
-    }
-
     @media (max-width: 1024px) {
-
-        .dash-main-grid,
-        .dash-secondary-grid {
+        .dash-main-grid {
             grid-template-columns: 1fr;
         }
     }
 </style>
+
 <!-- Load Lucide Icons -->
 <script src="https://unpkg.com/lucide@latest"></script>
-border:none;
-border-bottom:2px solid transparent;
-cursor:pointer;
-transition:all 0.2s;
-white-space:nowrap;
-}
 
-.tab-btn:hover {
-color:var(--primary);
-}
-
-.tab-btn.active {
-color:var(--primary);
-border-bottom-color:var(--primary);
-}
-
-.tab-content {
-display:none;
-/* Hidden by default */
-animation:fadeIn 0.3s ease-in-out;
-}
-
-.tab-content.active {
-display:block;
-}
-
-@keyframes fadeIn {
-from {
-opacity:0;
-transform:translateY(5px);
-}
-
-to {
-opacity:1;
-transform:translateY(0);
-}
-}
-
-/* --- Cards & Grid --- */
-.analytics-grid {
-display:grid;
-grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));
-gap:20px;
-margin-bottom:30px;
-}
-
-.compact-grid {
-display:grid;
-grid-template-columns:repeat(auto-fit, minmax(350px, 1fr));
-gap:24px;
-margin-bottom:30px;
-}
-
-.stat-card {
-background:var(--surface);
-border-radius:16px;
-padding:20px;
-box-shadow:0 4px 6px -1px rgba(0, 0, 0, 0.05);
-border:1px solid var(--border);
-transition:transform 0.2s, box-shadow 0.2s;
-}
-
-.stat-card:hover {
-transform:translateY(-2px);
-box-shadow:0 10px 15px -3px rgba(0, 0, 0, 0.05);
-}
-
-.stat-header {
-display:flex;
-justify-content:space-between;
-align-items:flex-start;
-margin-bottom:15px;
-}
-
-.stat-label {
-font-size:13px;
-font-weight:600;
-color:var(--text-muted);
-text-transform:uppercase;
-letter-spacing:0.5px;
-}
-
-.stat-value {
-font-size:28px;
-font-weight:800;
-color:var(--text-main);
-}
-
-.stat-subtext {
-font-size:13px;
-color:var(--text-muted);
-margin-top:5px;
-}
-
-/* --- Colors --- */
-.text-green {
-color:#10b981;
-}
-
-.text-blue {
-color:#3b82f6;
-}
-
-.text-purple {
-color:#8b5cf6;
-}
-
-.text-red {
-color:#ef4444;
-}
-
-.text-amber {
-color:#f59e0b;
-}
-
-.bg-green {
-background:#dcfce7;
-color:#166534;
-}
-
-.bg-blue {
-background:#dbeafe;
-color:#1e40af;
-}
-
-.bg-red {
-background:#fee2e2;
-color:#991b1b;
-}
-
-/* --- Charts Box --- */
-.chart-box {
-background:white;
-padding:24px;
-border-radius:16px;
-box-shadow:0 4px 6px -1px rgba(0, 0, 0, 0.05);
-margin-bottom:24px;
-}
-
-.chart-title {
-font-size:16px;
-font-weight:700;
-color:var(--text-main);
-margin-bottom:20px;
-}
-
-/* --- Tables --- */
-.modern-table {
-width:100%;
-border-collapse:collapse;
-}
-
-.modern-table th {
-text-align:left;
-padding:12px;
-background:#f8fafc;
-color:#64748b;
-font-size:13px;
-font-weight:600;
-border-bottom:1px solid var(--border);
-}
-
-.modern-table td {
-padding:12px;
-border-bottom:1px solid var(--border);
-font-size:14px;
-color:#334155;
-}
-
-.pill {
-padding:4px 10px;
-border-radius:9999px;
-font-size:12px;
 <div class="dashboard-container">
     <!-- Header -->
     <div class="dash-header">
         <div class="dash-title">
             <h1>Deep Analytics</h1>
-            <p style="color: var(--dash-text-muted); font-weight: 500; margin-top: 5px;">Comprehensive performance &
+            <p style="color: var(--text-muted); font-weight: 500; margin-top: 5px;">Comprehensive performance &
                 engagement insights</p>
         </div>
         <div style="display: flex; gap: 15px; align-items: center;">
             <a href="{% url 'admin:index' %}" class="date-btn"
-                style="background: white; border: 1px solid var(--dash-border); display: flex; align-items: center; gap: 8px;">
+                style="background: white; border: 1px solid var(--border); display: flex; align-items: center; gap: 8px;">
                 <i data-lucide="arrow-left" style="width: 16px;"></i> Return to Cockpit
             </a>
             <div class="date-filter">
@@ -464,45 +322,44 @@ font-size:12px;
     <!-- Tabs Navigation -->
     <div class="tabs-nav">
         <button class="tab-btn active" onclick="switchTab('overview', this)">
-            <i data-lucide="layout-dashboard"></i> Overview
+            <i data-lucide="layout-dashboard" style="width: 18px;"></i> Overview
         </button>
         <button class="tab-btn" onclick="switchTab('engagement', this)">
-            <i data-lucide="users"></i> Engagement
+            <i data-lucide="users" style="width: 18px;"></i> Engagement
         </button>
         <button class="tab-btn" onclick="switchTab('health', this)">
-            <i data-lucide="activity"></i> Store Health
+            <i data-lucide="activity" style="width: 18px;"></i> Store Health
         </button>
     </div>
 
     <!-- TAB 1: OVERVIEW -->
     <div id="overview" class="tab-content active">
         <!-- Highlights -->
-        <div class="kpi-grid">
-            <div class="card-block">
+        <div class="analytics-grid">
+            <div class="stat-card">
                 <div class="stat-label">Total Sessions</div>
                 <div class="stat-value">{{ total_sessions }} <span>visits</span></div>
             </div>
-            <div class="card-block">
+            <div class="stat-card">
                 <div class="stat-label">Total Visitors</div>
-                <div class="stat-value" style="color: var(--dash-primary)">{{ total_visitors }} <span>unique</span>
-                </div>
+                <div class="stat-value" style="color: var(--primary)">{{ total_visitors }} <span>unique</span></div>
             </div>
-            <div class="card-block">
+            <div class="stat-card">
                 <div class="stat-label">Bounce Rate</div>
-                <div class="stat-value" style="color: #f59e0b">{{ bounce_rate }}%</div>
+                <div class="stat-value text-amber">{{ bounce_rate }}%</div>
             </div>
-            <div class="card-block">
+            <div class="stat-card">
                 <div class="stat-label">Conv. Rate</div>
-                <div class="stat-value" style="color: var(--dash-emerald)">{{ funnel.rate }}%</div>
+                <div class="stat-value text-green">{{ funnel.rate }}%</div>
             </div>
         </div>
 
         <!-- Main Analytics Grid -->
         <div class="dash-main-grid">
             <!-- Sales & Orders Trend -->
-            <div class="card-block">
-                <div class="card-title">
-                    <h3><i data-lucide="trending-up" style="color: var(--dash-emerald)"></i> Sales Performance</h3>
+            <div class="chart-box">
+                <div class="chart-title">
+                    <i data-lucide="trending-up" class="text-green"></i> Sales Performance
                 </div>
                 <div style="height: 400px;">
                     <canvas id="salesTrendsChart"></canvas>
@@ -510,9 +367,9 @@ font-size:12px;
             </div>
 
             <!-- Conversion Funnel -->
-            <div class="card-block">
-                <div class="card-title">
-                    <h3><i data-lucide="filter" style="color: var(--dash-primary)"></i> Conversion Funnel</h3>
+            <div class="chart-box">
+                <div class="chart-title">
+                    <i data-lucide="filter" style="color: var(--primary)"></i> Conversion Funnel
                 </div>
                 <div style="height: 400px; display: flex; flex-direction: column; justify-content: center;">
                     <canvas id="funnelChart"></canvas>
@@ -521,29 +378,29 @@ font-size:12px;
         </div>
 
         <!-- Secondary Row -->
-        <div class="dash-secondary-grid">
+        <div class="compact-grid">
             <!-- Order Status -->
-            <div class="card-block">
-                <div class="card-title">
-                    <h3><i data-lucide="pie-chart" style="color: #6366f1"></i> Order Status</h3>
+            <div class="chart-box">
+                <div class="chart-title">
+                    <i data-lucide="pie-chart" class="text-blue"></i> Order Status
                 </div>
                 <div style="height: 250px;">
                     <canvas id="statusChart"></canvas>
                 </div>
             </div>
             <!-- Category Performance -->
-            <div class="card-block">
-                <div class="card-title">
-                    <h3><i data-lucide="tag" style="color: #ec4899"></i> Categories (Revenue)</h3>
+            <div class="chart-box">
+                <div class="chart-title">
+                    <i data-lucide="tag" style="color: #ec4899"></i> Categories (Revenue)
                 </div>
                 <div style="height: 250px;">
                     <canvas id="categoryChart"></canvas>
                 </div>
             </div>
             <!-- Top Products -->
-            <div class="card-block">
-                <div class="card-title">
-                    <h3><i data-lucide="flame" style="color: #f59e0b"></i> Most Viewed Products</h3>
+            <div class="chart-box">
+                <div class="chart-title">
+                    <i data-lucide="flame" class="text-amber"></i> Most Viewed Products
                 </div>
                 <table class="modern-table">
                     <tbody>
@@ -562,41 +419,40 @@ font-size:12px;
 
     <!-- TAB 2: ENGAGEMENT -->
     <div id="engagement" class="tab-content">
-        <div class="dash-secondary-grid">
+        <div class="compact-grid">
             <!-- User Behavior -->
-            <div class="card-block">
-                <div class="card-title">
-                    <h3><i data-lucide="user-check" style="color: var(--dash-primary)"></i> User Loyalty</h3>
+            <div class="stat-card">
+                <div class="chart-title">
+                    <i data-lucide="user-check" style="color: var(--primary)"></i> User Loyalty
                 </div>
                 <div style="padding: 10px 0;">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-                        <span style="color: var(--dash-text-muted); font-weight: 500;">New Signups</span>
+                        <span style="color: var(--text-muted); font-weight: 500;">New Signups</span>
                         <span style="font-weight: 700;">{{ auth_stats.new_users }}</span>
                     </div>
                     <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-                        <span style="color: var(--dash-text-muted); font-weight: 500;">Returning Users</span>
+                        <span style="color: var(--text-muted); font-weight: 500;">Returning Users</span>
                         <span style="font-weight: 700;">{{ auth_stats.returning_users }}</span>
                     </div>
                     <div style="display: flex; justify-content: space-between;">
-                        <span style="color: var(--dash-text-muted); font-weight: 500;">Repeat Customers</span>
-                        <span style="font-weight: 700; color: var(--dash-emerald);">{{ auth_stats.repeat_customers
-                            }}</span>
+                        <span style="color: var(--text-muted); font-weight: 500;">Repeat Customers</span>
+                        <span style="font-weight: 700; color: #10b981;">{{ auth_stats.repeat_customers }}</span>
                     </div>
                 </div>
             </div>
             <!-- Tech Distribution -->
-            <div class="card-block">
-                <div class="card-title">
-                    <h3><i data-lucide="smartphone" style="color: #6366f1"></i> Device Breakdown</h3>
+            <div class="stat-card">
+                <div class="chart-title">
+                    <i data-lucide="smartphone" class="text-blue"></i> Device Breakdown
                 </div>
                 <div style="height: 200px;">
                     <canvas id="deviceChart"></canvas>
                 </div>
             </div>
             <!-- Browser Breakdown -->
-            <div class="card-block">
-                <div class="card-title">
-                    <h3><i data-lucide="chrome" style="color: #f59e0b"></i> Top Browsers</h3>
+            <div class="stat-card">
+                <div class="chart-title">
+                    <i data-lucide="chrome" class="text-amber"></i> Top Browsers
                 </div>
                 <div style="height: 200px;">
                     <canvas id="browserChart"></canvas>

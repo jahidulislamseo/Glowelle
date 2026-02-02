@@ -17,7 +17,8 @@
       <li>
         <div class="flex items-center">
           <i data-lucide="chevron-right" class="h-4 w-4 text-gray-400"></i>
-          <a href="{% url 'shop' %}?category={{ product.category.slug }}" class="ml-1 md:ml-2 hover:text-green-600">{{ product.category.name }}</a>
+          <a href="{% url 'shop' %}?category={{ product.category.slug }}" class="ml-1 md:ml-2 hover:text-green-600">{{
+            product.category.name }}</a>
         </div>
       </li>
       <li aria-current="page">
@@ -162,10 +163,14 @@
           </div>
         </form>
         {% else %}
-        <button type="button" disabled
-          class="w-full h-14 rounded-xl bg-gray-100 text-gray-400 font-bold cursor-not-allowed">
-          Out of Stock
-        </button>
+        <form action="{% url 'create_stock_alert' product.id %}" method="post" class="space-y-4">
+          {% csrf_token %}
+          <button type="submit"
+            class="w-full h-14 rounded-xl bg-orange-50 text-orange-600 border border-orange-100 font-bold hover:bg-orange-100 transition-all active:scale-95 flex items-center justify-center gap-2">
+            <i data-lucide="bell" class="h-5 w-5"></i>
+            Notify Me When Back in Stock
+          </button>
+        </form>
         {% endif %}
       </div>
 
@@ -193,7 +198,7 @@
         // Image Slideshow logic
         let currentImageIndex = 0;
         let autoplayInterval;
-        const totalImages = {{ product.additional_images.count|add:1 }};
+        const totalImages = {{ product.additional_images.count| add: 1 }};
 
         function startAutoplay() {
           if (totalImages <= 1) return;
@@ -381,8 +386,14 @@
                   {{ review.user.username|slice:":1"|upper }}
                 </div>
                 <div>
-                  <div class="font-bold text-gray-900 leading-none mb-1">
-                    {{ review.user.username }}
+                  <div class="flex items-center gap-2 mb-1">
+                    <span class="font-bold text-gray-900 leading-none">{{ review.user.username }}</span>
+                    {% if review.is_verified_purchase %}
+                    <span
+                      class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-green-100 text-green-700">
+                      <i data-lucide="shield-check" class="h-3 w-3"></i> Verified Purchase
+                    </span>
+                    {% endif %}
                   </div>
                   <span class="text-xs text-gray-400">{{ review.created_at|date:"M d, Y" }}</span>
                 </div>
@@ -397,6 +408,13 @@
               </div>
             </div>
             <p class="text-gray-600 italic">"{{ review.comment }}"</p>
+            {% if review.image %}
+            <div class="mt-4">
+              <img src="{{ review.image.url }}" alt="Review Image"
+                class="w-24 h-24 object-cover rounded-lg border border-gray-200 cursor-pointer hover:opacity-90 transition-opacity"
+                onclick="window.open(this.src)">
+            </div>
+            {% endif %}
           </div>
           {% empty %}
           <div class="text-center py-12 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
@@ -411,7 +429,8 @@
         <!-- Add Review Form -->
         {% if user.is_authenticated %}
         <div id="write-review" class="bg-gray-50 p-8 rounded-2xl border border-gray-200">
-          <form action="{% url 'add_review' product.slug %}" method="post" class="space-y-6">
+          <form action="{% url 'add_review' product.slug %}" method="post" enctype="multipart/form-data"
+            class="space-y-6">
             {% csrf_token %}
             <div>
               <h4 class="text-xl font-bold text-gray-900 mb-1">Share Your Feedback</h4>
@@ -429,6 +448,11 @@
                   <option value="2">⭐⭐ (2/5 Fair)</option>
                   <option value="1">⭐ (1/5 Poor)</option>
                 </select>
+              </div>
+              <div>
+                <label class="block text-sm font-bold text-gray-700 mb-2">Upload Photo (Optional)</label>
+                <input type="file" name="image" accept="image/*"
+                  class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100" />
               </div>
             </div>
 

@@ -1,12 +1,13 @@
 from django.core.cache import cache
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Category, Product, Review, Wishlist
+from .models import Category, Product, Review, Wishlist, StockAlert
 from marketing.models import HomeSlider, DealOfTheDay
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from analytics.models import AnalyticsEvent, VisitorSession
 from django.utils import timezone
+from orders.models import Order
 
 def home(request):
     # Try fetching from cache first
@@ -233,11 +234,22 @@ def add_review(request, slug):
     rating = int(request.POST.get('rating', 5))
     comment = request.POST.get('comment', '')
     
+    image = request.FILES.get('image')
+    
+    # Check for Verified Purchase
+    is_verified = Order.objects.filter(
+        user=request.user,
+        items__product=product,
+        status='delivered'
+    ).exists()
+    
     Review.objects.create(
         user=request.user,
         product=product,
         rating=rating,
-        comment=comment
+        comment=comment,
+        image=image,
+        is_verified_purchase=is_verified
     )
     
     # Update product stats
@@ -299,3 +311,31 @@ def wishlist_to_cart(request, product_id):
     Wishlist.objects.filter(user=request.user, product=product).delete()
     
     return redirect('cart_detail')
+
+def create_stock_alert(request, product_id):
+    if request.method == 'POST':
+        product = get_object_or_404(Product, id=product_id)
+        email = request.POST.get('email')
+        
+        if request.user.is_authenticated:
+            StockAlert.objects.get_or_create(
+                user=request.user,
+                product=product,
+                defaults={'email': request.user.email}
+            )
+        elif email:
+            # For guests, we might need a separate way to track but for now we store email
+            # We don't have a 'Guest' user so we might just use email only or skip for now
+            # But the model requires a user. Let's make user optional or use a placeholder.
+            # Actually, per my model, user is NOT null. 
+            # I will only allow it for logged in users for now or ask user.
+            # Wait, the implementation plan said 'track users waiting'.
+            # I'll stick to logged in users for now or fix model.
+            from django.contrib import messages
+            messages.info(request, "Please login to set stock alerts.")
+            return redirect('login')
+            
+        from django.contrib import messages
+        messages.success(request, "We'll notify you when this item is back in stock!")
+        return redirect('product_detail', slug=product.slug)
+    return redirect('shop')

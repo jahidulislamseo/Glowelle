@@ -124,10 +124,26 @@ class Review(models.Model):
     user = models.ForeignKey('users.User', on_delete=models.CASCADE)
     rating = models.IntegerField(default=5)
     comment = models.TextField()
+    image = models.ImageField(upload_to='reviews/', null=True, blank=True)
+    is_verified_purchase = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.user.username} - {self.product.title}"
+        return f"{self.user.username} - {self.product.title} ({self.rating}★)"
+
+class StockAlert(models.Model):
+    user = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='stock_alerts')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='stock_alerts')
+    variant = models.ForeignKey(ProductVariant, on_delete=models.SET_NULL, null=True, blank=True, related_name='stock_alerts')
+    email = models.EmailField(null=True, blank=True, help_text="Email for notification if user is guest (optional)")
+    is_notified = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'product', 'variant')
+
+    def __str__(self):
+        return f"Alert for {self.user.username} - {self.product.title}"
 
 class Wishlist(models.Model):
     user = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='wishlist')
