@@ -199,11 +199,11 @@ class Order(models.Model):
             for item in self.items.all():
                 from products.models import Product, StockLog
                 
-                Product.objects.filter(id=item.product.id).update(stock_quantity=models.F('stock_quantity') + item['quantity'])
+                Product.objects.filter(id=item.product.id).update(stock_quantity=models.F('stock_quantity') + item.quantity)
                 
                 # Log the restoration
                 StockLog.objects.create(
-                    product=product,
+                    product=item.product,
                     quantity=item.quantity,
                     reason=f"Order #{self.id} {self.get_status_display()}"
                 )
