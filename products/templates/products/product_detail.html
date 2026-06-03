@@ -40,9 +40,9 @@
 
         <!-- Sliding Container -->
         <div id="image-slider-container" class="flex w-full h-full transition-transform duration-500 ease-in-out">
-          <img src="{{ product.image.url }}" alt="{{ product.title }}" class="object-cover w-full h-full flex-shrink-0">
+          <img src="{{ product.display_image_url }}" alt="{{ product.title }}" class="object-cover w-full h-full flex-shrink-0">
           {% for img in product.additional_images.all %}
-          <img src="{{ img.image.url }}" alt="Extra" class="object-cover w-full h-full flex-shrink-0">
+          <img src="{{ img.display_image_url }}" alt="Extra" class="object-cover w-full h-full flex-shrink-0">
           {% endfor %}
         </div>
 
@@ -67,12 +67,12 @@
       <div class="grid grid-cols-5 gap-3" id="thumbnail-container">
         <button onclick="changeSlide(0, true)"
           class="thumbnail-btn aspect-square relative border-2 border-green-600 rounded-md overflow-hidden transition-all">
-          <img src="{{ product.image.url }}" alt="Main" class="object-cover w-full h-full" />
+          <img src="{{ product.display_image_url }}" alt="Main" class="object-cover w-full h-full" />
         </button>
         {% for img in product.additional_images.all %}
         <button onclick="changeSlide({{ forloop.counter }}, true)"
           class="thumbnail-btn aspect-square relative border-2 border-transparent rounded-md overflow-hidden hover:border-green-600/50 transition-all">
-          <img src="{{ img.image.url }}" alt="Thumbnail" class="object-cover w-full h-full" />
+          <img src="{{ img.display_image_url }}" alt="Thumbnail" class="object-cover w-full h-full" />
         </button>
         {% endfor %}
       </div>
@@ -612,8 +612,8 @@
       "@type":"Product",
       "name":"{{ product.title|escapejs }}",
       "image":[
-        "{{ request.scheme }}://{{ request.get_host }}{{ product.image.url }}"
-        {% for img in product.additional_images.all %}, "{{ request.scheme }}://{{ request.get_host }}{{ img.image.url }}"{% endfor %}
+        "{{ product.display_image_url }}"
+        {% for img in product.additional_images.all %}, "{{ request.scheme }}://{{ request.get_host }}{{ img.display_image_url }}"{% endfor %}
       ],
       "description":"{{ product.get_meta_description|escapejs }}",
       "sku":"{{ product.id }}",

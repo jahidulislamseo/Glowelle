@@ -9,9 +9,12 @@
     const toggleIcon = document.getElementById('toggle-icon');
 
     let isOpen = false;
+    let historyLoaded = false;
     let idleTimer = null;
     const IDLE_TIME = 45000; // 45 seconds
     const TYPING_SPEED = 1500; // 1.5 seconds delay for human feel
+
+    const chatbotSuggestions = document.getElementById('chatbot-suggestions');
 
     // Generate unique session ID for conversation history
     let sessionId = localStorage.getItem('chatbot_session_id');
@@ -45,12 +48,35 @@
 
     chatbotToggle.addEventListener('click', () => {
         toggleChatbot();
-        if (isOpen && chatbotMessages.children.length === 0) {
-            showWelcomeMessage();
+        if (isOpen) {
+            if (!historyLoaded) {
+                loadChatHistory();
+            }
         }
         resetIdleTimer();
     });
     closeChatbot.addEventListener('click', toggleChatbot);
+
+    async function loadChatHistory() {
+        try {
+            const resp = await fetch(`/api/get-history/?session_id=${sessionId}`);
+            const data = await resp.json();
+
+            historyLoaded = true;
+            chatbotMessages.innerHTML = ''; // Clear initial UI
+
+            if (data.history && data.history.length > 0) {
+                data.history.forEach(msg => {
+                    addMessage(msg.content, msg.role === 'user');
+                });
+            } else {
+                showWelcomeMessage();
+            }
+        } catch (e) {
+            console.error("Failed to load history", e);
+            if (chatbotMessages.children.length === 0) showWelcomeMessage();
+        }
+    }
 
     function showWelcomeMessage() {
         showTypingIndicator();
@@ -180,6 +206,9 @@
         // Disable input
         chatbotInput.disabled = true;
 
+        // Clear suggestions when user sends a message
+        if (chatbotSuggestions) chatbotSuggestions.innerHTML = '';
+
         try {
             const response = await fetch('/api/chatbot/', {
                 method: 'POST',
@@ -204,32 +233,7 @@
 
                     // Render Suggested Actions (Enhanced Buttons)
                     if (data.suggestions && data.suggestions.length > 0) {
-                        const suggestionsDiv = document.createElement('div');
-                        suggestionsDiv.className = 'flex flex-wrap gap-2 mt-2 ml-2';
-
-                        data.suggestions.forEach(item => {
-                            const btn = document.createElement('button');
-                            btn.className = 'bg-white hover:bg-green-50 text-green-700 text-xs px-3 py-1.5 rounded-full transition-all border border-green-100 shadow-sm active:scale-95';
-
-                            // Handle both string and object suggestions
-                            const buttonText = typeof item === 'string' ? item : item.text;
-                            btn.textContent = buttonText;
-
-                            btn.onclick = () => {
-                                resetIdleTimer();
-                                if (typeof item === 'object' && item.action && item.action !== 'message') {
-                                    handleButtonAction(item);
-                                } else {
-                                    // Simple text message
-                                    chatbotInput.value = buttonText;
-                                    chatbotForm.dispatchEvent(new Event('submit'));
-                                }
-                            };
-                            suggestionsDiv.appendChild(btn);
-                        });
-
-                        chatbotMessages.appendChild(suggestionsDiv);
-                        chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+                        renderSuggestions(data.suggestions);
                     }
                 } else {
                     addMessage(data.response || 'Sorry, I encountered an error. Please try again.');
@@ -245,6 +249,30 @@
             chatbotInput.focus();
         }
     });
+
+    function renderSuggestions(suggestions) {
+        if (!chatbotSuggestions) return;
+        chatbotSuggestions.innerHTML = '';
+
+        suggestions.forEach(item => {
+            const btn = document.createElement('button');
+            btn.className = 'bg-white hover:bg-green-50 text-green-700 text-xs px-3 py-1.5 rounded-full transition-all border border-green-100 shadow-sm active:scale-95';
+
+            const buttonText = typeof item === 'string' ? item : item.text;
+            btn.textContent = buttonText;
+
+            btn.onclick = () => {
+                resetIdleTimer();
+                if (typeof item === 'object' && item.action && item.action !== 'message') {
+                    handleButtonAction(item);
+                } else {
+                    chatbotInput.value = buttonText;
+                    chatbotForm.dispatchEvent(new Event('submit'));
+                }
+            };
+            chatbotSuggestions.appendChild(btn);
+        });
+    }
 
     // Handle action button clicks
     function handleButtonAction(item) {

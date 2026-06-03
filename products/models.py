@@ -1,7 +1,49 @@
+import os
+
 from django.db import models
 from django.utils.text import slugify
 from django.urls import reverse
 from core.models import SEOModel
+
+
+DEFAULT_PRODUCT_IMAGE_URL = 'https://placehold.co/600x600?text=No+Image&format=webp'
+
+
+def ensure_webp_url(image_field):
+    if not image_field:
+        return DEFAULT_PRODUCT_IMAGE_URL
+
+    image_url = image_field.url
+    if image_url.startswith(('http://', 'https://')):
+        return image_url
+
+    try:
+        image_path = image_field.path
+    except Exception:
+        return DEFAULT_PRODUCT_IMAGE_URL
+
+    if not os.path.exists(image_path):
+        return DEFAULT_PRODUCT_IMAGE_URL
+
+    base_path, ext = os.path.splitext(image_path)
+    webp_path = f"{base_path}.webp"
+    webp_url = f"{os.path.splitext(image_url)[0]}.webp"
+
+    if os.path.exists(webp_path):
+        return webp_url
+
+    try:
+        from PIL import Image
+
+        with Image.open(image_path) as img:
+            if img.mode not in ('RGB', 'RGBA'):
+                img = img.convert('RGB')
+            img.save(webp_path, 'WEBP', quality=85, optimize=True, method=6)
+        return webp_url
+    except Exception as e:
+        # Fallback to original URL when WebP conversion fails
+        print(f"Error creating WebP for {image_field}: {e}")
+        return image_url
 
 class Category(SEOModel):
     name = models.CharField(max_length=255, unique=True)
@@ -62,14 +104,20 @@ class Product(SEOModel):
     def get_absolute_url(self):
         return reverse('product_detail', args=[self.slug])
 
+    @property
+    def display_image_url(self):
+        if not self.image:
+            return DEFAULT_PRODUCT_IMAGE_URL
+
+        return ensure_webp_url(self.image)
+
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
 
         if self.image:
-            from PIL import Image
-            import os
-            
             try:
+                from PIL import Image
+
                 img_path = self.image.path
                 if os.path.exists(img_path):
                     with Image.open(img_path) as img:
@@ -78,8 +126,9 @@ class Product(SEOModel):
                             img.thumbnail(output_size)
                             img.save(img_path, quality=85, optimize=True)
             except Exception as e:
-                # Log error or silently fail to avoid crashing if image is corrupted
                 print(f"Error resizing image for product {self.id}: {e}")
+
+            ensure_webp_url(self.image)
 
 class ProductVariant(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='variants')
@@ -99,6 +148,18 @@ class ProductImage(models.Model):
 
     def __str__(self):
         return f"Image for {self.product.title}"
+
+    @property
+    def display_image_url(self):
+        if not self.image:
+            return DEFAULT_PRODUCT_IMAGE_URL
+
+        return ensure_webp_url(self.image)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.image:
+            ensure_webp_url(self.image)
 
 class ProductVideo(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='videos')

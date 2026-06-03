@@ -32,7 +32,7 @@
             <a href="{% url 'product_detail' product.slug %}">
                 <div class="aspect-square relative bg-gray-100 overflow-hidden">
                     {% if product.image %}
-                    <img src="{{ product.image }}" alt="{{ product.title }}"
+                    <img src="{{ product.display_image_url }}" alt="{{ product.title }}"
                         class="object-cover w-full h-full transition-all duration-500 group-hover:scale-105">
                     {% else %}
                     <img src="https://placehold.co/600x400?text=No+Image" alt="{{ product.title }}"
@@ -44,8 +44,7 @@
             <div class="p-4">
                 <div class="text-sm text-muted-foreground mb-1">{{ product.category.name }}</div>
                 <a href="{% url 'product_detail' product.slug %}">
-                    <h3 class="font-semibold truncate group-hover:text-green-600 transition-colors text-gray-900">{{
-                        product.title }}</h3>
+                    <h3 class="font-semibold truncate group-hover:text-green-600 transition-colors text-gray-900">{{ product.title }}</h3>
                 </a>
                 <div class="flex items-center gap-1 mt-1 mb-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"

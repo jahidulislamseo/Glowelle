@@ -115,7 +115,7 @@
         {% for item in order.items.all %}
         <div class="p-4 flex items-center gap-4">
             <div class="h-16 w-16 bg-gray-100 rounded-md overflow-hidden">
-                <img src="{{ item.product.image }}" alt="{{ item.product.title }}" class="h-full w-full object-cover">
+                <img src="{{ item.product.display_image_url }}" alt="{{ item.product.title }}" class="h-full w-full object-cover">
             </div>
             <div class="flex-1">
                 <p class="font-medium">{{ item.product.title }}</p>

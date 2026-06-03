@@ -12,9 +12,14 @@ class BrandSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'slug', 'logo']
 
 class ProductImageSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+
     class Meta:
         model = ProductImage
         fields = ['id', 'image', 'alt_text']
+
+    def get_image(self, obj):
+        return obj.display_image_url
 
 class ProductVariantSerializer(serializers.ModelSerializer):
     class Meta:
@@ -31,6 +36,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
     brand = BrandSerializer(read_only=True)
+    image = serializers.SerializerMethodField()
     additional_images = ProductImageSerializer(many=True, read_only=True)
     variants = ProductVariantSerializer(many=True, read_only=True)
     reviews = ReviewSerializer(many=True, read_only=True)
@@ -44,3 +50,6 @@ class ProductSerializer(serializers.ModelSerializer):
             'category', 'brand', 'additional_images', 'variants', 'reviews',
             'created_at', 'updated_at'
         ]
+
+    def get_image(self, obj):
+        return obj.display_image_url

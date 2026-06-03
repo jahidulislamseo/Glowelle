@@ -6,9 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- SEO & Meta Tags -->
-    <title>{% if product %}{{ product.get_meta_title }} | Al Barakah Mart{% elif category %}{{ category.get_meta_title
-        }} | Al Barakah Mart{% else %}{{ site_settings.site_title|default:"Al Barakah Mart" }} | Premium Organic
-        Grocery{% endif %}</title>
+    <title>{% if product %}{{ product.get_meta_title }} | Al Barakah Mart{% elif category %}{{ category.get_meta_title }} | Al Barakah Mart{% else %}{{ site_settings.site_title|default:"Al Barakah Mart" }} | Premium Organic Grocery{% endif %}</title>
     <meta name="description"
         content="{% if product %}{{ product.get_meta_description }}{% elif category %}{{ category.get_meta_description }}{% else %}{{ site_settings.meta_description|default:'Your one-stop shop for fresh organic fruits, vegetables, meat, and daily essentials.' }}{% endif %}">
     <link rel="canonical" href="{{ request.build_absolute_uri }}">
@@ -28,7 +26,7 @@
         content="{{ product.get_meta_description|default:product.description|striptags|truncatewords:30 }}">
     <meta property="og:type" content="product">
     <meta property="og:image"
-        content="{% if product.og_image %}{{ request.scheme }}://{{ request.get_host }}{{ product.og_image.url }}{% elif product.image %}{{ product.image }}{% endif %}">
+        content="{% if product.og_image %}{{ request.scheme }}://{{ request.get_host }}{{ product.og_image.url }}{% elif product.image %}{{ product.display_image_url }}{% endif %}">
     {% elif category %}
     <meta property="og:title" content="{{ category.get_meta_title|default:category.name }}">
     <meta property="og:description"
@@ -46,7 +44,7 @@
     <meta name="twitter:description"
         content="{% if product %}{{ product.get_meta_description }}{% elif category %}{{ category.get_meta_description }}{% else %}Your one-stop shop for fresh organic fruits, vegetables, meat, and daily essentials.{% endif %}">
     {% if product and product.image %}
-    <meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ product.image.url }}">
+    <meta name="twitter:image" content="{{ product.display_image_url }}">
     {% endif %}
 
     <!-- Google Search Console -->
@@ -462,8 +460,7 @@
                 <span class="text-[10px] font-bold mt-1">Cart</span>
                 {% if cart|length > 0 %}
                 <span
-                    class="absolute top-2 right-4 h-4 w-4 flex items-center justify-center rounded-full bg-red-500 text-white text-[8px] font-bold">{{
-                    cart|length }}</span>
+                    class="absolute top-2 right-4 h-4 w-4 flex items-center justify-center rounded-full bg-red-500 text-white text-[8px] font-bold">{{ cart|length }}</span>
                 {% endif %}
             </a>
             <a href="{% url 'wishlist' %}"
@@ -573,8 +570,7 @@
                                 <span class="font-medium">Shopping Cart</span>
                                 {% if cart|length > 0 %}
                                 <span
-                                    class="ml-auto bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">{{
-                                    cart|length }}</span>
+                                    class="ml-auto bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">{{ cart|length }}</span>
                                 {% endif %}
                             </a>
 

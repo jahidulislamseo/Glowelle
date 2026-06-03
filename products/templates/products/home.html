@@ -1,154 +1,159 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<!-- Hero Section (Matching Hero.tsx) -->
 <!-- Modern Hero Section -->
-<section class="relative bg-white overflow-hidden pt-12 pb-24 lg:pt-20 lg:pb-32 mb-12">
-    <!-- Animated Background Blobs -->
-    <div
-        class="absolute -top-24 -left-20 w-72 h-72 md:w-96 md:h-96 bg-green-100 rounded-full blur-3xl opacity-60 animate-blob">
-    </div>
-    <div
-        class="absolute top-1/2 -right-20 w-80 h-80 bg-emerald-100 rounded-full blur-3xl opacity-60 animate-blob animation-delay-2000">
-    </div>
-    <div
-        class="absolute -bottom-32 left-1/3 w-80 h-80 bg-yellow-50 rounded-full blur-3xl opacity-60 animate-blob animation-delay-4000">
+<section class="relative overflow-hidden bg-[#f7fbf6] border-b border-green-100/70 mb-12">
+    <div class="absolute inset-0 opacity-[0.55]"
+        style="background-image: linear-gradient(120deg, rgba(5,150,105,.12), transparent 34%), radial-gradient(circle at 82% 20%, rgba(245,158,11,.13), transparent 28%), linear-gradient(rgba(6,95,70,.045) 1px, transparent 1px), linear-gradient(90deg, rgba(6,95,70,.045) 1px, transparent 1px); background-size: auto, auto, 42px 42px, 42px 42px;">
     </div>
 
     <div class="container mx-auto px-4 relative z-10">
-        <div class="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-            <!-- Left:Text Content -->
-            <div class="space-y-8 max-w-2xl mx-auto lg:mx-0 text-center lg:text-left reveal-on-scroll reveal-right">
-                <!-- Badge -->
+        <div class="grid lg:grid-cols-[1fr_1.08fr] gap-10 xl:gap-16 items-center min-h-[calc(100vh-92px)] py-12 lg:py-16">
+            <!-- Left: Text Content -->
+            <div class="max-w-2xl mx-auto lg:mx-0 text-center lg:text-left reveal-on-scroll reveal-right">
                 <div
-                    class="inline-flex items-center gap-2 bg-green-50 border border-green-100 text-green-700 px-4 py-1.5 rounded-full text-sm font-semibold shadow-sm hover:shadow-md transition-all cursor-default">
-                    <span class="flex h-2 w-2 relative">
-                        <span
-                            class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                    </span>
-                    100% Organic & Fresh
+                    class="inline-flex items-center gap-2 bg-white/85 border border-green-200 text-green-800 px-4 py-2 rounded-full text-sm font-bold shadow-soft backdrop-blur cursor-default">
+                    <span class="h-2.5 w-2.5 rounded-full bg-green-500 shadow-[0_0_0_5px_rgba(16,185,129,.14)]"></span>
+                    Premium Organic Grocery
                 </div>
 
-                <!-- Headline -->
                 <h1
-                    class="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold text-gray-900 tracking-tight leading-[1.1] reveal-on-scroll reveal-up delay-100">
-                    Nature's Best <br class="hidden lg:block" />
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-green-400">
-                        Delivered Fresh
-                    </span>
+                    class="mt-7 text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold text-gray-950 leading-[1.05] reveal-on-scroll reveal-up delay-100">
+                    Fresh food for a
+                    <span class="block text-green-600">better everyday.</span>
                 </h1>
 
-                <!-- Description -->
                 <p
-                    class="text-lg md:text-xl text-gray-600 leading-relaxed max-w-lg mx-auto lg:mx-0 reveal-on-scroll reveal-up delay-200">
-                    Experience the true taste of nature. Hand-picked organic vegetables, fruits, and essentials
-                    delivered directly from farm to your doorstep.
+                    class="mt-6 text-lg md:text-xl text-gray-600 leading-relaxed max-w-xl mx-auto lg:mx-0 reveal-on-scroll reveal-up delay-200">
+                    Hand-picked vegetables, fruits, meat, and daily essentials delivered fast from trusted local
+                    sources to your doorstep.
                 </p>
 
-                <!-- CTA Buttons -->
                 <div
-                    class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start reveal-on-scroll reveal-up delay-300">
+                    class="mt-8 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start reveal-on-scroll reveal-up delay-300">
                     <a href="{% url 'shop' %}"
-                        class="btn-primary inline-flex items-center justify-center h-14 px-8 text-lg font-bold rounded-full shadow-lg transform hover:-translate-y-1">
+                        class="btn-primary inline-flex items-center justify-center h-14 px-8 text-lg font-bold rounded-full shadow-lg hover:shadow-hover transform hover:-translate-y-1 transition-all">
                         Shop Now
                         <i data-lucide="shopping-bag" class="ml-2 h-5 w-5"></i>
                     </a>
                     <a href="#featured"
-                        class="inline-flex items-center justify-center h-14 px-8 text-lg font-bold text-gray-700 bg-white border-2 border-gray-100 rounded-full hover:border-green-200 hover:bg-green-50 transition-standard">
+                        class="inline-flex items-center justify-center h-14 px-8 text-lg font-bold text-gray-800 bg-white border border-gray-200 rounded-full hover:border-green-300 hover:text-green-700 hover:bg-green-50 transition-standard shadow-sm">
                         View Offers
+                        <i data-lucide="arrow-right" class="ml-2 h-5 w-5"></i>
                     </a>
                 </div>
 
-                <!-- Trust Indicators -->
                 <div
-                    class="pt-4 flex items-center justify-center lg:justify-start gap-8 text-sm font-medium text-gray-500">
-                    <div class="flex items-center gap-2">
-                        <div class="bg-green-100 p-1.5 rounded-full">
-                            <i data-lucide="truck" class="h-4 w-4 text-green-600"></i>
-                        </div>
-                        Fast Delivery
+                    class="mt-9 grid grid-cols-3 max-w-xl mx-auto lg:mx-0 bg-white/80 border border-white rounded-2xl shadow-premium backdrop-blur overflow-hidden reveal-on-scroll reveal-up delay-400">
+                    <div class="px-3 py-4 sm:px-5 border-r border-gray-100">
+                        <p class="text-2xl font-extrabold text-gray-950">4.9</p>
+                        <p class="mt-1 text-xs sm:text-sm font-semibold text-gray-500">Rating</p>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <div class="bg-green-100 p-1.5 rounded-full">
-                            <i data-lucide="shield-check" class="h-4 w-4 text-green-600"></i>
-                        </div>
-                        Secure Checkout
+                    <div class="px-3 py-4 sm:px-5 border-r border-gray-100">
+                        <p class="text-2xl font-extrabold text-gray-950">100%</p>
+                        <p class="mt-1 text-xs sm:text-sm font-semibold text-gray-500">Fresh</p>
+                    </div>
+                    <div class="px-3 py-4 sm:px-5">
+                        <p class="text-2xl font-extrabold text-gray-950">Fast</p>
+                        <p class="mt-1 text-xs sm:text-sm font-semibold text-gray-500">Delivery</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Right:Hero Visual (Slider) -->
-            <div class="relative mx-auto w-full max-w-lg lg:max-w-none reveal-on-scroll reveal-left order-first lg:order-last">
-                <!-- Floating Elements -->
-                <div
-                    class="absolute -top-10 -right-10 z-20 bg-white p-4 rounded-2xl shadow-xl animate-bounce-slow hidden md:block">
-                    <div class="flex items-center gap-3">
-                        <div class="bg-yellow-100 p-2 rounded-full">
-                            <span class="text-xl">⭐</span>
-                        </div>
-                        <div>
-                            <p class="font-bold text-gray-900">4.9/5</p>
-                            <p class="text-xs text-gray-500">Customer Rating</p>
-                        </div>
-                    </div>
-                </div>
-                <div
-                    class="absolute -bottom-6 -left-6 z-20 bg-white p-4 rounded-2xl shadow-xl animate-bounce-slow animation-delay-1000 hidden md:block">
-                    <div class="flex items-center gap-3">
-                        <div class="bg-green-100 p-2 rounded-full">
-                            <i data-lucide="leaf" class="h-5 w-5 text-green-600"></i>
-                        </div>
-                        <div>
-                            <p class="font-bold text-gray-900">100%</p>
-                            <p class="text-xs text-gray-500">Organic Certified</p>
-                        </div>
-                    </div>
+            <!-- Right: Hero Visual (Slider) -->
+            <div class="relative mx-auto w-full max-w-2xl lg:max-w-none reveal-on-scroll reveal-left order-first lg:order-last">
+                <div class="absolute -inset-4 rounded-[2rem] bg-white/60 border border-white shadow-premium hidden sm:block">
                 </div>
 
-                <!-- Main Image/Slider Container -->
-                <div class="relative rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white aspect-[4/3] group bg-gray-100"
+                <div class="relative rounded-[1.75rem] overflow-hidden shadow-2xl border border-white aspect-[16/11] group bg-gray-100"
                     id="hero-slider">
                     {% for slider in sliders %}
                     <div
                         class="slide absolute inset-0 transition-opacity duration-1000 ease-in-out {% if forloop.first %}opacity-100{% else %}opacity-0{% endif %}">
                         {% if slider.image %}
-                        <img src="{{ slider.image.url }}" alt="{{ slider.title }}"
-                            class="object-cover w-full h-full transform transition-transform duration-[10000ms] scale-100 group-hover:scale-110">
+                        <img src="{{ slider.image.url }}" alt="{{ slider.title|default:'Fresh grocery collection' }}"
+                            class="object-cover w-full h-full transform transition-transform duration-[10000ms] scale-100 group-hover:scale-105">
                         {% else %}
-                        <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=800"
-                            class="object-cover w-full h-full">
+                        <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1200"
+                            alt="Fresh grocery collection" class="object-cover w-full h-full">
                         {% endif %}
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent">
+                        <div class="absolute inset-0 bg-gradient-to-t from-gray-950/75 via-gray-950/15 to-transparent">
                         </div>
                         {% if slider.title %}
-                        <div class="absolute bottom-8 left-8 text-white z-10">
-                            <h3 class="text-2xl font-bold mb-1">{{ slider.title }}</h3>
+                        <div class="absolute left-5 right-5 bottom-5 sm:left-8 sm:right-auto sm:bottom-8 text-white z-10 max-w-sm">
+                            <p class="inline-flex items-center gap-2 bg-white/15 border border-white/20 backdrop-blur px-3 py-1 rounded-full text-xs font-bold mb-3">
+                                <i data-lucide="sparkles" class="h-3.5 w-3.5"></i>
+                                Today's Highlight
+                            </p>
+                            <h3 class="text-2xl sm:text-3xl font-extrabold leading-tight">{{ slider.title }}</h3>
                             {% if slider.subtitle %}
-                            <p class="text-gray-200 text-sm">{{ slider.subtitle }}</p>
+                            <p class="mt-2 text-sm sm:text-base text-white/85">{{ slider.subtitle }}</p>
                             {% endif %}
                         </div>
                         {% endif %}
                     </div>
                     {% empty %}
                     <div class="slide absolute inset-0 opacity-100">
-                        <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=800"
-                            class="object-cover w-full h-full">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent">
+                        <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1200"
+                            alt="Fresh grocery collection" class="object-cover w-full h-full">
+                        <div class="absolute inset-0 bg-gradient-to-t from-gray-950/70 via-gray-950/10 to-transparent">
                         </div>
                     </div>
                     {% endfor %}
 
-                    <!-- Slider Controls -->
-                    <div class="absolute bottom-6 right-6 flex gap-2 z-20">
-                        <button onclick="prevSlide()"
-                            class="p-2 bg-white/20 hover:bg-white/40 backdrop-blur-sm rounded-full text-white transition-colors">
+                    <div class="absolute top-5 left-5 z-20 flex flex-wrap gap-2">
+                        <span class="inline-flex items-center gap-1.5 bg-white/90 backdrop-blur text-green-800 px-3 py-2 rounded-full text-xs font-bold shadow-soft">
+                            <i data-lucide="leaf" class="h-4 w-4"></i>
+                            Organic Picks
+                        </span>
+                        <span class="inline-flex items-center gap-1.5 bg-white/90 backdrop-blur text-amber-700 px-3 py-2 rounded-full text-xs font-bold shadow-soft">
+                            <i data-lucide="badge-percent" class="h-4 w-4"></i>
+                            Daily Deals
+                        </span>
+                    </div>
+
+                    <div class="absolute bottom-5 right-5 flex gap-2 z-20">
+                        <button type="button" onclick="prevSlide()"
+                            class="h-11 w-11 inline-flex items-center justify-center bg-white/20 hover:bg-white/35 backdrop-blur rounded-full text-white border border-white/20 transition-colors"
+                            aria-label="Previous slide">
                             <i data-lucide="chevron-left" class="h-5 w-5"></i>
                         </button>
-                        <button onclick="nextSlide()"
-                            class="p-2 bg-white/20 hover:bg-white/40 backdrop-blur-sm rounded-full text-white transition-colors">
+                        <button type="button" onclick="nextSlide()"
+                            class="h-11 w-11 inline-flex items-center justify-center bg-white/20 hover:bg-white/35 backdrop-blur rounded-full text-white border border-white/20 transition-colors"
+                            aria-label="Next slide">
                             <i data-lucide="chevron-right" class="h-5 w-5"></i>
                         </button>
+                    </div>
+                </div>
+
+                <div
+                    class="relative -mt-8 mx-auto w-[92%] grid grid-cols-3 bg-white rounded-2xl border border-gray-100 shadow-xl overflow-hidden z-20">
+                    <div class="flex items-center gap-3 px-3 sm:px-5 py-4 border-r border-gray-100">
+                        <span class="hidden sm:inline-flex h-10 w-10 items-center justify-center rounded-full bg-green-100 text-green-700">
+                            <i data-lucide="truck" class="h-5 w-5"></i>
+                        </span>
+                        <div>
+                            <p class="text-sm font-extrabold text-gray-950">Fast</p>
+                            <p class="text-xs text-gray-500 font-medium">Home delivery</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 px-3 sm:px-5 py-4 border-r border-gray-100">
+                        <span class="hidden sm:inline-flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 text-amber-700">
+                            <i data-lucide="star" class="h-5 w-5"></i>
+                        </span>
+                        <div>
+                            <p class="text-sm font-extrabold text-gray-950">4.9/5</p>
+                            <p class="text-xs text-gray-500 font-medium">Loved by buyers</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 px-3 sm:px-5 py-4">
+                        <span class="hidden sm:inline-flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
+                            <i data-lucide="shield-check" class="h-5 w-5"></i>
+                        </span>
+                        <div>
+                            <p class="text-sm font-extrabold text-gray-950">Secure</p>
+                            <p class="text-xs text-gray-500 font-medium">Easy checkout</p>
+                        </div>
                     </div>
                 </div>
 
@@ -156,7 +161,6 @@
                     let heroSlideIndex = 0;
                     const heroSlides = document.querySelectorAll('#hero-slider .slide');
                     const totalHeroSlides = heroSlides.length;
-                    let heroInterval;
 
                     function showHeroSlide(index) {
                         heroSlides.forEach((slide, i) => {
@@ -166,16 +170,17 @@
                     }
 
                     function nextSlide() {
+                        if (!totalHeroSlides) return;
                         heroSlideIndex = (heroSlideIndex + 1) % totalHeroSlides;
                         showHeroSlide(heroSlideIndex);
                     }
 
                     function prevSlide() {
+                        if (!totalHeroSlides) return;
                         heroSlideIndex = (heroSlideIndex - 1 + totalHeroSlides) % totalHeroSlides;
                         showHeroSlide(heroSlideIndex);
                     }
 
-                    // Auto Play
                     if (totalHeroSlides > 1) {
                         setInterval(nextSlide, 5000);
                     }
@@ -183,39 +188,6 @@
             </div>
         </div>
     </div>
-
-    <!-- CSS for Blobs -->
-    <style>
-        @keyframes blob {
-            0% {
-                transform: translate(0px, 0px) scale(1);
-            }
-
-            33% {
-                transform: translate(30px, -50px) scale(1.1);
-            }
-
-            66% {
-                transform: translate(-20px, 20px) scale(0.9);
-            }
-
-            100% {
-                transform: translate(0px, 0px) scale(1);
-            }
-        }
-
-        .animate-blob {
-            animation: blob 7s infinite;
-        }
-
-        .animation-delay-2000 {
-            animation-delay: 2s;
-        }
-
-        .animation-delay-4000 {
-            animation-delay: 4s;
-        }
-    </style>
 </section>
 
 
@@ -366,7 +338,7 @@
                 <!-- Product Image -->
                 <div class="relative aspect-square w-full overflow-hidden bg-gray-100 skeleton">
                     <a href="{% url 'product_detail' product.slug %}">
-                        <img src="{% if product.image %}{{ product.image.url }}{% else %}https://placehold.co/600?text=No+Image{% endif %}"
+                        <img src="{% if product.image %}{{ product.display_image_url }}{% else %}https://placehold.co/600?text=No+Image{% endif %}"
                             alt="{{ product.title }}"
                             onload="this.classList.remove('opacity-0'); this.closest('.skeleton').classList.remove('skeleton')"
                             onerror="this.closest('.skeleton').classList.remove('skeleton')"
@@ -464,7 +436,7 @@
                 <!-- Product Image -->
                 <div class="relative aspect-square w-full overflow-hidden bg-gray-100 skeleton">
                     <a href="{% url 'product_detail' product.slug %}">
-                        <img src="{% if product.image %}{{ product.image.url }}{% else %}https://placehold.co/600?text=No+Image{% endif %}"
+                        <img src="{% if product.image %}{{ product.display_image_url }}{% else %}https://placehold.co/600?text=No+Image{% endif %}"
                             alt="{{ product.title }}"
                             onload="this.classList.remove('opacity-0'); this.closest('.skeleton').classList.remove('skeleton')"
                             onerror="this.closest('.skeleton').classList.remove('skeleton')"
@@ -629,7 +601,7 @@
             {% for product in new_arrivals %}
             <div class="flex items-center gap-4 p-4 border rounded-xl hover:shadow-lg transition-shadow">
                 <div class="w-32 h-32 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 skeleton relative group/img">
-                    <img src="{% if product.image %}{{ product.image.url }}{% else %}https://placehold.co/200?text=No+Image{% endif %}"
+                    <img src="{% if product.image %}{{ product.display_image_url }}{% else %}https://placehold.co/200?text=No+Image{% endif %}"
                         alt="{{ product.title }}"
                         onload="this.classList.remove('opacity-0'); this.closest('.skeleton').classList.remove('skeleton')"
                         onerror="this.closest('.skeleton').classList.remove('skeleton')"
@@ -733,7 +705,7 @@
                         <!-- Product Image -->
                         <div class="relative aspect-square w-full overflow-hidden bg-gray-100 skeleton">
                             <a href="{% url 'product_detail' product.slug %}">
-                                <img src="{% if product.image %}{{ product.image.url }}{% else %}https://placehold.co/600?text=No+Image{% endif %}"
+                                <img src="{% if product.image %}{{ product.display_image_url }}{% else %}https://placehold.co/600?text=No+Image{% endif %}"
                                     alt="{{ product.title }}"
                                     onload="this.classList.remove('opacity-0'); this.closest('.skeleton').classList.remove('skeleton')"
                                     onerror="this.closest('.skeleton').classList.remove('skeleton')"
@@ -879,7 +851,7 @@
                 class="w-[calc(50%-12px)] md:w-[calc(20%-20px)] lg:w-[calc(20%-20px)] flex-shrink-0 bg-white rounded-lg p-4 relative border border-gray-100 group hover:border-green-200 transition-colors">
                 <a href="{% url 'product_detail' product.slug %}"
                     class="block mb-4 overflow-hidden rounded-lg aspect-square skeleton relative group/savers">
-                    <img src="{% if product.image %}{{ product.image.url }}{% else %}https://placehold.co/600?text=No+Image{% endif %}"
+                    <img src="{% if product.image %}{{ product.display_image_url }}{% else %}https://placehold.co/600?text=No+Image{% endif %}"
                         alt="{{ product.title }}"
                         onload="this.classList.remove('opacity-0'); this.closest('.skeleton').classList.remove('skeleton')"
                         onerror="this.closest('.skeleton').classList.remove('skeleton')"

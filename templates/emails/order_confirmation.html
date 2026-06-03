@@ -230,8 +230,7 @@
                                 <td colspan="2" style="padding-top: 15px;">
                                     <span class="summary-label">Shipping To</span><br>
                                     <span class="summary-value">{{ order.full_name }}</span><br>
-                                    <span style="font-size: 13px; color: #64748b;">{{ order.address }}, {{ order.city
-                                        }}</span>
+                                    <span style="font-size: 13px; color: #64748b;">{{ order.address }}, {{ order.city }}</span>
                                 </td>
                             </tr>
                         </table>
@@ -273,16 +272,14 @@
                             {% if order.discount_amount %}
                             <tr>
                                 <td align="left" class="total-label" style="color: #ef4444;">Discount</td>
-                                <td align="right" class="total-value" style="color: #ef4444;">-৳{{ order.discount_amount
-                                    }}</td>
+                                <td align="right" class="total-value" style="color: #ef4444;">-৳{{ order.discount_amount }}</td>
                             </tr>
                             {% endif %}
                             <tr>
                                 <td align="left"
                                     style="padding-top: 15px; font-size: 18px; font-weight: 700; color: #1a1a1a;">Total
                                     Payable</td>
-                                <td align="right" style="padding-top: 15px;" class="grand-total">৳{{ order.total|add:60
-                                    }}</td>
+                                <td align="right" style="padding-top: 15px;" class="grand-total">৳{{ order.total|add:60 }}</td>
                             </tr>
                         </table>
                     </div>

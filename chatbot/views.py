@@ -108,12 +108,29 @@ def extract_order_details(text):
     phone_pattern = r'(?:\+88|88)?01[3-9]\d{8}'
     phone_match = re.search(phone_pattern, text)
     details = {'phone': None, 'address': None}
+    
+    # Extract phone
     if phone_match:
         details['phone'] = phone_match.group(0)
-        address_text = text.replace(details['phone'], '').strip()
-        clean_address = re.sub(r'address|phone|mobile|delivery|to|:', '', address_text, flags=re.IGNORECASE).strip()
+    
+    # Extract address (logic: if there's no phone, or if address is separate)
+    # Looking for keywords that usually precede an address in this context
+    address_indicators = ['address', 'ঠিকানা', 'dhaka', 'road', 'house', 'block', 'sector']
+    if any(ind in text.lower() for ind in address_indicators):
+        # Clean up the text to extract just the address
+        clean_address = text
+        if details['phone']:
+            clean_address = clean_address.replace(details['phone'], '')
+        
+        # Remove common instruction words with word boundaries
+        clean_address = re.sub(r'\b(address|phone|mobile|delivery|to|ঠিকানা|মোবাইল|নাম্বার)\b', '', clean_address, flags=re.IGNORECASE).strip()
+        
+        # Also handle colons
+        clean_address = clean_address.replace(':', '').strip()
+        
         if len(clean_address) > 5:
             details['address'] = clean_address
+            
     return details
 
 def create_order_from_chat(session_id, phone, address, chat_history):
@@ -425,8 +442,7 @@ def chatbot_response(request):
             "delivery": "🚚 Inside Dhaka: Same Day (80 BDT) | Outside: 2-3 Days (150 BDT)"
         }
         clean_msg = user_message.lower().strip()
-        if 'delivery' in clean_msg: clean_msg = 'delivery'
-        elif 'support' in clean_msg or 'human' in clean_msg: clean_msg = 'human'
+        # Only use fast replies for very short/exact keyword matches to prevent AI bypass
         if clean_msg in fast_replies or clean_msg == 'back to menu':
             response_text = fast_replies.get(clean_msg, fast_replies['menu'])
             save_chat_interaction(session_id, user_message, response_text)
@@ -437,6 +453,14 @@ def chatbot_response(request):
             return JsonResponse({"response": faq_answer, "status": "success", "suggestions": ["🛒 Browse Products", "📦 Track Order"]})
         # Get session memory for context
         user_prefs, greeting_count = get_session_memory(session_id)
+        if not user_prefs: user_prefs = {}
+        
+        # Extract details from current message
+        current_details = extract_order_details(user_message)
+        if current_details['phone']:
+            user_prefs['phone'] = current_details['phone']
+        if current_details['address']:
+            user_prefs['address'] = current_details['address']
         
         # Detect user's language
         user_language = detect_language(user_message)
@@ -447,21 +471,21 @@ def chatbot_response(request):
         # Handle greeting with flow control
         if intent == 'greeting':
             greeting_resp = get_greeting_response(session_id, greeting_count)
-            save_conversation_memory(session_id, user_message, greeting_resp, intent)
+            save_conversation_memory(session_id, user_message, greeting_resp, intent, preferences=user_prefs)
             save_chat_interaction(session_id, user_message, greeting_resp)
             return JsonResponse({"response": greeting_resp, "status": "success", "suggestions": get_random_suggestions()})
         
         # Check training data for quick responses
         training_resp = get_training_response(intent, user_message)
         if training_resp:
-            save_conversation_memory(session_id, user_message, training_resp, intent)
+            save_conversation_memory(session_id, user_message, training_resp, intent, preferences=user_prefs)
             save_chat_interaction(session_id, user_message, training_resp)
             return JsonResponse({"response": training_resp, "status": "success", "suggestions": get_random_suggestions()})
         
         # Handle order tracking
         if intent == 'order_tracking':
             tracking_response = handle_order_tracking(user_message, session_id)
-            save_conversation_memory(session_id, user_message, tracking_response, intent)
+            save_conversation_memory(session_id, user_message, tracking_response, intent, preferences=user_prefs)
             save_chat_interaction(session_id, user_message, tracking_response)
             return JsonResponse({"response": tracking_response, "status": "success", "suggestions": [{"text": "⬅ Back to Menu", "action": "message"}]})
         product_context, products_list = get_product_context(user_message, intent)
@@ -497,6 +521,16 @@ ORDERING RULES FOR LOGGED-IN USER:
             if not user_info.get('phone'): missing.append('Phone')
             if not user_info.get('address'): missing.append('Address')
             user_context = f"\n\n🔐 USER LOGGED IN: {user_info['name']}\nMISSING INFO: {', '.join(missing)}\nAsk user for missing information only.\n"
+        
+        # Add guest info context from memory
+        if not request.user.is_authenticated or not user_info or not user_info['has_complete_info']:
+            guest_phone = user_prefs.get('phone')
+            guest_address = user_prefs.get('address')
+            if guest_phone or guest_address:
+                user_context += f"\n\n📍 GUEST USER INFO (Collected from chat):"
+                if guest_phone: user_context += f"\n- Phone: {guest_phone}"
+                if guest_address: user_context += f"\n- Address: {guest_address}"
+                user_context += "\nRULES: If info is present, DON'T ask again. Just confirm or ask for MISSING info."
         
         sys_prompt = bot_settings.system_prompt if bot_settings else "You are 'Al Barakah Assistant'."
         promo_ctx = f"\n🔥 PROMO: {bot_settings.promo_message}" if bot_settings and bot_settings.is_promo_active else ""
@@ -551,7 +585,7 @@ ORDERING RULES FOR LOGGED-IN USER:
                         print(f"DEBUG: Invalid ORDER_READY format, expected 4+ parts, got {len(parts)}")
             
             # Save to conversation memory for learning
-            save_conversation_memory(session_id, user_message, ai_text, intent)
+            save_conversation_memory(session_id, user_message, ai_text, intent, preferences=user_prefs)
             save_chat_interaction(session_id, user_message, ai_text)
             return JsonResponse({"response": ai_text, "status": "success", "suggestions": get_random_suggestions()})
         except Exception as e:
@@ -561,6 +595,12 @@ ORDERING RULES FOR LOGGED-IN USER:
             return JsonResponse({"response": "Sorry, try again!", "status": "error"})
     except Exception as e:
         return JsonResponse({"response": "Encountered an error.", "status": "error"})
+
+@csrf_exempt
+def get_chat_history(request):
+    session_id = request.GET.get('session_id', 'default')
+    history = get_chat_history_from_db(session_id)
+    return JsonResponse({"history": history, "status": "success"})
 
 @csrf_exempt
 def cart_status(request):

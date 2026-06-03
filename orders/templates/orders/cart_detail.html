@@ -48,7 +48,7 @@
                             <div
                                 class="relative h-20 w-20 md:h-24 md:w-24 rounded-2xl overflow-hidden bg-gray-50 border border-gray-100 shrink-0">
                                 {% if item.product.image %}
-                                <img src="{{ item.product.image.url }}" alt="{{ item.product.title }}"
+                                <img src="{{ item.product.display_image_url }}" alt="{{ item.product.title }}"
                                     class="object-cover w-full h-full transform group-hover:scale-110 transition-transform duration-700">
                                 {% else %}
                                 <div class="w-full h-full flex items-center justify-center text-gray-300">
@@ -61,14 +61,14 @@
                                     class="text-base md:text-lg font-bold text-gray-900 hover:text-green-600 transition-colors block leading-tight truncate">
                                     {{ item.product.title }}
                                 </a>
-                                <p class="text-gray-400 text-xs mt-1 uppercase tracking-wider font-semibold">{{
-                                    item.product.category.name }}</p>
+                                <p class="text-gray-400 text-xs mt-1 uppercase tracking-wider font-semibold">{{ item.product.category.name }}</p>
                                 <div class="lg:hidden mt-2 font-bold text-green-600">৳{{ item.price }} / unit</div>
                             </div>
                         </div>
 
                         <!-- Quantity and Price Row for Mobile -->
-                        <div class="col-span-12 lg:col-span-6 flex items-center justify-between lg:justify-end gap-6 border-t lg:border-none pt-4 lg:pt-0">
+                        <div
+                            class="col-span-12 lg:col-span-6 flex items-center justify-between lg:justify-end gap-6 border-t lg:border-none pt-4 lg:pt-0">
                             <!-- Quantity Control -->
                             <div class="flex items-center bg-gray-50 rounded-2xl p-1 border border-gray-100">
                                 <form action="{% url 'cart_update' item.product.id 'decrement' %}" method="post">
@@ -78,8 +78,8 @@
                                         <i data-lucide="minus" class="h-3 w-3 md:h-4 md:w-4"></i>
                                     </button>
                                 </form>
-                                <span class="w-8 md:w-12 text-center font-extrabold text-gray-900 tabular-nums text-base md:text-lg">{{
-                                    item.quantity }}</span>
+                                <span
+                                    class="w-8 md:w-12 text-center font-extrabold text-gray-900 tabular-nums text-base md:text-lg">{{ item.quantity }}</span>
                                 <form action="{% url 'cart_update' item.product.id 'increment' %}" method="post">
                                     {% csrf_token %}
                                     <button type="submit"
@@ -178,9 +178,8 @@
                             <span class="text-gray-400 font-bold uppercase text-[10px] tracking-[0.2em]">Estimated
                                 Total</span>
                             {% with total=cart.get_total_price_after_discount|add:60 %}
-                            <span class="text-4xl font-black text-gray-900 tabular-nums">৳{{ total|floatformat:2
-                                }}</span>
-                            {% endwith %}
+                            <span class="text-4xl font-black text-gray-900 tabular-nums">৳{{ total|floatformat:2 }}</span>
+                        {% endwith %}
                         </div>
                     </div>
 
