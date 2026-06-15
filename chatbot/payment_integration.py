@@ -6,10 +6,18 @@ Supports bKash, Nagad, and SSL Commerz payment gateways.
 import requests
 import hashlib
 import json
+from enum import Enum
 from decimal import Decimal
 from django.conf import settings
 from decouple import config
 from datetime import datetime
+
+
+class Gateway(Enum):
+    """Supported payment gateways."""
+    BKASH = 'bkash'
+    NAGAD = 'nagad'
+    SSLCOMMERZ = 'sslcommerz'
 
 
 class PaymentGatewayBase:
@@ -265,35 +273,48 @@ class PaymentService:
     
     def __init__(self):
         self.gateways = {
-            'bkash': BkashPayment(),
-            'nagad': NagadPayment(),
-            'sslcommerz': SSLCommerzPayment()
+            Gateway.BKASH: BkashPayment(),
+            Gateway.NAGAD: NagadPayment(),
+            Gateway.SSLCOMMERZ: SSLCommerzPayment()
         }
     
-    def create_payment(self, order, gateway='bkash'):
+    def _get_gateway_key(self, gateway):
+        """Helper to handle both Enum and string inputs for gateway."""
+        if isinstance(gateway, Gateway):
+            return gateway
+        try:
+            return Gateway(gateway)
+        except ValueError:
+            return gateway  # Return as-is, will be caught by "not in self.gateways" check
+
+    def create_payment(self, order, gateway=Gateway.BKASH):
         """Create payment with specified gateway."""
-        if gateway not in self.gateways:
+        gateway_key = self._get_gateway_key(gateway)
+        if gateway_key not in self.gateways:
             return {'success': False, 'error': 'Invalid gateway'}
         
-        return self.gateways[gateway].create_payment(order)
+        return self.gateways[gateway_key].create_payment(order)
     
-    def verify_payment(self, transaction_id, gateway='bkash'):
+    def verify_payment(self, transaction_id, gateway=Gateway.BKASH):
         """Verify payment."""
-        if gateway not in self.gateways:
+        gateway_key = self._get_gateway_key(gateway)
+        if gateway_key not in self.gateways:
             return {'success': False, 'error': 'Invalid gateway'}
         
-        return self.gateways[gateway].verify_payment(transaction_id)
+        return self.gateways[gateway_key].verify_payment(transaction_id)
     
-    def generate_payment_link_for_chat(self, order, gateway='bkash'):
+    def generate_payment_link_for_chat(self, order, gateway=Gateway.BKASH):
         """Generate payment link to send in chatbot."""
-        result = self.create_payment(order, gateway)
+        gateway_key = self._get_gateway_key(gateway)
+        result = self.create_payment(order, gateway_key)
         
         if result.get('success'):
+            gateway_name = gateway_key.value if isinstance(gateway_key, Gateway) else str(gateway_key)
             return f"""💳 **Payment Link Ready!**
 
 Order: {order.order_reference}
 Amount: {order.total} BDT
-Gateway: {gateway.upper()}
+Gateway: {gateway_name.upper()}
 
 🔗 Pay Now: {result.get('payment_url')}
 
