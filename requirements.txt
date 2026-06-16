@@ -30,8 +30,8 @@ sqlparse==0.5.5
 asgiref==3.11.0
 tzdata==2025.3
 
-# PDF generation (xhtml2pdf) - Enabled for Render
-xhtml2pdf==0.2.17
+# PDF generation (xhtml2pdf) - Disabled for Vercel (needs system cairo libs)
+# xhtml2pdf==0.2.17
 
 # Frontend
 django-tailwind==4.4.2
