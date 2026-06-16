@@ -34,7 +34,10 @@ else:
         }
     }
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,.vercel.app,.now.sh,.onrender.com,shop-2thz.onrender.com,shop-1-38i4.onrender.com').split(',')
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,.vercel.app,.now.sh,.onrender.com,glowelle.onrender.com,shop-2thz.onrender.com,shop-1-38i4.onrender.com').split(',')
+
+# Required for Render's proxy
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 CSRF_TRUSTED_ORIGINS = [
     'https://glowellebd.vercel.app',
