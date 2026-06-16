@@ -38,6 +38,7 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,.vercel.app
 
 CSRF_TRUSTED_ORIGINS = [
     'https://glowellebd.vercel.app',
+    'https://glowelle.onrender.com',
     'https://*.onrender.com',
     config('SITE_URL', default='http://localhost:8000'),
 ]
