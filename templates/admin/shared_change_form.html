@@ -1,0 +1,39 @@
+{% extends "admin/change_form.html" %}
+{% load i18n %}
+
+{% block submit_buttons_bottom %}
+{{ block.super }}
+
+{% if change_history %}
+<div style="
+    background:#fff;
+    border-radius:8px;
+    border:1px solid #E5E7EB;
+    padding:16px;
+    margin-top:12px;
+">
+    <h6 style="margin:0 0 12px 0; font-size:13px; font-weight:600; color:#374151; border-bottom:1px solid #E5E7EB; padding-bottom:10px;">
+        <i class="fas fa-history"></i>&nbsp; Change History
+    </h6>
+    {% for entry in change_history %}
+    <div style="padding:8px 0; border-bottom:1px solid #F9FAFB; font-size:12px;">
+        <div style="color:#6B7280; margin-bottom:3px;">
+            {{ entry.action_time|date:"M j, Y g:i A" }} &bull;
+            <strong style="color:#111827;">{{ entry.user.get_full_name|default:entry.user.username }}</strong>
+        </div>
+        <div style="display:flex; align-items:center; gap:6px; margin-top:3px; flex-wrap:wrap;">
+            {% if entry.is_addition %}
+                <span style="background:#D1FAE5; color:#059669; padding:1px 8px; border-radius:8px; font-size:11px; font-weight:600;">Created</span>
+            {% elif entry.is_change %}
+                <span style="background:#DBEAFE; color:#2563EB; padding:1px 8px; border-radius:8px; font-size:11px; font-weight:600;">Edited</span>
+            {% elif entry.is_deletion %}
+                <span style="background:#FEE2E2; color:#DC2626; padding:1px 8px; border-radius:8px; font-size:11px; font-weight:600;">Deleted</span>
+            {% endif %}
+            <span style="color:#6B7280;">{{ entry.get_change_message }}</span>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% endblock %}

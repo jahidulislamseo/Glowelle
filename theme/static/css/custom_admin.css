@@ -68,3 +68,88 @@
     margin-right: 10px;
     margin-top: -2px;
 }
+
+/* ── Changelist: Search + Actions on ONE line ── */
+
+/* The flex wrapper is injected by templates/admin/change_list.html */
+.cl-top-bar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 0 0 12px 0;
+}
+
+/* Search form sits inline */
+/* Override Bootstrap col-12: flex:0 0 100% and max-width:100% must be reset */
+.cl-top-bar #change-list-filters {
+    flex: 0 0 auto !important;
+    max-width: none !important;
+    width: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* Also strip the col-12 bootstrap flex from the actions wrapper */
+.cl-top-bar-actions {
+    flex: 0 0 auto !important;
+    max-width: none !important;
+    width: auto !important;
+}
+
+.cl-top-bar #changelist-search {
+    display: flex !important;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 !important;
+}
+
+.cl-top-bar #changelist-search .form-group {
+    margin-bottom: 0 !important;
+}
+
+/* Strip wrapper div around actions inside the top bar */
+.cl-top-bar-actions {
+    display: flex;
+    align-items: center;
+}
+
+.cl-top-bar-actions .actions {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+
+/* Actions block sits inline next to search */
+.cl-top-bar .actions {
+    display: flex !important;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.cl-top-bar .actions label {
+    margin-bottom: 0 !important;
+    display: flex;
+    align-items: center;
+}
+
+.cl-top-bar .actions select {
+    margin-bottom: 0 !important;
+    min-width: 150px;
+    height: 38px;
+}
+
+.cl-top-bar .actions button.btn {
+    height: 38px;
+    margin: 0 0 0 4px !important;
+}
+
+.cl-top-bar .actions .action-counter {
+    margin-left: 10px;
+    white-space: nowrap;
+}
+
+
+

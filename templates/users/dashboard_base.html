@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-pink-50 via-white to-rose-50">
+    <div class="container mx-auto px-4 py-8">
+        <div class="flex flex-col md:flex-row gap-6">
+
+            <!-- Sidebar -->
+            <aside class="w-full md:w-64 shrink-0">
+                <div class="bg-white rounded-2xl shadow-sm border border-pink-100 overflow-hidden sticky top-24">
+
+                    <!-- User Profile Header -->
+                    <div class="hidden md:block bg-gradient-to-br from-pink-600 to-rose-500 p-6 text-white">
+                        <div class="flex items-center gap-4">
+                            <div class="h-14 w-14 rounded-2xl border-2 border-white/30 overflow-hidden bg-white/20 flex items-center justify-center text-white font-bold text-xl shadow-inner shrink-0">
+                                {% if user.image %}
+                                <img src="{{ user.image.url }}" alt="{{ user.username }}" class="h-full w-full object-cover">
+                                {% else %}
+                                {{ user.username|make_list|first|upper }}
+                                {% endif %}
+                            </div>
+                            <div class="min-w-0">
+                                <p class="font-bold text-white truncate">{{ user.username }}</p>
+                                <p class="text-xs text-pink-100 truncate">{{ user.email }}</p>
+                                <span class="inline-block mt-1 text-[10px] bg-white/20 text-white px-2 py-0.5 rounded-full font-semibold">Member</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Navigation -->
+                    <nav class="flex md:flex-col overflow-x-auto md:overflow-visible p-3 gap-1 no-scrollbar">
+                        <a href="{% url 'dashboard' %}"
+                            class="flex items-center gap-3 px-4 py-3 text-sm font-semibold rounded-xl whitespace-nowrap transition-all
+                            {% if request.resolver_match.url_name == 'dashboard' %}bg-pink-600 text-white shadow-md shadow-pink-200
+                            {% else %}text-gray-500 hover:bg-pink-50 hover:text-pink-700{% endif %}">
+                            <i data-lucide="layout-dashboard" class="h-4 w-4 shrink-0"></i>
+                            <span>Overview</span>
+                        </a>
+                        <a href="{% url 'order_history' %}"
+                            class="flex items-center gap-3 px-4 py-3 text-sm font-semibold rounded-xl whitespace-nowrap transition-all
+                            {% if request.resolver_match.url_name == 'order_history' %}bg-pink-600 text-white shadow-md shadow-pink-200
+                            {% else %}text-gray-500 hover:bg-pink-50 hover:text-pink-700{% endif %}">
+                            <i data-lucide="shopping-bag" class="h-4 w-4 shrink-0"></i>
+                            <span>My Orders</span>
+                        </a>
+                        <a href="{% url 'address_list' %}"
+                            class="flex items-center gap-3 px-4 py-3 text-sm font-semibold rounded-xl whitespace-nowrap transition-all
+                            {% if request.resolver_match.url_name == 'address_list' %}bg-pink-600 text-white shadow-md shadow-pink-200
+                            {% else %}text-gray-500 hover:bg-pink-50 hover:text-pink-700{% endif %}">
+                            <i data-lucide="map-pin" class="h-4 w-4 shrink-0"></i>
+                            <span>Addresses</span>
+                        </a>
+                        <a href="{% url 'wallet' %}"
+                            class="flex items-center gap-3 px-4 py-3 text-sm font-semibold rounded-xl whitespace-nowrap transition-all
+                            {% if request.resolver_match.url_name == 'wallet' %}bg-pink-600 text-white shadow-md shadow-pink-200
+                            {% else %}text-gray-500 hover:bg-pink-50 hover:text-pink-700{% endif %}">
+                            <i data-lucide="wallet" class="h-4 w-4 shrink-0"></i>
+                            <span>Wallet</span>
+                        </a>
+                        <a href="{% url 'support_tickets' %}"
+                            class="flex items-center gap-3 px-4 py-3 text-sm font-semibold rounded-xl whitespace-nowrap transition-all
+                            {% if request.resolver_match.url_name == 'support_tickets' %}bg-pink-600 text-white shadow-md shadow-pink-200
+                            {% else %}text-gray-500 hover:bg-pink-50 hover:text-pink-700{% endif %}">
+                            <i data-lucide="help-circle" class="h-4 w-4 shrink-0"></i>
+                            <span>Support</span>
+                        </a>
+                        <a href="{% url 'profile' %}"
+                            class="flex items-center gap-3 px-4 py-3 text-sm font-semibold rounded-xl whitespace-nowrap transition-all
+                            {% if request.resolver_match.url_name == 'profile' %}bg-pink-600 text-white shadow-md shadow-pink-200
+                            {% else %}text-gray-500 hover:bg-pink-50 hover:text-pink-700{% endif %}">
+                            <i data-lucide="settings" class="h-4 w-4 shrink-0"></i>
+                            <span>Profile</span>
+                        </a>
+
+                        <div class="hidden md:block h-px bg-pink-100 my-2 mx-2"></div>
+
+                        <form action="{% url 'logout' %}" method="post" class="md:mt-0">
+                            {% csrf_token %}
+                            <button type="submit"
+                                class="w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold rounded-xl whitespace-nowrap text-red-500 hover:bg-red-50 transition-all">
+                                <i data-lucide="log-out" class="h-4 w-4 shrink-0"></i>
+                                <span>Logout</span>
+                            </button>
+                        </form>
+                    </nav>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="flex-1 min-w-0 space-y-6">
+                {% if messages %}
+                <div class="space-y-2">
+                    {% for message in messages %}
+                    <div class="flex items-center gap-3 p-4 rounded-xl border text-sm font-medium
+                        {% if message.tags == 'error' %}bg-red-50 text-red-700 border-red-200
+                        {% else %}bg-pink-50 text-pink-700 border-pink-200{% endif %}">
+                        {% if message.tags == 'error' %}
+                        <i data-lucide="alert-circle" class="h-4 w-4 shrink-0"></i>
+                        {% else %}
+                        <i data-lucide="check-circle" class="h-4 w-4 shrink-0"></i>
+                        {% endif %}
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {% block dashboard_content %}
+                {% endblock %}
+            </main>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

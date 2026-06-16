@@ -1,5 +1,5 @@
 """
-Advanced Order Management for Al Barakah Mart Chatbot
+Advanced Order Management for GlowElle Chatbot
 Handles order modification, cancellation, and repeat orders.
 """
 

@@ -1,105 +1,66 @@
-{% extends 'base.html' %}
+{% extends 'users/dashboard_base.html' %}
 
-{% block content %}
-<div class="bg-gray-50 min-h-screen py-8">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex flex-col md:flex-row gap-8">
-            <!-- Sidebar -->
-            <aside class="w-full md:w-64 space-y-2">
-                <nav class="space-y-1">
-                    <a href="{% url 'dashboard' %}"
-                        class="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-100">
-                        <i data-lucide="layout-dashboard" class="h-4 w-4"></i>
-                        Overview
-                    </a>
-                    <a href="{% url 'order_history' %}"
-                        class="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-100">
-                        <i data-lucide="shopping-bag" class="h-4 w-4"></i>
-                        Orders
-                    </a>
-                    <a href="{% url 'wallet' %}"
-                        class="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-100">
-                        <i data-lucide="wallet" class="h-4 w-4"></i>
-                        Wallet
-                    </a>
-                    <a href="{% url 'address_list' %}"
-                        class="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-100">
-                        <i data-lucide="map-pin" class="h-4 w-4"></i>
-                        Addresses
-                    </a>
-                    <a href="{% url 'profile' %}"
-                        class="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-100">
-                        <i data-lucide="user" class="h-4 w-4"></i>
-                        Profile
-                    </a>
-                    <a href="{% url 'support_tickets' %}"
-                        class="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg bg-green-600 text-white">
-                        <i data-lucide="help-circle" class="h-4 w-4"></i>
-                        Support
-                    </a>
-                </nav>
-            </aside>
+{% block dashboard_content %}
 
-            <!-- Main Content -->
-            <main class="flex-1 space-y-6">
-                <div class="flex items-center justify-between">
-                    <h2 class="text-2xl font-bold text-gray-900">Support Tickets</h2>
-                    <a href="{% url 'ticket_create' %}"
-                        class="btn-primary px-4 py-2 rounded-lg text-sm font-bold shadow-md flex items-center gap-2">
-                        <i data-lucide="plus" class="h-4 w-4"></i>
-                        New Ticket
-                    </a>
+<div class="flex items-center justify-between mb-6">
+    <div>
+        <h1 class="text-2xl font-bold text-gray-900">Support Tickets</h1>
+        <p class="text-sm text-gray-500 mt-1">Get help from our support team</p>
+    </div>
+    <a href="{% url 'ticket_create' %}"
+        class="inline-flex items-center gap-2 btn-primary px-4 py-2.5 rounded-full text-sm font-bold shadow-sm">
+        <i data-lucide="plus" class="h-4 w-4"></i>
+        New Ticket
+    </a>
+</div>
+
+{% if tickets %}
+<div class="bg-white rounded-2xl border border-pink-100 shadow-sm overflow-hidden">
+    <div class="divide-y divide-gray-50">
+        {% for ticket in tickets %}
+        <div class="p-5 hover:bg-pink-50/30 transition-colors flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <div class="h-10 w-10 rounded-xl flex items-center justify-center shrink-0
+                    {% if ticket.status == 'open' %}bg-pink-50
+                    {% elif ticket.status == 'closed' %}bg-gray-100
+                    {% else %}bg-blue-50{% endif %}">
+                    <i data-lucide="message-circle" class="h-5 w-5
+                        {% if ticket.status == 'open' %}text-pink-500
+                        {% elif ticket.status == 'closed' %}text-gray-400
+                        {% else %}text-blue-500{% endif %}"></i>
                 </div>
-
-                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left">
-                            <thead class="bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                                <tr>
-                                    <th class="px-6 py-3">Ticket ID</th>
-                                    <th class="px-6 py-3">Subject</th>
-                                    <th class="px-6 py-3">Status</th>
-                                    <th class="px-6 py-3">Last Updated</th>
-                                    <th class="px-6 py-3 text-right">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-100">
-                                {% for ticket in tickets %}
-                                <tr>
-                                    <td class="px-6 py-4 text-sm font-bold text-gray-900">#{{ ticket.id }}</td>
-                                    <td class="px-6 py-4">
-                                        <p class="text-sm font-medium text-gray-900">{{ ticket.subject }}</p>
-                                        <p class="text-xs text-gray-500 truncate max-w-xs">{{ ticket.message }}</p>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <span class="px-2 py-1 text-xs font-medium rounded-full 
-                                            {% if ticket.status == 'open' %}bg-blue-50 text-blue-700
-                                            {% elif ticket.status == 'in_progress' %}bg-yellow-50 text-yellow-700
-                                            {% else %}bg-gray-50 text-gray-700{% endif %}">
-                                            {{ ticket.get_status_display }}
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 text-sm text-gray-500">{{ ticket.updated_at|date:"M d, Y" }}
-                                    </td>
-                                    <td class="px-6 py-4 text-right">
-                                        <a href="#"
-                                            class="text-sm font-medium text-green-600 hover:text-green-700">View</a>
-                                    </td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="5" class="px-6 py-12 text-center text-gray-500">
-                                        <i data-lucide="life-buoy" class="mx-auto h-12 w-12 text-gray-200 mb-4"></i>
-                                        <p>No support tickets yet.</p>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+                <div>
+                    <h3 class="font-semibold text-gray-900 text-sm">{{ ticket.subject }}</h3>
+                    <p class="text-xs text-gray-400 mt-0.5">{{ ticket.created_at|date:"d M Y" }}</p>
                 </div>
-            </main>
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold
+                    {% if ticket.status == 'open' %}bg-pink-100 text-pink-700
+                    {% elif ticket.status == 'closed' %}bg-gray-100 text-gray-600
+                    {% else %}bg-blue-100 text-blue-700{% endif %} capitalize">
+                    {{ ticket.status }}
+                </span>
+                <button class="h-8 w-8 flex items-center justify-center rounded-lg bg-gray-50 text-gray-400 hover:bg-pink-50 hover:text-pink-600 transition-colors text-sm">
+                    <i data-lucide="chevron-right" class="h-4 w-4"></i>
+                </button>
+            </div>
         </div>
+        {% endfor %}
     </div>
 </div>
+{% else %}
+<div class="bg-white rounded-2xl border border-pink-100 shadow-sm p-16 text-center">
+    <div class="h-20 w-20 bg-pink-50 rounded-2xl flex items-center justify-center mx-auto mb-5">
+        <i data-lucide="life-buoy" class="h-10 w-10 text-pink-300"></i>
+    </div>
+    <h3 class="text-lg font-bold text-gray-800 mb-2">No tickets yet</h3>
+    <p class="text-gray-400 text-sm mb-6">Need help? Create a support ticket and we'll get back to you shortly.</p>
+    <a href="{% url 'ticket_create' %}" class="inline-flex items-center gap-2 btn-primary px-6 py-3 rounded-full text-sm font-bold">
+        <i data-lucide="plus" class="h-4 w-4"></i>
+        Create Ticket
+    </a>
+</div>
+{% endif %}
+
 {% endblock %}

@@ -1,5 +1,5 @@
 """
-Multi-Language Support for Al Barakah Mart Chatbot
+Multi-Language Support for GlowElle Chatbot
 Handles language detection and translation.
 """
 
@@ -133,7 +133,7 @@ def get_system_prompt_by_language(language):
     Get language-specific system prompt.
     """
     prompts = {
-        'bengali': """তুমি 'Al Barakah Mart' এর একজন সহায়ক সহকারী। তুমি গ্রাহকদের পণ্য খুঁজে পেতে, অর্ডার করতে এবং প্রশ্নের উত্তর দিতে সাহায্য কর।
+        'bengali': """তুমি 'GlowElle' এর একজন সহায়ক সহকারী। তুমি গ্রাহকদের পণ্য খুঁজে পেতে, অর্ডার করতে এবং প্রশ্নের উত্তর দিতে সাহায্য কর।
 
 নিয়ম:
 - সংক্ষিপ্ত এবং স্পষ্ট বাক্য ব্যবহার কর (সর্বোচ্চ ২-৩ লাইন)
@@ -142,7 +142,7 @@ def get_system_prompt_by_language(language):
 - প্রাকৃতিক কথোপকথন বজায় রাখ
 """,
         
-        'english': """You are a helpful assistant for 'Al Barakah Mart'. You help customers find products, place orders, and answer questions.
+        'english': """You are a helpful assistant for 'GlowElle'. You help customers find products, place orders, and answer questions.
 
 Rules:
 - Use short and clear sentences (max 2-3 lines)
@@ -151,7 +151,7 @@ Rules:
 - Maintain natural conversation
 """,
         
-        'banglish': """Tumi 'Al Barakah Mart' er ekjon helpful assistant. Tumi customers ke product khuje pete, order korte ebong questions er answer dite help koro.
+        'banglish': """Tumi 'GlowElle' er ekjon helpful assistant. Tumi customers ke product khuje pete, order korte ebong questions er answer dite help koro.
 
 Rules:
 - Choto ebong clear sentences use koro (max 2-3 lines)

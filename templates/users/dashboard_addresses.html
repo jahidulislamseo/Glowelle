@@ -1,97 +1,78 @@
-{% extends 'base.html' %}
+{% extends 'users/dashboard_base.html' %}
 
-{% block content %}
-<div class="bg-gray-50 min-h-screen py-8">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex flex-col md:flex-row gap-8">
-            <!-- Sidebar -->
-            <aside class="w-full md:w-64 space-y-2">
-                <nav class="space-y-1">
-                    <a href="{% url 'dashboard' %}"
-                        class="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-100">
-                        <i data-lucide="layout-dashboard" class="h-4 w-4"></i>
-                        Overview
-                    </a>
-                    <a href="{% url 'order_history' %}"
-                        class="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-100">
-                        <i data-lucide="shopping-bag" class="h-4 w-4"></i>
-                        Orders
-                    </a>
-                    <a href="{% url 'wallet' %}"
-                        class="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-100">
-                        <i data-lucide="wallet" class="h-4 w-4"></i>
-                        Wallet
-                    </a>
-                    <a href="{% url 'address_list' %}"
-                        class="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg bg-green-600 text-white">
-                        <i data-lucide="map-pin" class="h-4 w-4"></i>
-                        Addresses
-                    </a>
-                    <a href="{% url 'profile' %}"
-                        class="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-100">
-                        <i data-lucide="user" class="h-4 w-4"></i>
-                        Profile
-                    </a>
-                    <a href="{% url 'support_tickets' %}"
-                        class="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-100">
-                        <i data-lucide="help-circle" class="h-4 w-4"></i>
-                        Support
-                    </a>
-                </nav>
-            </aside>
+{% block dashboard_content %}
 
-            <!-- Main Content -->
-            <main class="flex-1 space-y-6">
-                <div class="flex items-center justify-between">
-                    <h2 class="text-2xl font-bold text-gray-900">My Addresses</h2>
-                    <a href="{% url 'address_add' %}"
-                        class="btn-primary px-4 py-2 rounded-lg text-sm font-bold shadow-md flex items-center gap-2">
-                        <i data-lucide="plus" class="h-4 w-4"></i>
-                        Add New Address
-                    </a>
-                </div>
+<div class="flex items-center justify-between mb-6">
+    <div>
+        <h1 class="text-2xl font-bold text-gray-900">Address Book</h1>
+        <p class="text-sm text-gray-500 mt-1">Manage your saved delivery addresses</p>
+    </div>
+    <a href="{% url 'address_add' %}"
+        class="inline-flex items-center gap-2 btn-primary px-4 py-2.5 rounded-full text-sm font-bold shadow-sm">
+        <i data-lucide="plus" class="h-4 w-4"></i>
+        Add Address
+    </a>
+</div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {% for address in addresses %}
-                    <div
-                        class="bg-white p-6 rounded-xl shadow-sm border {% if address.is_default %}border-green-500 ring-1 ring-green-500{% else %}border-gray-100{% endif %} relative">
-                        {% if address.is_default %}
-                        <span
-                            class="absolute top-4 right-4 bg-green-50 text-green-700 text-xs font-bold px-2 py-1 rounded-full uppercase">Default</span>
-                        {% endif %}
-                        <h3 class="font-bold text-gray-900 mb-2">{{ address.city }}</h3>
-                        <p class="text-sm text-gray-600 mb-1">{{ address.street }}</p>
-                        <p class="text-sm text-gray-600">{{ address.phone }}</p>
+{% if addresses %}
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    {% for address in addresses %}
+    <div class="bg-white rounded-2xl border {% if address.is_default %}border-pink-400 ring-2 ring-pink-200{% else %}border-pink-100{% endif %} p-5 shadow-sm hover:shadow-md transition-shadow relative">
 
-                        <div class="mt-6 pt-4 border-t border-gray-50 flex items-center gap-4">
-                            <a href="{% url 'address_edit' address.id %}"
-                                class="text-sm font-medium text-gray-600 hover:text-green-600">Edit</a>
-                            <form action="{% url 'address_delete' address.id %}" method="POST" class="inline">
-                                {% csrf_token %}
-                                <button type="submit"
-                                    class="text-sm font-medium text-red-600 hover:text-red-700">Delete</button>
-                            </form>
-                            {% if not address.is_default %}
-                            <form action="{% url 'address_make_default' address.id %}" method="POST"
-                                class="inline ml-auto">
-                                {% csrf_token %}
-                                <button type="submit"
-                                    class="text-xs font-bold text-green-600 hover:underline uppercase tracking-wider">Set
-                                    as Default</button>
-                            </form>
-                            {% endif %}
-                        </div>
-                    </div>
-                    {% empty %}
-                    <div
-                        class="col-span-full bg-white p-12 text-center rounded-xl border border-dashed border-gray-300">
-                        <i data-lucide="map-pin" class="mx-auto h-12 w-12 text-gray-200 mb-4"></i>
-                        <p class="text-gray-500">No addresses saved yet.</p>
-                    </div>
-                    {% endfor %}
-                </div>
-            </main>
+        {% if address.is_default %}
+        <span class="absolute top-4 right-4 inline-flex items-center gap-1 px-2.5 py-1 bg-pink-100 text-pink-700 text-[10px] font-bold uppercase rounded-full">
+            <i data-lucide="star" class="h-3 w-3"></i> Default
+        </span>
+        {% endif %}
+
+        <div class="flex items-start gap-4 mb-5">
+            <div class="h-10 w-10 bg-pink-50 rounded-xl flex items-center justify-center shrink-0 mt-0.5">
+                <i data-lucide="map-pin" class="h-5 w-5 text-pink-500"></i>
+            </div>
+            <div class="min-w-0">
+                <p class="font-semibold text-gray-900">{{ address.street }}</p>
+                <p class="text-sm text-gray-500 mt-0.5">{{ address.city }}</p>
+                <p class="text-sm text-gray-500 flex items-center gap-1 mt-1">
+                    <i data-lucide="phone" class="h-3.5 w-3.5"></i> {{ address.phone }}
+                </p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3 pt-4 border-t border-gray-100">
+            <a href="{% url 'address_edit' address.pk %}"
+                class="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-600 hover:text-pink-600 transition-colors">
+                <i data-lucide="edit-3" class="h-3.5 w-3.5"></i> Edit
+            </a>
+            <form action="{% url 'address_delete' address.pk %}" method="POST" onsubmit="return confirm('Delete this address?');">
+                {% csrf_token %}
+                <button type="submit" class="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-600 hover:text-red-600 transition-colors">
+                    <i data-lucide="trash-2" class="h-3.5 w-3.5"></i> Delete
+                </button>
+            </form>
+            {% if not address.is_default %}
+            <form action="{% url 'address_make_default' address.pk %}" method="POST" class="ml-auto">
+                {% csrf_token %}
+                <button type="submit" class="text-xs font-semibold text-pink-600 hover:text-pink-700 transition-colors">
+                    Set as Default
+                </button>
+            </form>
+            {% endif %}
         </div>
     </div>
+    {% endfor %}
 </div>
+{% else %}
+<div class="bg-white rounded-2xl border border-pink-100 shadow-sm p-16 text-center">
+    <div class="h-20 w-20 bg-pink-50 rounded-2xl flex items-center justify-center mx-auto mb-5">
+        <i data-lucide="map-pin" class="h-10 w-10 text-pink-300"></i>
+    </div>
+    <h3 class="text-lg font-bold text-gray-800 mb-2">No addresses saved</h3>
+    <p class="text-gray-400 text-sm mb-6">Add a shipping address to speed up your checkout process.</p>
+    <a href="{% url 'address_add' %}" class="inline-flex items-center gap-2 btn-primary px-6 py-3 rounded-full text-sm font-bold">
+        <i data-lucide="plus" class="h-4 w-4"></i>
+        Add Address
+    </a>
+</div>
+{% endif %}
+
 {% endblock %}

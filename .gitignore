@@ -29,15 +29,16 @@ wheels/
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
+db_v2.sqlite3
 /media
 /staticfiles
 /static_root
 
 # Environment variables
-# WARNING: .env is now tracked in Git - SECURITY RISK!
-# .env
-# .env.local
-# .env.*.local
+# SECURITY: .env contains API keys — NEVER commit to Git!
+.env
+.env.local
+.env.*.local
 
 # IDE
 .vscode/

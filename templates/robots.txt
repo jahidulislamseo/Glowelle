@@ -4,4 +4,4 @@ Disallow: /cart/
 Disallow: /checkout/
 Allow: /
 
-Sitemap: https://albarakah.bd/sitemap.xml
+Sitemap: https://glowellebd.com/sitemap.xml

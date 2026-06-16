@@ -18,14 +18,14 @@
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center">
     <div class="max-w-4xl w-full p-8">
-        <h1 class="text-4xl font-bold text-center mb-8 text-green-600">
-            🤖 Al Barakah Mart Chatbot Test
+        <h1 class="text-4xl font-bold text-center mb-8 text-pink-600">
+            🤖 GlowElle Chatbot Test
         </h1>
         
         <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
             <h2 class="text-2xl font-semibold mb-4">✅ Test Instructions</h2>
             <ol class="list-decimal list-inside space-y-2 text-gray-700">
-                <li>Look for the <strong class="text-green-600">green chat button</strong> in the bottom-right corner</li>
+                <li>Look for the <strong class="text-pink-600">green chat button</strong> in the bottom-right corner</li>
                 <li>Click it to open the chatbot window</li>
                 <li>Try these test messages:<ul class="ml-8 mt-2 space-y-1">
                         <li>• "আপনার কাছে কলা আছে?" (Bangla test)</li>
@@ -61,7 +61,7 @@
         </div>
 
         <div class="mt-8 text-center">
-            <button onclick="testAPI()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition">
+            <button onclick="testAPI()" class="bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition">
                 🧪 Test API Directly
             </button>
             <div id="api-result" class="mt-4 p-4 bg-gray-50 rounded hidden"></div>
@@ -87,7 +87,7 @@
                 
                 if (data.status === 'success') {
                     resultDiv.innerHTML = `
-                        <p class="text-green-600 font-bold">✅ API Working!</p>
+                        <p class="text-pink-600 font-bold">✅ API Working!</p>
                         <p class="mt-2 text-gray-700"><strong>Response:</strong> ${data.response.substring(0, 200)}...</p>
                     `;
                 } else {

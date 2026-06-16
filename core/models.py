@@ -14,7 +14,7 @@ class SEOModel(models.Model):
         if self.meta_title:
             return self.meta_title
         # Fallback to 'title' or 'name' attribute if available
-        return getattr(self, 'title', getattr(self, 'name', 'Al Barakah Mart'))
+        return getattr(self, 'title', getattr(self, 'name', 'GlowElle'))
     
     def get_meta_description(self):
         """Return meta_description if set, otherwise fall back to description field"""
@@ -29,7 +29,7 @@ class SEOModel(models.Model):
         return 'Your one-stop shop for fresh organic fruits, vegetables, meat, and daily essentials.'
 
 class SiteSettings(models.Model):
-    site_title = models.CharField(max_length=200, default="Al Barakah Mart")
+    site_title = models.CharField(max_length=200, default="GlowElle")
     meta_description = models.TextField(default="Your one-stop shop for fresh organic fruits, vegetables, meat, and daily essentials.", blank=True, help_text="SEO description for the homepage")
     
     # Analytics

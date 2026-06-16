@@ -21,7 +21,7 @@
                 <div>
                     <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Username</label>
                     <input id="username" name="username" type="text" autocomplete="username" required
-                        class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-600 focus:border-green-600 sm:text-sm transition-standard {% if form.username.errors %}border-red-500{% endif %}"
+                        class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-pink-600 focus:border-pink-600 sm:text-sm transition-standard {% if form.username.errors %}border-red-500{% endif %}"
                         placeholder="Username">
                     {% if form.username.errors %}
                     {% for error in form.username.errors %}
@@ -33,7 +33,7 @@
                     <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
                     <div class="relative">
                         <input id="password" name="password" type="password" autocomplete="current-password" required
-                            class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-600 focus:border-green-600 sm:text-sm transition-standard pr-10 {% if form.password.errors %}border-red-500{% endif %}"
+                            class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-pink-600 focus:border-pink-600 sm:text-sm transition-standard pr-10 {% if form.password.errors %}border-red-500{% endif %}"
                             placeholder="Password">
                         <button type="button" data-toggle-password="password"
                             class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 focus:outline-none">
@@ -50,7 +50,7 @@
 
             <div class="flex items-center justify-between">
                 <div class="text-sm">
-                    <a href="{% url 'register' %}" class="font-medium text-green-600 hover:text-green-500">
+                    <a href="{% url 'register' %}" class="font-medium text-pink-600 hover:text-pink-500">
                         Don't have an account? Register
                     </a>
                 </div>
@@ -75,7 +75,7 @@
             <div class="space-y-3">
                 <a href="{% url 'request_otp' %}"
                     class="flex w-full justify-center items-center gap-2 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 transition-standard">
-                    <i data-lucide="phone" class="h-4 w-4 text-green-600"></i>
+                    <i data-lucide="phone" class="h-4 w-4 text-pink-600"></i>
                     Login with Mobile (OTP)
                 </a>
 

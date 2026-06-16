@@ -1,8 +1,18 @@
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from .models import Product, StockAlert
 from django.core.mail import send_mail
 from django.conf import settings
+from django.core.cache import cache
+
+@receiver(post_save, sender=Product)
+@receiver(post_delete, sender=Product)
+def clear_product_cache(sender, instance, **kwargs):
+    """
+    Clear homepage cached data whenever products are modified or deleted.
+    """
+    cache.delete('home_page_data')
+
 
 @receiver(post_save, sender=Product)
 def notify_back_in_stock(sender, instance, created, **kwargs):
@@ -17,7 +27,7 @@ def notify_back_in_stock(sender, instance, created, **kwargs):
             
             for alert in alerts:
                 subject = f"Good News! {instance.title} is back in stock"
-                message = f"Hi {alert.user.username if alert.user else 'there'},\n\nThe product '{instance.title}' you were waiting for is back in stock. Grab it before it's gone!\n\nShop now: {settings.SITE_URL if hasattr(settings, 'SITE_URL') else ''}{instance.get_absolute_url()}\n\nBest regards,\nAl Barakah Mart"
+                message = f"Hi {alert.user.username if alert.user else 'there'},\n\nThe product '{instance.title}' you were waiting for is back in stock. Grab it before it's gone!\n\nShop now: {settings.SITE_URL if hasattr(settings, 'SITE_URL') else ''}{instance.get_absolute_url()}\n\nBest regards,\nGlowElle"
                 
                 recipient = alert.email or (alert.user.email if alert.user else None)
                 

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        @page {
+            size:a4 portrait;
+            margin:2cm;
+
+            @frame footer_frame {
+                /* Another static Frame */
+                -pdf-frame-content:footerContent;
+                bottom:1cm;
+                margin-left:1cm;
+                margin-right:1cm;
+                height:1cm;
+            }
+        }
+
+        body {
+            font-family:Helvetica, sans-serif;
+            font-size:12px;
+            color:#333;
+        }
+
+        .header {
+            text-align:center;
+            margin-bottom:20px;
+        }
+
+        .logo {
+            font-size:24px;
+            font-weight:bold;
+            color:#16a34a;
+        }
+
+        .invoice-title {
+            font-size:18px;
+            margin-top:10px;
+        }
+
+        .details {
+            margin-bottom:20px;
+            width:100%;
+        }
+
+        .details td {
+            vertical-align:top;
+        }
+
+        table {
+            width:100%;
+            border-collapse:collapse;
+            margin-bottom:20px;
+        }
+
+        th {
+            background-color:#f3f4f6;
+            padding:8px;
+            text-align:left;
+            font-weight:bold;
+            border-bottom:1px solid #ddd;
+        }
+
+        td {
+            padding:8px;
+            border-bottom:1px solid #eee;
+        }
+
+        .total-row td {
+            font-weight:bold;
+            border-top:2px solid #ddd;
+        }
+
+        .footer {
+            text-align:center;
+            font-size:10px;
+            color:#666;
+            margin-top:30px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="logo">GlowElle</div>
+        <div class="invoice-title">INVOICE #{{ order.id }}</div>
+        <div>Date:{{ order.created_at|date:"F d, Y" }}</div>
+    </div>
+
+    <table class="details">
+        <tr>
+            <td width="50%">
+                <strong>Billed To:</strong><br>
+                {{ order.user.username }}<br>
+                {{ order.phone }}<br>
+                {{ order.address }}
+            </td>
+            <td width="50%" align="right">
+                <strong>Order Stats:</strong><br>
+                Status:{{ order.get_status_display }}<br>
+                Payment:{{ order.get_payment_method_display }}
+            </td>
+        </tr>
+    </table>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Qty</th>
+                <th>Price</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in order.items.all %}
+            <tr>
+                <td>{{ item.product.title }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.price }}</td>
+                <td>{{ item.price|add:0 }}</td>
+                <!-- Simple multiply not available in default filters, assuming price is unit * qty or needs calc -->
+            </tr>
+            {% endfor %}
+            <tr class="total-row">
+                <td colspan="3" align="right">Grand Total:</td>
+                <td>BDT {{ order.total }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div id="footerContent" class="footer">
+        Thank you for shopping with GlowElle!<br>
+        For support, contact support@glowellebd.com
+    </div>
+</body>
+
+</html>

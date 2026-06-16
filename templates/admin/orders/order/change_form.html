@@ -581,5 +581,49 @@
 {% endfor %}
 
 </form>
+
+<!-- Change History Section -->
+{% if change_history %}
+<div class="oms-card" style="margin-top:24px;">
+    <h2 style="font-size:16px; display:flex; align-items:center; gap:8px;">
+        <i class="fas fa-history"></i> Change History
+    </h2>
+    <table class="oms-table">
+        <thead>
+            <tr>
+                <th>Date & Time</th>
+                <th>User</th>
+                <th>Action</th>
+                <th>Changes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for entry in change_history %}
+            <tr>
+                <td style="white-space:nowrap; color:var(--text-muted); font-size:13px;">
+                    {{ entry.action_time|date:"M j, Y g:i A" }}
+                </td>
+                <td style="font-weight:600; font-size:13px;">
+                    {{ entry.user.get_full_name|default:entry.user.username }}
+                </td>
+                <td>
+                    {% if entry.is_addition %}
+                        <span style="background:#D1FAE5; color:#059669; padding:2px 8px; border-radius:10px; font-size:12px; font-weight:600;">Created</span>
+                    {% elif entry.is_change %}
+                        <span style="background:#DBEAFE; color:#2563EB; padding:2px 8px; border-radius:10px; font-size:12px; font-weight:600;">Edited</span>
+                    {% elif entry.is_deletion %}
+                        <span style="background:#FEE2E2; color:#DC2626; padding:2px 8px; border-radius:10px; font-size:12px; font-weight:600;">Deleted</span>
+                    {% endif %}
+                </td>
+                <td style="font-size:13px; color:var(--text-muted);">
+                    {{ entry.get_change_message }}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
 </div>
 {% endblock %}

@@ -2,7 +2,7 @@
   {
     "intent": "greeting",
     "variations": [
-      {"user": "hi", "bot": "Assalamualaikum! Al Barakah Mart এ স্বাগতম 😊 কি নিতে চান?"},
+      {"user": "hi", "bot": "Assalamualaikum! GlowElle এ স্বাগতম 😊 কি নিতে চান?"},
       {"user": "salam", "bot": "Walaikum Assalam! কি সাহায্য করতে পারি?"},
       {"user": "hello bhai", "bot": "হ্যালো! বলুন, কি লাগবে?"},
       {"user": "assalamualaikum", "bot": "Walaikum Assalam! আজ কি নিবেন?"},
@@ -16,7 +16,7 @@
       {"user": "ki koro", "bot": "আপনার সেবায় আছি! কি লাগবে?"},
       {"user": "bhalo achen", "bot": "জি আলহামদুলিল্লাহ। আজ কি নিবেন?"},
       {"user": "how are you", "bot": "ভালো আছি! আপনি কি কিনতে চান?"},
-      {"user": "tumi ke", "bot": "আমি Al Barakah Mart এর সাপোর্ট টিম। কি সাহায্য করতে পারি?"}
+      {"user": "tumi ke", "bot": "আমি GlowElle এর সাপোর্ট টিম। কি সাহায্য করতে পারি?"}
     ]
   },
   {

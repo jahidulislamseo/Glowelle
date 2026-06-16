@@ -1,4 +1,4 @@
-# Al Barakah Mart - Django E-commerce Platform
+# GlowElle - Django E-commerce Platform
 
 A modern, feature-rich e-commerce platform built with Django for selling organic groceries and daily essentials in Dhaka, Bangladesh.
 

@@ -1,5 +1,5 @@
 """
-Smart Discount System for Al Barakah Mart
+Smart Discount System for GlowElle
 Provides intelligent discount recommendations and automatic coupon application.
 """
 

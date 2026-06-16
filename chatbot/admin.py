@@ -5,9 +5,10 @@ from django.utils import timezone
 from datetime import timedelta
 from .analytics_models import ChatbotAnalytics, ChatbotMetric, PopularProduct
 from .models import (
-    ChatbotSettings, ChatbotFAQ, ChatbotSuggestion, 
+    ChatbotSettings, ChatbotFAQ, ChatbotSuggestion,
     ChatbotIntent, ChatbotConversationMemory
 )
+from core.admin_mixins import ChangeHistoryMixin
 
 
 @admin.register(ChatbotAnalytics)
@@ -92,7 +93,7 @@ class PopularProductAdmin(admin.ModelAdmin):
 
 
 @admin.register(ChatbotSettings)
-class ChatbotSettingsAdmin(admin.ModelAdmin):
+class ChatbotSettingsAdmin(ChangeHistoryMixin, admin.ModelAdmin):
     list_display = ('id', 'welcome_message_short', 'is_promo_active')
     fieldsets = (
         ('Basic Settings', {
@@ -109,7 +110,7 @@ class ChatbotSettingsAdmin(admin.ModelAdmin):
 
 
 @admin.register(ChatbotFAQ)
-class ChatbotFAQAdmin(admin.ModelAdmin):
+class ChatbotFAQAdmin(ChangeHistoryMixin, admin.ModelAdmin):
     list_display = ('question', 'is_active', 'created_at')
     list_filter = ('is_active', 'created_at')
     search_fields = ('question', 'answer', 'keywords')
@@ -117,7 +118,7 @@ class ChatbotFAQAdmin(admin.ModelAdmin):
 
 
 @admin.register(ChatbotSuggestion)
-class ChatbotSuggestionAdmin(admin.ModelAdmin):
+class ChatbotSuggestionAdmin(ChangeHistoryMixin, admin.ModelAdmin):
     list_display = ('text', 'action', 'order', 'is_active')
     list_filter = ('is_active', 'action')
     list_editable = ('order', 'is_active')
@@ -125,7 +126,7 @@ class ChatbotSuggestionAdmin(admin.ModelAdmin):
 
 
 @admin.register(ChatbotIntent)
-class ChatbotIntentAdmin(admin.ModelAdmin):
+class ChatbotIntentAdmin(ChangeHistoryMixin, admin.ModelAdmin):
     list_display = ('intent_key', 'display_name', 'is_active')
     list_filter = ('is_active',)
     search_fields = ('intent_key', 'display_name', 'keywords')
@@ -134,19 +135,96 @@ class ChatbotIntentAdmin(admin.ModelAdmin):
 
 @admin.register(ChatbotConversationMemory)
 class ChatbotConversationMemoryAdmin(admin.ModelAdmin):
-    list_display = ('session_id_short', 'user_message_short', 'detected_intent', 'greeting_count', 'created_at')
-    list_filter = ('detected_intent', 'created_at')
-    search_fields = ('session_id', 'user_message', 'bot_response')
-    readonly_fields = ('session_id', 'user_message', 'bot_response', 'detected_intent', 
-                      'user_preferences', 'greeting_count', 'created_at')
-    
+    list_display = ('session_id_short', 'user_message_full', 'bot_response_full', 'intent_badge', 'greeting_count', 'created_at')
+    list_display_links = ('session_id_short',)
+    list_filter = ('detected_intent', ('created_at', admin.DateFieldListFilter))
+    search_fields = ('session_id', 'user_message', 'bot_response', 'detected_intent')
+    readonly_fields = ('session_id', 'user_message', 'bot_response', 'detected_intent',
+                      'user_preferences_display', 'greeting_count', 'created_at')
+    date_hierarchy = 'created_at'
+    list_per_page = 25
+    ordering = ('-created_at',)
+    actions = ['delete_selected_memories']
+
+    INTENT_COLORS = {
+        'greeting': '#28a745',
+        'product_query': '#007bff',
+        'order': '#fd7e14',
+        'support': '#dc3545',
+        'discount': '#6f42c1',
+        'faq': '#17a2b8',
+    }
+
     def session_id_short(self, obj):
-        return obj.session_id[:12] + '...' if len(obj.session_id) > 12 else obj.session_id
+        short = obj.session_id[:10] + '…' if len(obj.session_id) > 10 else obj.session_id
+        return format_html('<code style="font-size:11px;color:#555;">{}</code>', short)
     session_id_short.short_description = 'Session'
-    
-    def user_message_short(self, obj):
-        return obj.user_message[:50] + '...' if len(obj.user_message) > 50 else obj.user_message
-    user_message_short.short_description = 'Message'
-    
+
+    def user_message_full(self, obj):
+        return format_html(
+            '<div style="max-width:280px;max-height:80px;overflow-y:auto;'
+            'white-space:pre-wrap;word-break:break-word;font-size:12px;'
+            'background:#f8f9fa;padding:4px 6px;border-radius:4px;'
+            'border-left:3px solid #007bff;">{}</div>',
+            obj.user_message
+        )
+    user_message_full.short_description = 'User Message'
+
+    def bot_response_full(self, obj):
+        return format_html(
+            '<div style="max-width:300px;max-height:80px;overflow-y:auto;'
+            'white-space:pre-wrap;word-break:break-word;font-size:12px;'
+            'background:#f0fff4;padding:4px 6px;border-radius:4px;'
+            'border-left:3px solid #28a745;color:#333;">{}</div>',
+            obj.bot_response
+        )
+    bot_response_full.short_description = 'Bot Response'
+
+    def intent_badge(self, obj):
+        intent = obj.detected_intent or 'unknown'
+        color = self.INTENT_COLORS.get(intent, '#6c757d')
+        return format_html(
+            '<span style="background:{};color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">{}</span>',
+            color, intent
+        )
+    intent_badge.short_description = 'Intent'
+
+    def user_preferences_display(self, obj):
+        if not obj.user_preferences:
+            return '—'
+        rows = ''.join(
+            f'<tr><td style="padding:3px 8px;font-weight:600;">{k}</td>'
+            f'<td style="padding:3px 8px;">{v}</td></tr>'
+            for k, v in obj.user_preferences.items()
+        )
+        return format_html(
+            '<table style="border-collapse:collapse;font-size:13px;">'
+            '<thead><tr><th style="padding:3px 8px;border-bottom:1px solid #ddd;">Key</th>'
+            '<th style="padding:3px 8px;border-bottom:1px solid #ddd;">Value</th></tr></thead>'
+            '<tbody>{}</tbody></table>',
+            format_html(rows)
+        )
+    user_preferences_display.short_description = 'User Preferences'
+
+    def get_fieldsets(self, request, obj=None):
+        return (
+            ('Session Info', {
+                'fields': ('session_id', 'detected_intent', 'greeting_count', 'created_at'),
+            }),
+            ('Conversation', {
+                'fields': ('user_message', 'bot_response'),
+            }),
+            ('Preferences', {
+                'fields': ('user_preferences_display',),
+                'classes': ('collapse',),
+            }),
+        )
+
+    def delete_selected_memories(self, request, queryset):
+        count = queryset.count()
+        queryset.delete()
+        self.message_user(request, f'{count} conversation memory record(s) deleted.')
+    delete_selected_memories.short_description = 'Delete selected memories'
+
     def has_add_permission(self, request):
         return False

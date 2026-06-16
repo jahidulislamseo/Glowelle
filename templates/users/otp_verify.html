@@ -19,14 +19,14 @@
                     <label for="otp_code" class="block text-sm font-medium text-gray-700 mb-1">Enter 6-digit
                         Code</label>
                     <input id="otp_code" name="otp_code" type="text" pattern="\d{6}" maxlength="6" required autofocus
-                        class="appearance-none block w-full px-3 py-3 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-600 focus:border-green-600 text-center text-2xl font-bold tracking-[0.5em] transition-standard"
+                        class="appearance-none block w-full px-3 py-3 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-pink-600 focus:border-pink-600 text-center text-2xl font-bold tracking-[0.5em] transition-standard"
                         placeholder="······">
                 </div>
             </div>
 
             <div class="flex items-center justify-between">
                 <div class="text-sm">
-                    <a href="{% url 'request_otp' %}" class="font-medium text-green-600 hover:text-green-500">
+                    <a href="{% url 'request_otp' %}" class="font-medium text-pink-600 hover:text-pink-500">
                         Didn't receive code? Resend
                     </a>
                 </div>

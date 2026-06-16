@@ -1,17 +1,18 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
 <!-- Shop Banner -->
 <div
     class="relative h-64 bg-gradient-to-r from-primary/20 via-primary/5 to-transparent overflow-hidden mb-8 reveal-on-scroll reveal-down">
     <div class="absolute inset-0">
-        <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1000"
-            alt="Shop Fresh Groceries" class="w-full h-full object-cover opacity-80">
+        <img src="{% static 'images/shop_hero.png' %}"
+            alt="Shop Premium Cosmetics" class="w-full h-full object-cover opacity-90">
     </div>
     <div class="relative container mx-auto px-4 h-full flex items-center reveal-on-scroll reveal-up delay-100">
-        <div class="max-w-2xl">
-            <h1 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">Shop</h1>
-            <p class="text-lg text-gray-700">Explore our wide range of premium organic products.</p>
+        <div class="max-w-2xl bg-white/60 backdrop-blur-sm p-6 rounded-2xl border border-white/20">
+            <h1 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-2">Shop</h1>
+            <p class="text-lg text-gray-700">Explore our wide range of premium cosmetics and skincare products.</p>
         </div>
     </div>
 </div>
@@ -21,7 +22,7 @@
     <nav class="flex mb-6 text-sm text-gray-500" aria-label="Breadcrumb">
         <ol class="inline-flex items-center space-x-1 md:space-x-3">
             <li class="inline-flex items-center">
-                <a href="{% url 'home' %}" class="hover:text-green-600 flex items-center gap-1">
+                <a href="{% url 'home' %}" class="hover:text-pink-600 flex items-center gap-1">
                     <i data-lucide="home" class="h-3 w-3"></i> Home
                 </a>
             </li>
@@ -29,7 +30,7 @@
                 <div class="flex items-center">
                     <i data-lucide="chevron-right" class="h-4 w-4 text-gray-400"></i>
                     <a href="{% url 'shop' %}"
-                        class="ml-1 md:ml-2 hover:text-green-600 {% if not current_category %}font-medium text-gray-900{% endif %}">Shop</a>
+                        class="ml-1 md:ml-2 hover:text-pink-600 {% if not current_category %}font-medium text-gray-900{% endif %}">Shop</a>
                 </div>
             </li>
             {% if current_category %}
@@ -53,10 +54,10 @@
         <div class="flex items-center gap-3">
             <button id="mobile-filter-btn"
                 class="flex-1 flex items-center justify-center gap-3 bg-white border-2 border-gray-100 py-3.5 rounded-2xl font-bold text-gray-700 hover:bg-gray-50 active:scale-95 transition-all shadow-sm">
-                <i data-lucide="filter" class="h-5 w-5 text-green-600"></i> Filters
+                <i data-lucide="filter" class="h-5 w-5 text-pink-600"></i> Filters
             </button>
             <form action="{% url 'shop' %}" class="flex-[2] relative">
-                <select name="sort" class="w-full bg-white border-2 border-gray-100 py-3.5 pl-4 pr-10 rounded-2xl font-bold text-gray-700 appearance-none focus:border-green-500 outline-none">
+                <select name="sort" class="w-full bg-white border-2 border-gray-100 py-3.5 pl-4 pr-10 rounded-2xl font-bold text-gray-700 appearance-none focus:border-pink-500 outline-none">
                     <option value="newest">Newest</option>
                     <option value="price_low">Price: Low-High</option>
                     <option value="price_high">Price: High-Low</option>
@@ -80,11 +81,11 @@
             <div>
                 <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">Categories</h3>
                 <div class="space-y-2">
-                    <a href="{% url 'shop' %}" class="flex items-center gap-3 p-3 rounded-xl {% if not current_category %}bg-green-50 text-green-700 font-bold{% else %}text-gray-600 hover:bg-gray-50{% endif %}">
+                    <a href="{% url 'shop' %}" class="flex items-center gap-3 p-3 rounded-xl {% if not current_category %}bg-pink-50 text-pink-700 font-bold{% else %}text-gray-600 hover:bg-gray-50{% endif %}">
                         View All
                     </a>
                     {% for cat in categories %}
-                    <a href="{% url 'shop' %}?category={{ cat.slug }}" class="flex items-center gap-3 p-3 rounded-xl {% if current_category == cat.slug %}bg-green-50 text-green-700 font-bold{% else %}text-gray-600 hover:bg-gray-50{% endif %}">
+                    <a href="{% url 'shop' %}?category={{ cat.slug }}" class="flex items-center gap-3 p-3 rounded-xl {% if current_category == cat.slug %}bg-pink-50 text-pink-700 font-bold{% else %}text-gray-600 hover:bg-gray-50{% endif %}">
                         <span class="text-lg">{{ cat.icon|default:"📦" }}</span>
                         {{ cat.name }}
                     </a>
@@ -96,8 +97,8 @@
             <div>
                 <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">Price Range</h3>
                 <div class="grid grid-cols-2 gap-3">
-                    <input type="number" placeholder="Min" class="w-full p-3 rounded-xl border-2 border-gray-100 font-bold text-sm focus:border-green-500 outline-none">
-                    <input type="number" placeholder="Max" class="w-full p-3 rounded-xl border-2 border-gray-100 font-bold text-sm focus:border-green-500 outline-none">
+                    <input type="number" placeholder="Min" class="w-full p-3 rounded-xl border-2 border-gray-100 font-bold text-sm focus:border-pink-500 outline-none">
+                    <input type="number" placeholder="Max" class="w-full p-3 rounded-xl border-2 border-gray-100 font-bold text-sm focus:border-pink-500 outline-none">
                 </div>
                 <button class="w-full mt-4 bg-gray-900 text-white py-3 rounded-xl font-bold hover:bg-black transition-all">Apply Price</button>
             </div>
@@ -114,14 +115,14 @@
                     <ul class="space-y-2 text-sm">
                         <li>
                             <a href="{% url 'shop' %}"
-                                class="hover:text-green-600 transition-colors {% if not current_category %}font-bold text-green-600{% else %}text-gray-500{% endif %}">
+                                class="hover:text-pink-600 transition-colors {% if not current_category %}font-bold text-pink-600{% else %}text-gray-500{% endif %}">
                                 View All
                             </a>
                         </li>
                         {% for cat in categories %}
                         <li>
                             <a href="{% url 'shop' %}?category={{ cat.slug }}"
-                                class="hover:text-green-600 flex items-center gap-2 transition-colors {% if current_category == cat.slug %}font-bold text-green-600{% else %}text-gray-500{% endif %}">
+                                class="hover:text-pink-600 flex items-center gap-2 transition-colors {% if current_category == cat.slug %}font-bold text-pink-600{% else %}text-gray-500{% endif %}">
                                 <span>{{ cat.icon|default:"📦" }}</span>
                                 {{ cat.name }}
                             </a>
@@ -144,7 +145,7 @@
                             <input type="number" name="max_price" placeholder="Max" value="{{ request.GET.max_price }}"
                                 class="w-20 h-10 px-3 rounded-md border border-gray-200 text-sm">
                         </div>
-                        <button type="submit" class="w-full bg-green-600 text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-green-700 transition-colors">
+                        <button type="submit" class="w-full bg-pink-600 text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-pink-700 transition-colors">
                             Apply
                         </button>
                     </form>
@@ -185,7 +186,7 @@
             {% if products.has_next %}
             <div class="mt-16 text-center" id="load-more-container">
                 <button id="load-more-btn" data-page="{{ products.next_page_number }}"
-                    class="group relative inline-flex items-center gap-3 bg-white border-2 border-green-600 text-green-600 px-12 py-4 rounded-full font-bold hover:bg-green-600 hover:text-white transition-all transform active:scale-95 shadow-lg overflow-hidden">
+                    class="group relative inline-flex items-center gap-3 bg-white border-2 border-pink-600 text-pink-600 px-12 py-4 rounded-full font-bold hover:bg-pink-600 hover:text-white transition-all transform active:scale-95 shadow-lg overflow-hidden">
                     <span class="relative z-10 flex items-center gap-2">
                         Load More Products
                         <i data-lucide="chevron-down"
@@ -297,19 +298,19 @@
             </script>
             {% else %}
             <div class="text-center py-16 bg-white rounded-xl border border-gray-100 shadow-sm">
-                <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-50 mb-6">
-                    <i data-lucide="search-x" class="w-10 h-10 text-green-500"></i>
+                <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-pink-50 mb-6">
+                    <i data-lucide="search-x" class="w-10 h-10 text-pink-500"></i>
                 </div>
                 <h3 class="text-xl font-bold text-gray-900 mb-2">No products found</h3>
                 <p class="text-gray-500 mb-8 max-w-md mx-auto">We couldn't find any products matching your search. Try
                     different keywords or browse by category.</p>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
                     <a href="{% url 'shop' %}"
-                        class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                        class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500">
                         Clear Filters
                     </a>
                     <a href="{% url 'home' %}"
-                        class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-sm font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                        class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-sm font-medium rounded-lg text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500">
                         Go Home
                     </a>
                 </div>

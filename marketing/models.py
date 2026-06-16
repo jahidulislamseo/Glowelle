@@ -1,5 +1,9 @@
 from django.db import models
 from django.utils import timezone
+from django.core.cache import cache
+
+def clear_homepage_cache():
+    cache.delete('home_page_data')
 
 class Coupon(models.Model):
     code = models.CharField(max_length=50, unique=True, help_text="Case insensitive")
@@ -13,6 +17,7 @@ class Coupon(models.Model):
 
 class HomeSlider(models.Model):
     title = models.CharField(max_length=255, blank=True, null=True)
+    subtitle = models.CharField(max_length=500, blank=True, null=True)
     image = models.ImageField(upload_to='sliders/')
     link_url = models.URLField(blank=True, null=True, help_text="URL to redirect when clicked")
     sort_order = models.IntegerField(default=0, help_text="Low numbers appear first")
@@ -25,6 +30,14 @@ class HomeSlider(models.Model):
     def __str__(self):
         return self.title or "Slider Image"
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        clear_homepage_cache()
+
+    def delete(self, *args, **kwargs):
+        super().delete(*args, **kwargs)
+        clear_homepage_cache()
+
 class DealOfTheDay(models.Model):
     title = models.CharField(max_length=255, default="Deal of the Day")
     subtitle = models.CharField(max_length=500, blank=True, null=True, help_text="e.g. Get up to 50% OFF...")
@@ -36,6 +49,14 @@ class DealOfTheDay(models.Model):
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        clear_homepage_cache()
+
+    def delete(self, *args, **kwargs):
+        super().delete(*args, **kwargs)
+        clear_homepage_cache()
 
 class SellingNote(models.Model):
     title = models.CharField(max_length=100)
@@ -51,3 +72,12 @@ class SellingNote(models.Model):
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        clear_homepage_cache()
+
+    def delete(self, *args, **kwargs):
+        super().delete(*args, **kwargs)
+        clear_homepage_cache()
+

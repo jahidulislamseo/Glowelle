@@ -4,7 +4,7 @@
 <div class="container mx-auto px-4 py-8 min-h-[60vh]">
     <div class="flex items-center justify-between mb-8">
         <h1 class="text-3xl font-bold">My Wishlist</h1>
-        <a href="{% url 'shop' %}" class="text-green-600 hover:text-green-700 font-medium">
+        <a href="{% url 'shop' %}" class="text-pink-600 hover:text-pink-700 font-medium">
             Continue Shopping
         </a>
     </div>
@@ -44,7 +44,7 @@
             <div class="p-4">
                 <div class="text-sm text-muted-foreground mb-1">{{ product.category.name }}</div>
                 <a href="{% url 'product_detail' product.slug %}">
-                    <h3 class="font-semibold truncate group-hover:text-green-600 transition-colors text-gray-900">{{ product.title }}</h3>
+                    <h3 class="font-semibold truncate group-hover:text-pink-600 transition-colors text-gray-900">{{ product.title }}</h3>
                 </a>
                 <div class="flex items-center gap-1 mt-1 mb-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -58,7 +58,7 @@
                     <span class="text-xs text-gray-500">({{ product.reviews_count }})</span>
                 </div>
                 <div class="flex items-baseline gap-2">
-                    <span class="font-bold text-lg text-green-600">৳{{ product.price }}</span>
+                    <span class="font-bold text-lg text-pink-600">৳{{ product.price }}</span>
                     {% if product.original_price %}
                     <span class="text-sm text-gray-400 line-through">৳{{ product.original_price }}</span>
                     {% endif %}

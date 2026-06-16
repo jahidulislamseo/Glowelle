@@ -1,5 +1,8 @@
 from django.contrib import admin
+from django.contrib.admin.models import LogEntry
+from django.contrib.contenttypes.models import ContentType
 from django.utils.html import format_html
+from core.admin_mixins import ChangeHistoryMixin
 from django.utils.safestring import mark_safe
 from django.urls import reverse
 
@@ -8,7 +11,7 @@ from .models import Order, OrderItem, Courier, PaymentGateway, OrderStatusHistor
 from import_export.admin import ImportExportModelAdmin
 
 @admin.register(PaymentGateway)
-class PaymentGatewayAdmin(admin.ModelAdmin):
+class PaymentGatewayAdmin(ChangeHistoryMixin, admin.ModelAdmin):
     list_display = ['name', 'is_active', 'account_number']
     list_editable = ['is_active']
     search_fields = ['name']
@@ -20,7 +23,7 @@ class OrderItemInline(admin.TabularInline):
     readonly_fields = ['product', 'quantity', 'price']
 
 @admin.register(OrderStatusHistory)
-class OrderStatusHistoryAdmin(admin.ModelAdmin):
+class OrderStatusHistoryAdmin(ChangeHistoryMixin, admin.ModelAdmin):
     list_display = ['order', 'status', 'created_by', 'created_at']
     readonly_fields = ['created_at']
 
@@ -171,6 +174,11 @@ class OrderAdmin(ImportExportModelAdmin):
         try:
             order = Order.objects.get(pk=object_id)
             extra_context['timeline'] = order.status_history.all()
+
+            ct = ContentType.objects.get_for_model(Order)
+            extra_context['change_history'] = LogEntry.objects.filter(
+                content_type=ct, object_id=object_id
+            ).select_related('user').order_by('-action_time')[:50]
             
             # Customer Lifetime Stats (Only if user exists)
             if order.user:

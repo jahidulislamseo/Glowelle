@@ -1,5 +1,5 @@
 """
-Product Recommendation Engine for Al Barakah Mart Chatbot
+Product Recommendation Engine for GlowElle Chatbot
 Provides intelligent product suggestions based on user behavior and purchase history.
 """
 

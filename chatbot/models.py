@@ -19,11 +19,11 @@ class ChatbotFAQ(models.Model):
 
 class ChatbotSettings(models.Model):
     welcome_message = models.TextField(
-        default="👋 Hi! Welcome to Al Barakah Mart! How can I help you today?",
+        default="👋 Hi! Welcome to GlowElle! How can I help you today?",
         help_text="First message shown when the chat opens"
     )
     system_prompt = models.TextField(
-        default="You are 'Al Barakah Assistant'. Be helpful, confident, and professional. Use product data provided. Guarantee 100% freshness.",
+        default="You are 'GlowElle Assistant'. Be helpful, confident, and professional. Use product data provided. Guarantee 100% freshness.",
         help_text="Global instructions for the AI brain"
     )
     not_found_message = models.TextField(

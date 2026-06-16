@@ -2,15 +2,16 @@ from django.contrib import admin
 from django.utils.html import format_html
 from .models import Category, Product, Review, Wishlist, Brand, ProductVariant, StockLog, ProductImage, ProductVideo
 from import_export.admin import ImportExportModelAdmin
+from core.admin_mixins import ChangeHistoryMixin
 
 @admin.register(Brand)
-class BrandAdmin(admin.ModelAdmin):
+class BrandAdmin(ChangeHistoryMixin, admin.ModelAdmin):
     list_display = ['name', 'slug']
     prepopulated_fields = {'slug': ('name',)}
     search_fields = ['name']
 
 @admin.register(Category)
-class CategoryAdmin(admin.ModelAdmin):
+class CategoryAdmin(ChangeHistoryMixin, admin.ModelAdmin):
     list_display = ['name', 'slug', 'icon']
     prepopulated_fields = {'slug': ('name',)}
     search_fields = ['name']
@@ -55,7 +56,7 @@ class LowStockFilter(admin.SimpleListFilter):
 
 @admin.register(Product)
 # class ProductAdmin(admin.ModelAdmin, ImportExportModelAdmin): # ImportExport might be compatible, trying without first to be safe
-class ProductAdmin(admin.ModelAdmin):
+class ProductAdmin(ChangeHistoryMixin, admin.ModelAdmin):
     list_display = ['title', 'price', 'in_stock', 'stock_quantity', 'category', 'brand', 'display_image', 'rating', 'chatbot_priority']
     list_filter = ['category', 'brand', LowStockFilter, 'in_stock', 'is_new', 'is_best_seller', 'chatbot_priority']
     search_fields = ['title', 'description', 'sku']
@@ -93,7 +94,7 @@ class ProductAdmin(admin.ModelAdmin):
     
     def display_image(self, obj):
         if obj.image:
-            return format_html('<img src="{}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;" />', obj.image.url)
+            return format_html('<img src="{}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;" />', obj.display_image_url)
         return "-"
     display_image.short_description = "Image"
 

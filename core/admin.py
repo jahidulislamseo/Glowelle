@@ -1,9 +1,10 @@
 from django.contrib import admin
 from django import forms
 from .models import SiteSettings, ContactMessage
+from core.admin_mixins import ChangeHistoryMixin
 
 @admin.register(SiteSettings)
-class SiteSettingsAdmin(admin.ModelAdmin):
+class SiteSettingsAdmin(ChangeHistoryMixin, admin.ModelAdmin):
     list_display = ['site_title', 'support_email']
     
     fieldsets = (
@@ -33,7 +34,7 @@ class SiteSettingsAdmin(admin.ModelAdmin):
         return True
 
 @admin.register(ContactMessage)
-class ContactMessageAdmin(admin.ModelAdmin):
+class ContactMessageAdmin(ChangeHistoryMixin, admin.ModelAdmin):
     list_display = ['name', 'email', 'created_at', 'is_read']
     list_filter = ['is_read', 'created_at']
     search_fields = ['name', 'email', 'message']

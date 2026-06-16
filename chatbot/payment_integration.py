@@ -1,5 +1,5 @@
 """
-Payment Integration for Al Barakah Mart
+Payment Integration for GlowElle
 Supports bKash, Nagad, and SSL Commerz payment gateways.
 """
 

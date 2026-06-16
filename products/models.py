@@ -13,6 +13,10 @@ def ensure_webp_url(image_field):
     if not image_field:
         return DEFAULT_PRODUCT_IMAGE_URL
 
+    # If the image name itself is a URL, return it directly
+    if image_field.name and image_field.name.startswith(('http://', 'https://')):
+        return image_field.name
+
     image_url = image_field.url
     if image_url.startswith(('http://', 'https://')):
         return image_url
@@ -20,10 +24,11 @@ def ensure_webp_url(image_field):
     try:
         image_path = image_field.path
     except Exception:
-        return DEFAULT_PRODUCT_IMAGE_URL
+        return image_url
 
     if not os.path.exists(image_path):
-        return DEFAULT_PRODUCT_IMAGE_URL
+        return image_url
+
 
     base_path, ext = os.path.splitext(image_path)
     webp_path = f"{base_path}.webp"

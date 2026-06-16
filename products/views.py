@@ -22,7 +22,10 @@ def home(request):
     if not home_data:
         featured_products = list(Product.objects.select_related('category', 'brand').all()[:8])
         new_arrivals = list(Product.objects.select_related('category', 'brand').order_by('-created_at')[:4])
-        on_sale_products = list(Product.objects.select_related('category', 'brand').filter(original_price__isnull=False)[:4])
+        on_sale_products = list(Product.objects.select_related('category', 'brand').filter(original_price__isnull=False)[:8])
+        # Fallback: if no discounted products, show newest arrivals in Beauty Deals
+        if not on_sale_products:
+            on_sale_products = list(Product.objects.select_related('category', 'brand').order_by('-created_at')[:8])
         best_products = list(Product.objects.select_related('category', 'brand').order_by('-rating', '-reviews_count')[:10])
         sliders = list(HomeSlider.objects.filter(is_active=True).order_by('sort_order'))
         selling_notes = list(SellingNote.objects.filter(is_active=True).order_by('sort_order'))
@@ -30,21 +33,23 @@ def home(request):
         # Deal of the Day
         deal_of_the_day = DealOfTheDay.objects.filter(is_active=True, end_date__gt=timezone.now()).first()
         
-        # Categorized Products for Homepage
-        target_slugs = ['fruits', 'vegetables', 'meat-fish', 'personal-care', 'snacks', 'beverages', 'dairy']
+        # Categorized Products for Homepage — dynamic: any category with products
         categorized_products = []
-        
-        for slug in target_slugs:
-            try:
-                category = Category.objects.get(slug=slug)
-                products = list(Product.objects.select_related('category', 'brand').filter(category=category)[:4])
-                if products:
-                    categorized_products.append({
-                        'category': category,
-                        'products': products
-                    })
-            except Category.DoesNotExist:
-                pass
+        active_categories = Category.objects.filter(
+            products__isnull=False
+        ).distinct()[:8]
+
+        for category in active_categories:
+            products = list(
+                Product.objects.select_related('category', 'brand')
+                .filter(category=category)[:5]
+            )
+            if products:
+                categorized_products.append({
+                    'category': category,
+                    'products': products
+                })
+
         
         home_data = {
             'categories': list(Category.objects.all()),
@@ -57,8 +62,8 @@ def home(request):
             'best_products': best_products,
             'selling_notes': selling_notes,
         }
-        # Cache for 15 minutes (900 seconds)
-        cache.set('home_page_data', home_data, 900)
+        # Cache for 60 seconds (dev-friendly: changes reflect quickly)
+        cache.set('home_page_data', home_data, 60)
 
     # Wishlist Context (Dynamic, per user)
     wishlist_product_ids = []
@@ -179,22 +184,22 @@ def product_detail(request, slug):
         product=product
     ).values('product').annotate(
         count=Count('product')
-    ).order_by('-count')[:5]
-    
+    ).order_by('-count')[:4]
+
     if bought_together.exists():
         product_ids = [item['product'] for item in bought_together]
-        related_products = list(Product.objects.filter(id__in=product_ids).select_related('category', 'brand')[:5])
-    
+        related_products = list(Product.objects.filter(id__in=product_ids).select_related('category', 'brand')[:4])
+
     # 2. Fallback to category + brand based if not enough
-    if len(related_products) < 5:
+    if len(related_products) < 4:
         category_products = Product.objects.filter(
             Q(brand=product.brand) | Q(category=product.category)
-        ).exclude(id=product.id).select_related('category', 'brand').distinct()[:5]
-        
+        ).exclude(id=product.id).select_related('category', 'brand').distinct()[:4]
+
         # Merge and deduplicate
         existing_ids = [p.id for p in related_products]
         for p in category_products:
-            if p.id not in existing_ids and len(related_products) < 5:
+            if p.id not in existing_ids and len(related_products) < 4:
                 related_products.append(p)
     
     reviews = product.reviews.all().order_by('-created_at')
@@ -338,3 +343,21 @@ def create_stock_alert(request, product_id):
         messages.success(request, "We'll notify you when this item is back in stock!")
         return redirect('product_detail', slug=product.slug)
     return redirect('shop')
+
+
+def search_suggestions(request):
+    query = request.GET.get('q', '').strip()
+    products = []
+    if len(query) >= 1:
+        products = Product.objects.select_related('category', 'brand').filter(
+            Q(title__icontains=query) |
+            Q(category__name__icontains=query) |
+            Q(brand__name__icontains=query)
+        ).distinct()[:6]
+        
+    html = render_to_string('products/partials/search_suggestions.html', {
+        'products': products,
+        'query': query,
+    }, request=request)
+    return JsonResponse({'html': html})
+

@@ -1,4 +1,4 @@
-# Render Deployment Guide for Al Barakah Mart
+# Render Deployment Guide for GlowElle BD
 
 ## Prerequisites
 1. GitHub account with your code pushed to: https://github.com/jahidulislamseo/shop
@@ -20,7 +20,7 @@
 ### 3. Configure Web Service
 
 **Basic Settings:**
-- **Name**: `al-barakah-mart` (or your preferred name)
+- **Name**: `glowelle-bd` (or your preferred name)
 - **Region**: Choose closest to Bangladesh (Singapore recommended)
 - **Branch**: `main`
 - **Root Directory**: Leave empty
@@ -48,9 +48,9 @@ DISABLE_COLLECTSTATIC=1
 
 1. Go back to Render Dashboard
 2. Click "New +" → "PostgreSQL"
-3. **Name**: `al-barakah-mart-db`
-4. **Database**: `albarakahmart`
-5. **User**: `albarakahmart_user`
+3. **Name**: `glowelle-bd-db`
+4. **Database**: `glowellebd`
+5. **User**: `glowellebd_user`
 6. **Region**: Same as web service
 7. **PostgreSQL Version**: 15
 8. Click "Create Database"
@@ -87,12 +87,12 @@ python manage.py createsuperuser
 
 Your website will be available at:
 ```
-https://al-barakah-mart.onrender.com
+https://glowelle-bd.onrender.com
 ```
 
 Admin panel:
 ```
-https://al-barakah-mart.onrender.com/manager-portal-631/
+https://glowelle-bd.onrender.com/manager-portal-631/
 ```
 
 ## Important Notes
@@ -168,4 +168,4 @@ For issues:
 
 ---
 
-**Your Al Barakah Mart will be live in ~5-10 minutes after deployment starts!** 🚀
+**Your GlowElle BD will be live in ~5-10 minutes after deployment starts!** 🚀

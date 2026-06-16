@@ -1,5 +1,5 @@
 """
-Django settings for Al Barakah Mart project.
+Django settings for GlowElle BD project.
 """
 
 from pathlib import Path
@@ -16,28 +16,48 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-dev-key-change-in-pro
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
+# Cache Configuration
+# Development: DummyCache (no caching - changes show instantly)
+# Production: LocMemCache (15 min cache for performance)
+if DEBUG:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+        }
+    }
+else:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'glowelle-cache',
+            'TIMEOUT': 900,  # 15 minutes
+        }
+    }
+
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,.vercel.app,.now.sh,.onrender.com,shop-2thz.onrender.com,shop-1-38i4.onrender.com').split(',')
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://albarakahmart.vercel.app',
+    'https://glowellebd.vercel.app',
     'https://*.onrender.com',
+    config('SITE_URL', default='http://localhost:8000'),
 ]
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
-    "https://albarakahmart.vercel.app",
+    "http://localhost:8000",
+    "https://glowellebd.vercel.app",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
 
 # Security Settings (Production)
 if not DEBUG:
-    SECURE_SSL_REDIRECT = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-    SECURE_HSTS_SECONDS = 31536000
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
+    SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=True, cast=bool)
+    SESSION_COOKIE_SECURE = config('SESSION_COOKIE_SECURE', default=True, cast=bool)
+    CSRF_COOKIE_SECURE = config('CSRF_COOKIE_SECURE', default=True, cast=bool)
+    SECURE_HSTS_SECONDS = config('SECURE_HSTS_SECONDS', default=31536000, cast=int)
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = config('SECURE_HSTS_INCLUDE_SUBDOMAINS', default=True, cast=bool)
+    SECURE_HSTS_PRELOAD = config('SECURE_HSTS_PRELOAD', default=True, cast=bool)
     SECURE_CONTENT_TYPE_NOSNIFF = True
     SECURE_BROWSER_XSS_FILTER = True
     X_FRAME_OPTIONS = 'DENY'
@@ -127,12 +147,18 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db_v2.sqlite3',
+# Production: set DATABASE_URL in .env (e.g. Supabase PostgreSQL)
+# Local development: uses SQLite as fallback
+_db_url = config('DATABASE_URL', default=None)
+if _db_url:
+    DATABASES = {'default': dj_database_url.parse(_db_url, conn_max_age=600)}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db_v2.sqlite3',
+        }
     }
-}
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -169,18 +195,22 @@ AUTH_USER_MODEL = 'users.User'
 
 # Media files
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'frontend' / 'public' / 'media'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 SITE_ID = 1
 
 # Email
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# Development: prints to console | Production: sends real email via Gmail SMTP
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
-DEFAULT_FROM_EMAIL = 'Al Barakah Mart <noreply@albarakah.bd>'
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')  # Use Gmail App Password
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='GlowElle BD <noreply@glowellebd.com>')
 
 LOGIN_REDIRECT_URL = 'dashboard'
 LOGIN_URL = 'login'

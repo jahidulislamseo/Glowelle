@@ -18,7 +18,7 @@
             <div class="grid grid-cols-4 gap-2">
                 {% for img in additional_images %}
                 <div
-                    class="aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-green-500 transition-all">
+                    class="aspect-square bg-gray-100 rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-pink-500 transition-all">
                     <img src="{{ img.display_image_url }}" alt="{{ product.title }}" class="w-full h-full object-cover">
                 </div>
                 {% endfor %}
@@ -35,7 +35,7 @@
 
             <!-- Price -->
             <div class="flex items-baseline gap-2">
-                <span class="text-3xl font-bold text-green-600">৳{{ product.price }}</span>
+                <span class="text-3xl font-bold text-pink-600">৳{{ product.price }}</span>
                 {% if product.original_price %}
                 <span class="text-lg text-gray-400 line-through">৳{{ product.original_price }}</span>
                 <span class="text-sm font-semibold text-red-500 bg-red-50 px-2 py-1 rounded">
@@ -46,7 +46,7 @@
 
             <!-- Stock Status -->
             {% if product.in_stock %}
-            <div class="flex items-center gap-2 text-green-600">
+            <div class="flex items-center gap-2 text-pink-600">
                 <i data-lucide="check-circle" class="h-5 w-5"></i>
                 <span class="font-medium">In Stock ({{ product.stock_quantity }} available)</span>
             </div>
@@ -69,7 +69,7 @@
                     {% csrf_token %}
                     <input type="hidden" name="quantity" value="1">
                     <button type="submit"
-                        class="w-full bg-green-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-green-700 transition-all active:scale-95 flex items-center justify-center gap-2">
+                        class="w-full bg-pink-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-pink-700 transition-all active:scale-95 flex items-center justify-center gap-2">
                         <i data-lucide="shopping-cart" class="h-5 w-5"></i>
                         Add to Cart
                     </button>

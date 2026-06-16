@@ -1,5 +1,5 @@
 """
-Notification Service for Al Barakah Mart
+Notification Service for GlowElle
 Handles SMS, Email, and WhatsApp notifications for order updates.
 """
 
@@ -69,7 +69,7 @@ class NotificationService:
         
         status_text = status_messages.get(order.status, order.get_status_display())
         
-        message = f"""🛒 Al Barakah Mart
+        message = f"""🛒 GlowElle
 
 {status_text}
 
@@ -90,6 +90,20 @@ class NotificationService:
         
         return message
     
+    def _format_phone(self, phone):
+        """
+        Format phone number for Bangladesh with correct country prefix.
+        """
+        phone = phone.strip()
+        if not phone.startswith('+'):
+            if phone.startswith('88'):
+                phone = '+' + phone
+            elif phone.startswith('0'):
+                phone = '+88' + phone[1:]
+            else:
+                phone = '+88' + phone
+        return phone
+
     def _send_sms(self, phone, message):
         """
         Send SMS notification via Twilio.
@@ -98,14 +112,7 @@ class NotificationService:
             return False
         
         try:
-            # Format phone number for Bangladesh
-            if not phone.startswith('+'):
-                if phone.startswith('88'):
-                    phone = '+' + phone
-                elif phone.startswith('0'):
-                    phone = '+88' + phone[1:]
-                else:
-                    phone = '+88' + phone
+            phone = self._format_phone(phone)
             
             message_obj = self.twilio_client.messages.create(
                 body=message,
@@ -131,7 +138,7 @@ class NotificationService:
                 'cancelled': 'Order Cancelled'
             }
             
-            subject = f"Al Barakah Mart - {status_subjects.get(order.status, 'Order Update')} #{order.order_reference}"
+            subject = f"GlowElle - {status_subjects.get(order.status, 'Order Update')} #{order.order_reference}"
             
             # Create HTML email
             html_message = f"""
@@ -150,7 +157,7 @@ class NotificationService:
             <body>
                 <div class="container">
                     <div class="header">
-                        <h1>🛒 Al Barakah Mart</h1>
+                        <h1>🛒 GlowElle</h1>
                     </div>
                     <div class="content">
                         <h2>{self._get_order_message(order, status_change).split('\\n')[1]}</h2>
@@ -172,7 +179,7 @@ class NotificationService:
                         </ul>
                     </div>
                     <div class="footer">
-                        <p>Thank you for shopping with Al Barakah Mart!</p>
+                        <p>Thank you for shopping with GlowElle!</p>
                         <p>📞 Support: {config('SUPPORT_PHONE', default='+880 1609132361')}</p>
                     </div>
                 </div>
@@ -202,14 +209,7 @@ class NotificationService:
             return False
         
         try:
-            # Format phone number
-            if not phone.startswith('+'):
-                if phone.startswith('88'):
-                    phone = '+' + phone
-                elif phone.startswith('0'):
-                    phone = '+88' + phone[1:]
-                else:
-                    phone = '+88' + phone
+            phone = self._format_phone(phone)
             
             message_obj = self.twilio_client.messages.create(
                 body=message,

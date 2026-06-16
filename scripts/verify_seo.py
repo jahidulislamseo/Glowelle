@@ -1,1 +1,0 @@
-import requests; r = requests.get('http://127.0.0.1:8000'); target = 'Your one-stop shop for fresh organic fruits, vegetables, meat, and daily essentials.'; print(f'Found in HTML: {target in r.text}')

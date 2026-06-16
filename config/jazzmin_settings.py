@@ -1,12 +1,12 @@
 JAZZMIN_SETTINGS = {
     # title of the window (Will default to current_admin_site.site_title if absent or None)
-    "site_title": "Al Barakah Admin",
+    "site_title": "GlowElle Admin",
 
     # Title on the login screen (19 chars max) (defaults to current_admin_site.site_header if absent or None)
-    "site_header": "Al Barakah Mart",
+    "site_header": "GlowElle BD",
 
     # Title on the brand (19 chars max) (defaults to current_admin_site.site_header if absent or None)
-    "site_brand": "Al Barakah Admin",
+    "site_brand": "Admin",
 
     # Logo to use for your site, must be present in static files, used for brand on top left
     "site_logo": "images/logo.png",
@@ -18,16 +18,16 @@ JAZZMIN_SETTINGS = {
     "login_logo_dark": None,
 
     # CSS classes that are applied to the logo above
-    "site_logo_classes": "img-circle",
+    "site_logo_classes": "",
 
     # Relative path to a favicon for your site, will default to site_logo if absent (ideally 32x32 px)
     "site_icon": "images/logo.png",
 
     # Welcome text on the login screen
-    "welcome_sign": "Welcome back to Al Barakah Admin",
+    "welcome_sign": "Welcome back to GlowElle Admin",
 
     # Copyright on the footer
-    "copyright": "Al Barakah Mart Ltd",
+    "copyright": "GlowElle BD © 2025",
 
     # List of model admins to search from the search bar, search bar omitted if excluded
     # If you want to use a single search field you dont need to use a list, you can simply write "search_model": "auth.User"
@@ -87,17 +87,19 @@ JAZZMIN_SETTINGS = {
     "navigation_expanded": True,
 
     # Hide these apps when generating side menu e.g (auth)
-    "hide_apps": [],
+    "hide_apps": ["sites", "account", "socialaccount"],
 
     # Hide these models when generating side menu (e.g auth.user)
-    "hide_models": [],
+    "hide_models": ["auth.Group"],
 
     # List of apps (and/or models) to base side menu ordering off of (does not need to contain all apps/models)
     "order_with_respect_to": [
+        # --- Orders ---
         "orders",
         "orders.Order",
         "orders.OrderStatusHistory",
         "orders.PaymentGateway",
+        # --- Products ---
         "products",
         "products.Product",
         "products.Category",
@@ -105,65 +107,85 @@ JAZZMIN_SETTINGS = {
         "products.Review",
         "products.StockLog",
         "products.Wishlist",
+        # --- Users ---
         "users",
         "users.User",
         "users.Address",
         "users.SupportTicket",
         "users.Wallet",
+        # --- Marketing ---
         "marketing",
         "marketing.Coupon",
         "marketing.DealOfTheDay",
         "marketing.HomeSlider",
+        "marketing.SellingNote",
+        # --- Core ---
         "core",
-        "core.ChatbotSettings",
-        "core.ChatbotFAQ",
-        "core.ChatbotSuggestion",
-        "core.ChatbotIntent",
         "core.ContactMessage",
         "core.SiteSettings",
-        "account",
+        # --- Analytics ---
         "analytics",
+        "analytics.VisitorSession",
+        "analytics.PageView",
+        "analytics.AnalyticsEvent",
+        # --- Chatbot ---
+        "chatbot",
+        "chatbot.ChatbotSettings",
+        "chatbot.ChatbotFAQ",
+        "chatbot.ChatbotSuggestion",
+        "chatbot.ChatbotIntent",
+        "chatbot.ChatbotAnalytics",
+        "chatbot.ChatbotMetric",
+        "chatbot.PopularProduct",
+        "chatbot.ChatbotConversationMemory",
+        # --- System (bottom) ---
         "auth",
-        "sites",
-        "socialaccount"
     ],
 
     # Custom icons for side menu apps/models
     "icons": {
-        "auth": "fas fa-users-cog",
-        "auth.Group": "fas fa-users",
+        # Auth
+        "auth": "fas fa-shield-alt",
+        "auth.User": "fas fa-user-shield",
+        # Users
         "users.User": "fas fa-user",
         "users.Address": "fas fa-map-marker-alt",
         "users.Wallet": "fas fa-wallet",
         "users.SupportTicket": "fas fa-headset",
+        # Products
         "products.Product": "fas fa-box",
         "products.Category": "fas fa-tags",
         "products.Brand": "fas fa-copyright",
         "products.Review": "fas fa-star",
         "products.Wishlist": "fas fa-heart",
         "products.StockLog": "fas fa-clipboard-list",
+        # Orders
         "orders.Order": "fas fa-shopping-cart",
         "orders.OrderItem": "fas fa-list",
         "orders.Courier": "fas fa-truck",
         "orders.OrderStatusHistory": "fas fa-history",
         "orders.PaymentGateway": "fas fa-credit-card",
+        # Marketing
         "marketing.HomeSlider": "fas fa-images",
         "marketing.Coupon": "fas fa-ticket-alt",
-        "marketing.DealOfTheDay": "fas fa-clock",
+        "marketing.DealOfTheDay": "fas fa-fire",
+        "marketing.SellingNote": "fas fa-sticky-note",
+        # Core
         "core.SiteSettings": "fas fa-cogs",
         "core.ContactMessage": "fas fa-envelope",
-        "core.ChatbotFAQ": "fas fa-question-circle",
-        "core.ChatbotSettings": "fas fa-robot",
-        "core.ChatbotSuggestion": "fas fa-lightbulb",
-        "core.ChatbotIntent": "fas fa-bullseye",
-        "account.EmailAddress": "fas fa-at",
+        # Analytics
         "analytics.AnalyticsEvent": "fas fa-chart-bar",
         "analytics.PageView": "fas fa-eye",
         "analytics.VisitorSession": "fas fa-user-clock",
-        "sites.Site": "fas fa-globe",
-        "socialaccount.SocialAccount": "fas fa-share-alt",
-        "socialaccount.SocialToken": "fas fa-key",
-        "socialaccount.SocialApp": "fas fa-mobile-alt",
+        # Chatbot
+        "chatbot.ChatbotSettings": "fas fa-robot",
+        "chatbot.ChatbotFAQ": "fas fa-question-circle",
+        "chatbot.ChatbotSuggestion": "fas fa-lightbulb",
+        "chatbot.ChatbotIntent": "fas fa-bullseye",
+        "chatbot.ChatbotAnalytics": "fas fa-chart-line",
+        "chatbot.ChatbotMetric": "fas fa-tachometer-alt",
+        "chatbot.PopularProduct": "fas fa-fire-alt",
+        "chatbot.ChatbotConversationMemory": "fas fa-comments",
     },
     # Icons that are used when one is not specified
     "default_icon_parents": "fas fa-chevron-circle-right",

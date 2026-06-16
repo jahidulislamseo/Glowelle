@@ -3,9 +3,10 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Sum, Count, Q
 from .models import User, Address, Wallet, SupportTicket
+from core.admin_mixins import ChangeHistoryMixin
 
 @admin.register(User)
-class UserAdmin(BaseUserAdmin):
+class UserAdmin(ChangeHistoryMixin, BaseUserAdmin):
     list_display = ('email', 'first_name', 'last_name', 'get_order_count', 'get_total_spent', 'is_staff', 'date_joined')
     list_filter = ('is_active', 'is_staff', 'date_joined')
     search_fields = ('email', 'username', 'first_name', 'last_name')
@@ -40,19 +41,19 @@ class UserAdmin(BaseUserAdmin):
         return queryset
 
 @admin.register(Address)
-class AddressAdmin(admin.ModelAdmin):
+class AddressAdmin(ChangeHistoryMixin, admin.ModelAdmin):
     list_display = ('user', 'street', 'city', 'phone', 'is_default')
     list_filter = ('city', 'is_default')
     search_fields = ('user__email', 'street', 'phone')
 
 @admin.register(SupportTicket)
-class SupportTicketAdmin(admin.ModelAdmin):
+class SupportTicketAdmin(ChangeHistoryMixin, admin.ModelAdmin):
     list_display = ('id', 'subject', 'user', 'status', 'created_at')
     list_filter = ('status', 'created_at')
     search_fields = ('subject', 'message', 'user__email')
     list_editable = ('status',)
 
 @admin.register(Wallet)
-class WalletAdmin(admin.ModelAdmin):
+class WalletAdmin(ChangeHistoryMixin, admin.ModelAdmin):
     list_display = ('user', 'balance', 'currency')
     search_fields = ('user__email',)
