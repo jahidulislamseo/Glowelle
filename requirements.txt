@@ -32,6 +32,9 @@ tzdata==2025.3
 
 # PDF generation (xhtml2pdf) - Enabled for Render
 xhtml2pdf==0.2.17
+# Cloudinary for media storage
+django-cloudinary-storage==0.3.0
+cloudinary==1.40.0
 
 # Frontend
 django-tailwind==4.4.2

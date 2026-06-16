@@ -33,7 +33,6 @@ else:
             'TIMEOUT': 900,  # 15 minutes
         }
     }
-
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,.vercel.app,.now.sh,.onrender.com,glowelle.onrender.com,shop-2thz.onrender.com,shop-1-38i4.onrender.com').split(',')
 
 # Required for Render's proxy
@@ -92,6 +91,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'markdownify.apps.MarkdownifyConfig',
+    'cloudinary',
+    'cloudinary_storage',
     
     # Allauth
     'allauth',
@@ -191,15 +192,32 @@ STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
+# Cloudinary for Media Files (User-uploaded content)
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+from decouple import config
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME', default=''),
+    'API_KEY': config('CLOUDINARY_API_KEY', default=''),
+    'API_SECRET': config('CLOUDINARY_API_SECRET', default=''),
+}
+cloudinary.config(**CLOUDINARY_STORAGE)
+
+# Use Cloudinary for media files if credentials are set
+if CLOUDINARY_STORAGE['CLOUD_NAME']:
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+else:
+    # Fallback to local storage for development
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = BASE_DIR / 'media'
+
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 INTERNAL_IPS = ["127.0.0.1"]
 AUTH_USER_MODEL = 'users.User'
-
-# Media files
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
 
 SITE_ID = 1
 
