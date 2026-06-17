@@ -2,37 +2,34 @@
 {% load static %}
 
 {% block content %}
-<div class="min-h-screen bg-[#fcfdfd] py-12">
-    <div class="container mx-auto px-4 max-w-7xl">
-        <!-- Checkout Steps / Header -->
-        <div class="mb-12">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+<div class="min-h-screen bg-[#fcfdfd] py-6 md:py-12 pb-28 md:pb-12">
+    <div class="container mx-auto px-3 sm:px-4 max-w-7xl">
+
+        <!-- Header -->
+        <div class="mb-6 md:mb-12">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6">
                 <div>
-                    <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight">Checkout</h1>
-                    <p class="text-gray-500 mt-2 font-medium">Please provide your shipping and payment details to
-                        complete your order.</p>
+                    <h1 class="text-2xl md:text-4xl font-extrabold text-gray-900 tracking-tight">Checkout</h1>
+                    <p class="text-gray-500 mt-1 md:mt-2 font-medium text-sm md:text-base">Please provide your shipping and payment details.</p>
                 </div>
                 <!-- Progress Indicator -->
-                <div class="flex items-center gap-2 sm:gap-4 overflow-x-auto pb-4 md:pb-0 no-scrollbar">
-                    <div class="flex items-center gap-2 shrink-0">
-                        <div
-                            class="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-green-500 text-white flex items-center justify-center font-bold shadow-lg shadow-green-200">
-                            <i data-lucide="check" class="h-4 w-4 sm:h-5 sm:w-5"></i>
+                <div class="flex items-center gap-2 sm:gap-4 overflow-x-auto pb-1 md:pb-0 no-scrollbar">
+                    <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                        <div class="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-green-500 text-white flex items-center justify-center font-bold shadow-lg shadow-green-200">
+                            <i data-lucide="check" class="h-3.5 w-3.5 sm:h-5 sm:w-5"></i>
                         </div>
                         <span class="text-xs sm:text-sm font-bold text-gray-900">Cart</span>
                     </div>
                     <div class="h-px w-4 sm:w-8 bg-green-200 shrink-0"></div>
-                    <div class="flex items-center gap-2 shrink-0">
-                        <div
-                            class="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-green-600 text-white flex items-center justify-center font-bold ring-4 ring-green-100">
+                    <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                        <div class="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-green-600 text-white flex items-center justify-center font-bold ring-4 ring-green-100">
                             2
                         </div>
                         <span class="text-xs sm:text-sm font-bold text-gray-900">Review</span>
                     </div>
                     <div class="h-px w-4 sm:w-8 bg-gray-100 shrink-0"></div>
-                    <div class="flex items-center gap-2 shrink-0 opacity-30">
-                        <div
-                            class="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center font-bold">
+                    <div class="flex items-center gap-1.5 sm:gap-2 shrink-0 opacity-30">
+                        <div class="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center font-bold">
                             3
                         </div>
                         <span class="text-xs sm:text-sm font-bold text-gray-500">Finish</span>
@@ -41,48 +38,46 @@
             </div>
         </div>
 
-        <form method="post" id="checkout-form" class="grid lg:grid-cols-12 gap-8 lg:gap-10 items-start">
+        <form method="post" id="checkout-form" class="grid lg:grid-cols-12 gap-5 md:gap-8 lg:gap-10 items-start">
             {% csrf_token %}
 
             <!-- Left Column: Shipping & Payment -->
-            <div class="lg:col-span-8 space-y-6 md:space-y-8">
+            <div class="lg:col-span-8 space-y-4 md:space-y-6 lg:space-y-8">
 
                 {% if form.non_field_errors or messages %}
-                <div class="bg-red-50 border-none rounded-3xl p-6 flex flex-col gap-2">
+                <div class="bg-red-50 border-none rounded-2xl md:rounded-3xl p-4 md:p-6 flex flex-col gap-2">
                     {% for message in messages %}
-                    <p class="text-red-700 font-bold flex items-center gap-2">
-                        <i data-lucide="alert-circle" class="h-5 w-5"></i> {{ message }}
+                    <p class="text-red-700 font-bold flex items-center gap-2 text-sm md:text-base">
+                        <i data-lucide="alert-circle" class="h-4 w-4 md:h-5 md:w-5 shrink-0"></i> {{ message }}
                     </p>
                     {% endfor %}
                     {% for error in form.non_field_errors %}
-                    <p class="text-red-700 font-bold flex items-center gap-2">
-                        <i data-lucide="alert-triangle" class="h-5 w-5"></i> {{ error }}
+                    <p class="text-red-700 font-bold flex items-center gap-2 text-sm md:text-base">
+                        <i data-lucide="alert-triangle" class="h-4 w-4 md:h-5 md:w-5 shrink-0"></i> {{ error }}
                     </p>
                     {% endfor %}
                 </div>
                 {% endif %}
 
                 <!-- Shipping Section -->
-                <section
-                    class="bg-white rounded-[2.5rem] p-8 md:p-10 border border-gray-100 shadow-sm relative overflow-hidden">
-                    <div class="flex items-center gap-4 mb-8">
-                        <div class="h-12 w-12 rounded-2xl bg-green-50 flex items-center justify-center text-green-600">
-                            <i data-lucide="truck" class="h-6 w-6"></i>
+                <section class="bg-white rounded-2xl md:rounded-[2.5rem] p-5 md:p-8 lg:p-10 border border-gray-100 shadow-sm relative overflow-hidden">
+                    <div class="flex items-center gap-3 md:gap-4 mb-5 md:mb-8">
+                        <div class="h-10 w-10 md:h-12 md:w-12 rounded-xl md:rounded-2xl bg-green-50 flex items-center justify-center text-green-600 shrink-0">
+                            <i data-lucide="truck" class="h-5 w-5 md:h-6 md:w-6"></i>
                         </div>
-                        <h2 class="text-2xl font-black text-gray-900 tracking-tight">Shipping Information</h2>
+                        <h2 class="text-lg md:text-2xl font-black text-gray-900 tracking-tight">Shipping Information</h2>
                     </div>
 
                     {% if addresses %}
-                    <div class="mb-8 p-6 bg-green-50/50 rounded-3xl border border-green-100/50">
-                        <label class="block text-sm font-extrabold text-green-800 mb-3 flex items-center gap-2">
+                    <div class="mb-5 md:mb-8 p-4 md:p-6 bg-green-50/50 rounded-2xl md:rounded-3xl border border-green-100/50">
+                        <label class="block text-xs font-extrabold text-green-800 mb-2 md:mb-3 flex items-center gap-2">
                             <i data-lucide="bookmark" class="h-4 w-4"></i> Use a saved address
                         </label>
                         <select id="saved-address-select"
-                            class="block w-full rounded-2xl border-none shadow-sm focus:ring-2 focus:ring-green-500/20 py-4 font-bold text-gray-700 bg-white">
+                            class="block w-full rounded-xl md:rounded-2xl border-none shadow-sm focus:ring-2 focus:ring-green-500/20 py-3 md:py-4 font-bold text-gray-700 bg-white text-sm md:text-base">
                             <option value="">-- Choose a saved address --</option>
                             {% for addr in addresses %}
-                            <option value="{{ addr.id }}" data-street="{{ addr.street }}" data-city="{{ addr.city }}"
-                                data-phone="{{ addr.phone }}">
+                            <option value="{{ addr.id }}" data-street="{{ addr.street }}" data-city="{{ addr.city }}" data-phone="{{ addr.phone }}">
                                 {{ addr.street }}, {{ addr.city }}
                             </option>
                             {% endfor %}
@@ -90,146 +85,173 @@
                     </div>
                     {% endif %}
 
-                    <div class="grid md:grid-cols-2 gap-8">
+                    <div class="grid md:grid-cols-2 gap-4 md:gap-8">
                         <!-- Full Name -->
-                        <div class="space-y-2">
-                            <label
-                                class="block text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Recipient
-                                Name</label>
+                        <div class="space-y-1.5 md:space-y-2">
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Recipient Name</label>
                             <div class="relative group">
-                                <div
-                                    class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none group-focus-within:text-green-600 transition-colors text-gray-300">
-                                    <i data-lucide="user" class="h-5 w-5"></i>
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none group-focus-within:text-green-600 transition-colors text-gray-300">
+                                    <i data-lucide="user" class="h-4 w-4 md:h-5 md:w-5"></i>
                                 </div>
                                 {{ form.full_name }}
                             </div>
                             {% if form.full_name.errors %}
-                            {% for error in form.full_name.errors %}<p
-                                class="text-xs text-red-500 font-bold tabular-nums">{{ error }}</p>{% endfor %}
+                            {% for error in form.full_name.errors %}<p class="text-xs text-red-500 font-bold">{{ error }}</p>{% endfor %}
                             {% endif %}
                         </div>
 
                         <!-- Email -->
-                        <div class="space-y-2">
-                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Email
-                                Address</label>
+                        <div class="space-y-1.5 md:space-y-2">
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Email Address</label>
                             <div class="relative group">
-                                <div
-                                    class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none group-focus-within:text-green-600 transition-colors text-gray-300">
-                                    <i data-lucide="mail" class="h-5 w-5"></i>
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none group-focus-within:text-green-600 transition-colors text-gray-300">
+                                    <i data-lucide="mail" class="h-4 w-4 md:h-5 md:w-5"></i>
                                 </div>
                                 {{ form.email }}
                             </div>
                             {% if form.email.errors %}
-                            {% for error in form.email.errors %}<p class="text-xs text-red-500 font-bold tabular-nums">
-                                {{ error }}</p>{% endfor %}
+                            {% for error in form.email.errors %}<p class="text-xs text-red-500 font-bold">{{ error }}</p>{% endfor %}
                             {% endif %}
                         </div>
 
                         <!-- Phone -->
-                        <div class="space-y-2">
-                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Phone
-                                Number</label>
+                        <div class="space-y-1.5 md:space-y-2">
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Phone Number</label>
                             <div class="relative group">
-                                <div
-                                    class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none group-focus-within:text-green-600 transition-colors text-gray-300">
-                                    <i data-lucide="phone" class="h-5 w-5"></i>
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none group-focus-within:text-green-600 transition-colors text-gray-300">
+                                    <i data-lucide="phone" class="h-4 w-4 md:h-5 md:w-5"></i>
                                 </div>
                                 {{ form.phone }}
                             </div>
                             {% if form.phone.errors %}
-                            {% for error in form.phone.errors %}<p class="text-xs text-red-500 font-bold tabular-nums">
-                                {{ error }}</p>{% endfor %}
+                            {% for error in form.phone.errors %}<p class="text-xs text-red-500 font-bold">{{ error }}</p>{% endfor %}
                             {% endif %}
                             <p class="text-[10px] text-gray-400 font-semibold px-1 italic">Format: 01XXXXXXXXX</p>
                         </div>
 
                         <!-- City & Zip -->
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="space-y-2">
-                                <label
-                                    class="block text-xs font-bold text-gray-400 uppercase tracking-widest px-1">City</label>
+                        <div class="grid grid-cols-2 gap-3 md:gap-4">
+                            <div class="space-y-1.5 md:space-y-2">
+                                <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest px-1">City</label>
                                 {{ form.city }}
                                 {% if form.city.errors %}
-                                {% for error in form.city.errors %}<p
-                                    class="text-xs text-red-500 font-bold tabular-nums">{{ error }}</p>{% endfor %}
+                                {% for error in form.city.errors %}<p class="text-xs text-red-500 font-bold">{{ error }}</p>{% endfor %}
                                 {% endif %}
                             </div>
-                            <div class="space-y-2">
-                                <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Zip
-                                    Code</label>
+                            <div class="space-y-1.5 md:space-y-2">
+                                <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Zip Code</label>
                                 {{ form.zip_code }}
                                 {% if form.zip_code.errors %}
-                                {% for error in form.zip_code.errors %}<p
-                                    class="text-xs text-red-500 font-bold tabular-nums">{{ error }}</p>{% endfor %}
+                                {% for error in form.zip_code.errors %}<p class="text-xs text-red-500 font-bold">{{ error }}</p>{% endfor %}
                                 {% endif %}
                             </div>
                         </div>
 
                         <!-- Address -->
-                        <div class="col-span-full space-y-2">
-                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Full
-                                Delivery Address</label>
+                        <div class="col-span-full space-y-1.5 md:space-y-2">
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Full Delivery Address</label>
                             <div class="relative group">
-                                <div
-                                    class="absolute top-4 left-4 pointer-events-none group-focus-within:text-green-600 transition-colors text-gray-300">
-                                    <i data-lucide="map-pin" class="h-5 w-5"></i>
+                                <div class="absolute top-4 left-4 pointer-events-none group-focus-within:text-green-600 transition-colors text-gray-300">
+                                    <i data-lucide="map-pin" class="h-4 w-4 md:h-5 md:w-5"></i>
                                 </div>
                                 {{ form.address }}
                             </div>
                             {% if form.address.errors %}
-                            {% for error in form.address.errors %}<p
-                                class="text-xs text-red-500 font-bold tabular-nums">{{ error }}</p>{% endfor %}
+                            {% for error in form.address.errors %}<p class="text-xs text-red-500 font-bold">{{ error }}</p>{% endfor %}
                             {% endif %}
                         </div>
                     </div>
                 </section>
 
                 <!-- Payment Section -->
-                <section class="bg-white rounded-[2.5rem] p-8 md:p-10 border border-gray-100 shadow-sm">
-                    <div class="flex items-center gap-4 mb-8">
-                        <div
-                            class="h-12 w-12 rounded-2xl bg-orange-50 flex items-center justify-center text-orange-600">
-                            <i data-lucide="credit-card" class="h-6 w-6"></i>
+                <section class="bg-white rounded-2xl md:rounded-[2.5rem] p-5 md:p-8 lg:p-10 border border-gray-100 shadow-sm">
+                    <div class="flex items-center gap-3 md:gap-4 mb-5 md:mb-8">
+                        <div class="h-10 w-10 md:h-12 md:w-12 rounded-xl md:rounded-2xl bg-orange-50 flex items-center justify-center text-orange-600 shrink-0">
+                            <i data-lucide="credit-card" class="h-5 w-5 md:h-6 md:w-6"></i>
                         </div>
-                        <h2 class="text-2xl font-black text-gray-900 tracking-tight">Payment Method</h2>
+                        <h2 class="text-lg md:text-2xl font-black text-gray-900 tracking-tight">Payment Method</h2>
                     </div>
 
-                    <div class="max-w-md space-y-4">
+                    <div class="max-w-md space-y-3 md:space-y-4">
                         <div class="relative group">
                             {{ form.payment_method }}
                             <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-                                <i data-lucide="chevron-down" class="h-5 w-5"></i>
+                                <i data-lucide="chevron-down" class="h-4 w-4 md:h-5 md:w-5"></i>
                             </div>
                         </div>
-                        <p
-                            class="text-sm text-gray-500 font-medium leading-relaxed bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                        <p class="text-xs md:text-sm text-gray-500 font-medium leading-relaxed bg-gray-50 p-3 md:p-4 rounded-xl md:rounded-2xl border border-gray-100">
                             <i data-lucide="info" class="h-4 w-4 inline-block mr-1 text-blue-500"></i>
-                            Processing through our secure payment gateway. For Cash on Delivery, please have the exact
-                            amount ready.
+                            Processing through our secure payment gateway. For Cash on Delivery, please have the exact amount ready.
                         </p>
                     </div>
                 </section>
+
+                <!-- Mobile Order Review (shown only on mobile, before place order) -->
+                <div class="lg:hidden bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+                    <h2 class="text-base font-black text-gray-900 mb-4 flex items-center justify-between">
+                        Order Review
+                        <span class="text-xs text-gray-400 font-semibold">{{ cart|length }} item(s)</span>
+                    </h2>
+
+                    <div class="space-y-3 max-h-56 overflow-y-auto pr-1 custom-scrollbar mb-4">
+                        {% for item in cart %}
+                        <div class="flex gap-3 group">
+                            <div class="h-12 w-12 rounded-xl overflow-hidden bg-gray-50 border border-gray-100 shrink-0">
+                                <img src="{% if item.product.image %}{{ item.product.display_image_url }}{% else %}https://placehold.co/100x100?text=No+Image{% endif %}"
+                                    alt="{{ item.product.title }}"
+                                    class="object-cover w-full h-full group-hover:scale-110 transition-transform duration-500">
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <h4 class="font-bold text-gray-900 text-sm line-clamp-1">{{ item.product.title }}</h4>
+                                <p class="text-xs text-gray-400 font-semibold mt-0.5">{{ item.quantity }} x ৳{{ item.price }}</p>
+                            </div>
+                            <div class="font-black text-gray-900 text-sm shrink-0">৳{{ item.total_price }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="space-y-2 pt-4 border-t border-gray-100">
+                        <div class="flex justify-between text-sm text-gray-500 font-medium">
+                            <span>Subtotal</span>
+                            <span class="text-gray-900 font-bold">৳{{ cart.get_total_price }}</span>
+                        </div>
+                        <div class="flex justify-between text-sm text-gray-500 font-medium">
+                            <span>Delivery</span>
+                            <span class="text-green-600 font-bold">+৳60</span>
+                        </div>
+                        {% with discount=cart.get_discount %}
+                        {% if discount > 0 %}
+                        <div class="flex justify-between text-sm font-bold text-red-500">
+                            <span class="flex items-center gap-1"><i data-lucide="tag" class="h-3 w-3"></i> Discount</span>
+                            <span class="tabular-nums">-৳{{ discount|floatformat:2 }}</span>
+                        </div>
+                        {% endif %}
+                        {% endwith %}
+                        <div class="flex justify-between items-center pt-3 border-t border-dashed border-gray-100">
+                            <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Total</span>
+                            {% with total=cart.get_total_price_after_discount|add:60 %}
+                            <span class="text-xl font-black text-gray-900 tabular-nums">৳{{ total|floatformat:2 }}</span>
+                            {% endwith %}
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <!-- Right Column: Order Review Sidebar -->
-            <div class="lg:col-span-4 sticky top-28">
+            <!-- Right Column: Order Review Sidebar (Desktop Only) -->
+            <div class="hidden lg:block lg:col-span-4 sticky top-28">
                 <div class="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-xl shadow-green-900/5">
                     <h2 class="text-2xl font-black text-gray-900 mb-8">Order Review</h2>
 
                     <div class="space-y-6 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar mb-8">
                         {% for item in cart %}
                         <div class="flex gap-4 group">
-                            <div
-                                class="h-16 w-16 rounded-2xl overflow-hidden bg-gray-50 border border-gray-100 shrink-0">
+                            <div class="h-16 w-16 rounded-2xl overflow-hidden bg-gray-50 border border-gray-100 shrink-0">
                                 <img src="{% if item.product.image %}{{ item.product.display_image_url }}{% else %}https://placehold.co/100x100?text=No+Image{% endif %}"
                                     alt="{{ item.product.title }}"
                                     class="object-cover w-full h-full group-hover:scale-110 transition-transform duration-500">
                             </div>
                             <div class="min-w-0 flex-1">
-                                <h4
-                                    class="font-bold text-gray-900 text-sm line-clamp-1 group-hover:text-green-600 transition-colors">
-                                    {{ item.product.title }}</h4>
+                                <h4 class="font-bold text-gray-900 text-sm line-clamp-1 group-hover:text-green-600 transition-colors">{{ item.product.title }}</h4>
                                 <p class="text-xs text-gray-400 font-semibold mt-0.5">{{ item.quantity }} x ৳{{ item.price }}</p>
                                 <p class="text-sm font-black text-gray-900 mt-1">৳{{ item.total_price }}</p>
                             </div>
@@ -250,18 +272,15 @@
                         {% with discount=cart.get_discount %}
                         {% if discount > 0 %}
                         <div class="flex justify-between items-center text-sm font-bold text-red-500">
-                            <span class="flex items-center gap-1"><i data-lucide="tag" class="h-3 w-3"></i>
-                                Discount</span>
+                            <span class="flex items-center gap-1"><i data-lucide="tag" class="h-3 w-3"></i> Discount</span>
                             <span class="tabular-nums">-৳{{ discount|floatformat:2 }}</span>
                         </div>
                         {% endif %}
                         {% endwith %}
-
                         <div class="pt-6 mt-4 border-t border-dashed border-gray-100 flex justify-between items-end">
-                            <span class="text-gray-400 font-bold text-[10px] uppercase tracking-widest pb-1">Total
-                                Payable</span>
+                            <span class="text-gray-400 font-bold text-[10px] uppercase tracking-widest pb-1">Total Payable</span>
                             {% with total=cart.get_total_price_after_discount|add:60 %}
-                                <span class="text-3xl font-black text-gray-900 tabular-nums">৳{{ total|floatformat:2 }}</span>
+                            <span class="text-3xl font-black text-gray-900 tabular-nums">৳{{ total|floatformat:2 }}</span>
                             {% endwith %}
                         </div>
                     </div>
@@ -289,7 +308,25 @@
                     </div>
                 </div>
             </div>
+
         </form>
+    </div>
+</div>
+
+<!-- Mobile Sticky Place Order Bar -->
+<div class="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-100 shadow-2xl shadow-black/10 px-4 py-4">
+    <div class="flex items-center justify-between gap-4 max-w-lg mx-auto">
+        <div>
+            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Total Payable</p>
+            {% with total=cart.get_total_price_after_discount|add:60 %}
+            <p class="text-xl font-black text-gray-900 tabular-nums">৳{{ total|floatformat:2 }}</p>
+            {% endwith %}
+        </div>
+        <button type="submit" form="checkout-form"
+            class="flex-1 bg-gray-900 text-white font-black py-4 px-6 rounded-2xl shadow-lg hover:bg-black active:scale-95 transition-all flex items-center justify-center gap-2 text-base">
+            Place Order
+            <i data-lucide="check-circle" class="h-5 w-5"></i>
+        </button>
     </div>
 </div>
 
@@ -309,12 +346,10 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // Lucide icons initialization (if not handled globally)
         if (typeof lucide !== 'undefined') {
             lucide.createIcons();
         }
 
-        // Saved address selection logic
         const savedAddressSelect = document.getElementById('saved-address-select');
         if (savedAddressSelect) {
             savedAddressSelect.addEventListener('change', function () {
@@ -331,11 +366,10 @@
                     if (addressField) addressField.value = street;
                     if (cityField) {
                         cityField.value = city;
-                        cityField.dispatchEvent(new Event('change')); // Trigger zip logic
+                        cityField.dispatchEvent(new Event('change'));
                     }
                     if (phoneField) phoneField.value = phone;
 
-                    // Visual feedback
                     [addressField, cityField, phoneField].forEach(f => {
                         if (f) {
                             f.classList.add('ring-2', 'ring-green-500/20');
@@ -346,25 +380,17 @@
             });
         }
 
-        // City & Zip Logic
         const cityInput = document.getElementById('{{ form.city.id_for_label }}');
         const zipInput = document.getElementById('{{ form.zip_code.id_for_label }}');
 
         if (cityInput) {
             cityInput.setAttribute('list', 'cities');
-
             cityInput.addEventListener('change', function () {
                 const val = this.value.toLowerCase().trim();
                 const zips = {
-                    'dhaka': '1000',
-                    'chittagong': '4000',
-                    'sylhet': '3100',
-                    'khulna': '9100',
-                    'rajshahi': '6000',
-                    'barisal': '8200',
-                    'rangpur': '5400',
-                    'mymensingh': '2200',
-                    'comilla': '3500',
+                    'dhaka': '1000', 'chittagong': '4000', 'sylhet': '3100',
+                    'khulna': '9100', 'rajshahi': '6000', 'barisal': '8200',
+                    'rangpur': '5400', 'mymensingh': '2200', 'comilla': '3500',
                     'narayanganj': '1400'
                 };
                 if (zips[val] && zipInput) {
@@ -376,22 +402,9 @@
 </script>
 
 <style>
-    /* Custom Scrollbar for Summary Sidebar */
-    .custom-scrollbar::-webkit-scrollbar {
-        width: 4px;
-    }
-
-    .custom-scrollbar::-webkit-scrollbar-track {
-        background: transparent;
-    }
-
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: #f1f5f9;
-        border-radius: 10px;
-    }
-
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-        background: #e2e8f0;
-    }
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #f1f5f9; border-radius: 10px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #e2e8f0; }
 </style>
 {% endblock %}
