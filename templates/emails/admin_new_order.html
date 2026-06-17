@@ -1,0 +1,79 @@
+{% extends "emails/base_email.html" %}
+{% block title %}নতুন অর্ডার - Admin Alert{% endblock %}
+{% block tagline %}নতুন অর্ডার এসেছে! 🛒{% endblock %}
+
+{% block content %}
+<p class="greeting">নতুন অর্ডার!</p>
+<p class="intro-text">
+  একটি নতুন অর্ডার পাওয়া গেছে। নিচে বিস্তারিত দেখুন।
+</p>
+
+<div class="highlight-box">
+  <div style="font-size:13px; font-weight:600; color:#6b7280; text-transform:uppercase; letter-spacing:1px;">মোট পরিমাণ</div>
+  <div class="highlight-amount">৳{{ order.total }}</div>
+  <div style="margin-top:8px;">
+    {% if order.payment_method == 'cod' %}
+      <span class="badge badge-yellow">Cash on Delivery</span>
+    {% else %}
+      <span class="badge badge-green">Online Payment</span>
+    {% endif %}
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-row">
+    <span class="card-label">অর্ডার নম্বর</span>
+    <span class="card-value">#{{ order.order_reference|default:order.id }}</span>
+  </div>
+  <div class="card-row">
+    <span class="card-label">কাস্টমার</span>
+    <span class="card-value">{{ order.full_name }}</span>
+  </div>
+  <div class="card-row">
+    <span class="card-label">Phone</span>
+    <span class="card-value">{{ order.phone }}</span>
+  </div>
+  <div class="card-row">
+    <span class="card-label">Email</span>
+    <span class="card-value">{{ order.email }}</span>
+  </div>
+  <div class="card-row">
+    <span class="card-label">ঠিকানা</span>
+    <span class="card-value">{{ order.address }}, {{ order.city }}</span>
+  </div>
+  <div class="card-row">
+    <span class="card-label">অর্ডারের সময়</span>
+    <span class="card-value">{{ order.created_at|date:"d F, Y - H:i" }}</span>
+  </div>
+</div>
+
+<p style="font-size:14px; font-weight:700; color:#111827; margin-bottom:12px; text-transform:uppercase; letter-spacing:1px;">অর্ডারকৃত পণ্য</p>
+<table class="items-table">
+  <thead>
+    <tr>
+      <th style="text-align:left;">পণ্য</th>
+      <th style="text-align:center;">পরিমাণ</th>
+      <th style="text-align:right;">মোট</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in order.items.all %}
+    <tr>
+      <td><div class="item-name">{{ item.product.title }}</div></td>
+      <td style="text-align:center; font-weight:600;">{{ item.quantity }}</td>
+      <td class="item-price">৳{{ item.get_cost }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+  <tfoot>
+    <tr class="total-row">
+      <td colspan="2">মোট</td>
+      <td style="text-align:right;">৳{{ order.total }}</td>
+    </tr>
+  </tfoot>
+</table>
+
+<div class="btn-center">
+  <a href="{{ site_url }}/admin/orders/order/{{ order.id }}/change/" class="btn">⚙️ Admin-এ দেখুন</a>
+</div>
+{% endblock %}

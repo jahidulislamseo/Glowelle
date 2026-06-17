@@ -14,6 +14,7 @@ from products.models import Product
 from analytics.models import VisitorSession, PageView, AnalyticsEvent
 from .models import ContactMessage
 from .utils import generate_pdf_response
+from .email_utils import send_admin_contact_email
 
 User = get_user_model()
 
@@ -24,7 +25,8 @@ def contact(request):
         message = request.POST.get('message')
         
         if name and email and message:
-            ContactMessage.objects.create(name=name, email=email, message=message)
+            contact_msg = ContactMessage.objects.create(name=name, email=email, message=message)
+            send_admin_contact_email(contact_msg)
             messages.success(request, 'Your message has been sent successfully! We will contact you soon.')
             return redirect('contact')
         else:

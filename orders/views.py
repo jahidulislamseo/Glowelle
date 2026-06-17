@@ -119,7 +119,8 @@ def coupon_apply(request):
     code = request.POST.get('code')
     if code:
         try:
-            coupon = Coupon.objects.get(code__iexact=code, active=True, valid_from__lte=timezone.now(), valid_to__gte=timezone.now())
+            today = timezone.now().date()
+            coupon = Coupon.objects.get(code__iexact=code, active=True, valid_from__date__lte=today, valid_to__date__gte=today)
             request.session['coupon_id'] = coupon.id
             messages.success(request, f"Coupon '{code}' applied successfully!")
             

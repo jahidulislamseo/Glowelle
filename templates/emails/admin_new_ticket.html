@@ -1,0 +1,46 @@
+{% extends "emails/base_email.html" %}
+{% block title %}নতুন Support Ticket - Admin{% endblock %}
+{% block tagline %}নতুন Support Ticket 🎫{% endblock %}
+
+{% block content %}
+<p class="greeting">নতুন Support Ticket!</p>
+<p class="intro-text">
+  একজন customer নতুন support ticket খুলেছেন। দ্রুত সাড়া দিন।
+</p>
+
+<div class="card">
+  <div class="card-row">
+    <span class="card-label">Ticket নম্বর</span>
+    <span class="card-value">#{{ ticket.id }}</span>
+  </div>
+  <div class="card-row">
+    <span class="card-label">বিষয়</span>
+    <span class="card-value">{{ ticket.subject }}</span>
+  </div>
+  <div class="card-row">
+    <span class="card-label">Customer</span>
+    <span class="card-value">{{ ticket.user.get_full_name|default:ticket.user.username }}</span>
+  </div>
+  <div class="card-row">
+    <span class="card-label">Email</span>
+    <span class="card-value">{{ ticket.user.email }}</span>
+  </div>
+  <div class="card-row">
+    <span class="card-label">স্ট্যাটাস</span>
+    <span class="card-value"><span class="badge badge-yellow">Open</span></span>
+  </div>
+  <div class="card-row">
+    <span class="card-label">খোলার তারিখ</span>
+    <span class="card-value">{{ ticket.created_at|date:"d F, Y - H:i" }}</span>
+  </div>
+</div>
+
+<div style="background:#f0fdf4; border-left:4px solid #16a34a; border-radius:0 12px 12px 0; padding:20px 24px; margin:20px 0;">
+  <p style="font-size:13px; font-weight:600; color:#15803d; margin-bottom:10px;">বার্তা:</p>
+  <p style="font-size:15px; color:#374151; line-height:1.8;">{{ ticket.message }}</p>
+</div>
+
+<div class="btn-center">
+  <a href="{{ site_url }}/admin/users/supportticket/{{ ticket.id }}/change/" class="btn">🎫 Ticket পরিচালনা করুন</a>
+</div>
+{% endblock %}

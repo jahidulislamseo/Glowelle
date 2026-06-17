@@ -1,0 +1,38 @@
+{% extends "emails/base_email.html" %}
+{% block title %}নতুন Contact বার্তা - Admin{% endblock %}
+{% block tagline %}Contact Form বার্তা 📩{% endblock %}
+
+{% block content %}
+<p class="greeting">নতুন বার্তা এসেছে!</p>
+<p class="intro-text">
+  Contact form থেকে একটি নতুন বার্তা পাওয়া গেছে।
+</p>
+
+<div class="card">
+  <div class="card-row">
+    <span class="card-label">নাম</span>
+    <span class="card-value">{{ msg.name }}</span>
+  </div>
+  <div class="card-row">
+    <span class="card-label">Email</span>
+    <span class="card-value">{{ msg.email }}</span>
+  </div>
+  <div class="card-row">
+    <span class="card-label">সময়</span>
+    <span class="card-value">{{ msg.created_at|date:"d F, Y - H:i" }}</span>
+  </div>
+</div>
+
+<div style="background:#f0fdf4; border-left:4px solid #16a34a; border-radius:0 12px 12px 0; padding:20px 24px; margin:20px 0;">
+  <p style="font-size:13px; font-weight:600; color:#15803d; margin-bottom:10px;">বার্তা:</p>
+  <p style="font-size:15px; color:#374151; line-height:1.8;">{{ msg.message }}</p>
+</div>
+
+<div class="btn-center">
+  <a href="mailto:{{ msg.email }}" class="btn">📧 Reply করুন</a>
+</div>
+
+<div class="btn-center" style="margin-top:0;">
+  <a href="{{ site_url }}/admin/core/contactmessage/" style="color:#16a34a; font-size:14px; font-weight:600;">Admin-এ সব বার্তা দেখুন →</a>
+</div>
+{% endblock %}

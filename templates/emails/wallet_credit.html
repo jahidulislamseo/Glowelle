@@ -1,0 +1,40 @@
+{% extends "emails/base_email.html" %}
+{% block title %}Wallet Credit - GlowElle{% endblock %}
+{% block tagline %}Wallet আপডেট 💰{% endblock %}
+
+{% block content %}
+<p class="greeting">হ্যালো {{ user.first_name|default:user.username }},</p>
+<p class="intro-text">
+  আপনার GlowElle Wallet-এ টাকা যোগ হয়েছে। নিচে বিবরণ দেখুন।
+</p>
+
+<div class="highlight-box">
+  <div style="font-size:40px;">💰</div>
+  <div style="font-size:14px; font-weight:600; color:#6b7280; margin-top:8px; text-transform:uppercase; letter-spacing:1px;">যোগ হয়েছে</div>
+  <div class="highlight-amount">+৳{{ amount }}</div>
+</div>
+
+<div class="card">
+  <div class="card-row">
+    <span class="card-label">বিবরণ</span>
+    <span class="card-value">{{ description }}</span>
+  </div>
+  <div class="card-row">
+    <span class="card-label">নতুন Balance</span>
+    <span class="card-value" style="color:#16a34a;">৳{{ new_balance }}</span>
+  </div>
+  <div class="card-row">
+    <span class="card-label">তারিখ</span>
+    <span class="card-value">{% now "d F, Y - H:i" %}</span>
+  </div>
+</div>
+
+<div class="btn-center">
+  <a href="{{ site_url }}/dashboard/wallet" class="btn">💳 Wallet দেখুন</a>
+</div>
+
+<hr class="divider">
+<p style="font-size:13px; color:#9ca3af; text-align:center;">
+  Wallet ব্যবহার করে checkout-এ সরাসরি পেমেন্ট করুন।
+</p>
+{% endblock %}

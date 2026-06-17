@@ -233,6 +233,8 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')  # Use Gmail App Password
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='GlowElle BD <noreply@glowellebd.com>')
+ADMIN_EMAIL = config('ADMIN_EMAIL', default=EMAIL_HOST_USER or 'admin@glowellebd.com')
+SITE_URL = config('SITE_URL', default='http://localhost:8000')
 
 LOGIN_REDIRECT_URL = 'dashboard'
 LOGIN_URL = 'login'

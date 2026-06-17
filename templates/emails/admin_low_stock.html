@@ -1,0 +1,54 @@
+{% extends "emails/base_email.html" %}
+{% block title %}Low Stock Alert - Admin{% endblock %}
+{% block tagline %}স্টক সতর্কতা ⚠️{% endblock %}
+
+{% block content %}
+<p class="greeting">স্টক সতর্কতা!</p>
+<p class="intro-text">
+  নিচের <strong>{{ products|length }} টি পণ্যের</strong> স্টক ১০-এর নিচে নেমে গেছে। দ্রুত restocking করুন।
+</p>
+
+<div style="background:#fef2f2; border:2px solid #fca5a5; border-radius:16px; padding:16px 20px; margin-bottom:20px; text-align:center;">
+  <div style="font-size:40px;">⚠️</div>
+  <div style="font-size:20px; font-weight:800; color:#991b1b; margin-top:8px;">{{ products|length }} টি পণ্যে স্টক কম!</div>
+</div>
+
+<table class="items-table">
+  <thead>
+    <tr>
+      <th style="text-align:left;">পণ্যের নাম</th>
+      <th style="text-align:center;">বাকি স্টক</th>
+      <th style="text-align:center;">স্ট্যাটাস</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for product in products %}
+    <tr>
+      <td>
+        <div class="item-name">{{ product.title }}</div>
+        {% if product.category %}<div style="font-size:12px; color:#9ca3af;">{{ product.category.name }}</div>{% endif %}
+      </td>
+      <td style="text-align:center; font-size:18px; font-weight:900;
+        {% if product.stock_quantity <= 3 %}color:#dc2626;{% elif product.stock_quantity <= 6 %}color:#ea580c;{% else %}color:#d97706;{% endif %}">
+        {{ product.stock_quantity }}
+      </td>
+      <td style="text-align:center;">
+        {% if product.stock_quantity == 0 %}
+          <span class="badge badge-red">Out of Stock</span>
+        {% elif product.stock_quantity <= 3 %}
+          <span class="badge badge-red">Critical</span>
+        {% elif product.stock_quantity <= 6 %}
+          <span class="badge badge-yellow">Very Low</span>
+        {% else %}
+          <span class="badge badge-yellow">Low</span>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<div class="btn-center" style="margin-top:24px;">
+  <a href="{{ site_url }}/admin/products/product/" class="btn">📦 Inventory পরিচালনা করুন</a>
+</div>
+{% endblock %}

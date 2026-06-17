@@ -1,0 +1,40 @@
+{% extends "emails/base_email.html" %}
+{% block title %}GlowElle-তে স্বাগতম!{% endblock %}
+{% block tagline %}আপনাকে স্বাগতম 🎉{% endblock %}
+
+{% block content %}
+<p class="greeting">হ্যালো {{ user.first_name|default:user.username }},</p>
+<p class="intro-text">
+  <strong>GlowElle BD</strong>-তে আপনাকে স্বাগতম! আপনার account সফলভাবে তৈরি হয়েছে। এখন আপনি আমাদের সেরা পণ্যগুলো অর্ডার করতে পারবেন।
+</p>
+
+<div class="highlight-box">
+  <div style="font-size: 48px;">🎁</div>
+  <div style="font-size: 18px; font-weight: 800; color: #15803d; margin-top: 8px;">প্রথম অর্ডারে বিশেষ ছাড়!</div>
+  <div style="font-size: 14px; color: #4b5563; margin-top: 6px;">আমাদের সেরা পণ্য দেখুন এবং আজই অর্ডার করুন</div>
+</div>
+
+<div class="card">
+  <div class="card-row">
+    <span class="card-label">Username</span>
+    <span class="card-value">{{ user.username }}</span>
+  </div>
+  <div class="card-row">
+    <span class="card-label">Email</span>
+    <span class="card-value">{{ user.email }}</span>
+  </div>
+  <div class="card-row">
+    <span class="card-label">যোগদানের তারিখ</span>
+    <span class="card-value">{{ user.date_joined|date:"d F, Y" }}</span>
+  </div>
+</div>
+
+<div class="btn-center">
+  <a href="{{ site_url }}" class="btn">🛒 কেনাকাটা শুরু করুন</a>
+</div>
+
+<hr class="divider">
+<p style="font-size: 13px; color: #9ca3af; text-align: center;">
+  কোনো সমস্যা হলে আমাদের সাথে যোগাযোগ করুন: {{ support_phone }}
+</p>
+{% endblock %}

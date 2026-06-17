@@ -47,7 +47,8 @@ class NotificationService:
         
         # Send Email
         if order.user and order.user.email:
-            results['email'] = self._send_email(order.user.email, order, status_change)
+            from core.email_utils import send_order_status_email
+            results['email'] = send_order_status_email(order)
         
         # Send WhatsApp
         if self.twilio_client and order.phone:

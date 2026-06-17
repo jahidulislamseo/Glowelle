@@ -1,51 +1,43 @@
-from django.db.models.signals import post_save
+from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
-from django.utils.html import strip_tags
-from django.conf import settings
 from .models import Order
+from core.email_utils import (
+    send_order_confirmation_email,
+    send_order_status_email,
+    send_admin_new_order_email,
+    send_return_refund_email,
+)
+
+_order_prev_status = {}
+_order_prev_return_status = {}
+
+
+@receiver(pre_save, sender=Order)
+def capture_old_status(sender, instance, **kwargs):
+    if instance.pk:
+        try:
+            old = Order.objects.get(pk=instance.pk)
+            _order_prev_status[instance.pk] = old.status
+            _order_prev_return_status[instance.pk] = old.return_status
+        except Order.DoesNotExist:
+            pass
+
 
 @receiver(post_save, sender=Order)
 def send_order_notification(sender, instance, created, **kwargs):
-    user = instance.user
-    subject = ""
-    template = ""
-    
     if created:
-        subject = f"Order Confirmation - #{instance.id}"
-        template = "emails/order_confirmation.html"
-    else:
-        # Check if status changed? (Requires tracking old status, simplistic approach for now)
-        # For simplicity in this MV, we only verify Confirmation on Create.
-        # Handling status updates properly requires a pre_save signal or field tracker.
-        return 
+        send_order_confirmation_email(instance)
+        send_admin_new_order_email(instance)
+        _order_prev_status.pop(instance.pk, None)
+        _order_prev_return_status.pop(instance.pk, None)
+        return
 
-    if template:
-        # For guest users, user is None. Use order details instead.
-        recipient_email = user.email if user else instance.email
-        customer_name = getattr(user, 'first_name', '') or getattr(user, 'username', '') if user else instance.full_name
+    old_status = _order_prev_status.pop(instance.pk, None)
+    old_return_status = _order_prev_return_status.pop(instance.pk, None)
 
-        context = {
-            'order': instance, 
-            'user': user, 
-            'site_url': 'http://127.0.0.1:8000',
-            'customer_name': customer_name
-        }
+    if old_status and old_status != instance.status:
+        send_order_status_email(instance)
 
-        html_message = render_to_string(template, context)
-        plain_message = strip_tags(html_message)
-        
-        if recipient_email:
-            try:
-                send_mail(
-                    subject,
-                    plain_message,
-                    settings.DEFAULT_FROM_EMAIL,
-                    [recipient_email],
-                    html_message=html_message,
-                    fail_silently=False, 
-                )
-                print(f"Email sent to {recipient_email} for Order #{instance.id}")
-            except Exception as e:
-                print(f"Failed to send email: {e}")
+    if old_return_status and old_return_status != instance.return_status:
+        if instance.return_status in ('approved', 'rejected', 'completed'):
+            send_return_refund_email(instance)

@@ -17,6 +17,7 @@ from orders.cart import Cart
 from products.models import Product
 from .models import User, Address, Wallet, SupportTicket
 from .forms import RegisterForm, UserUpdateForm, AddressForm, SupportTicketForm
+from core.email_utils import send_welcome_email, send_support_ticket_email, send_admin_new_ticket_email, send_otp_email
 
 @login_required
 def address_add(request):
@@ -70,6 +71,8 @@ def ticket_create(request):
             ticket = form.save(commit=False)
             ticket.user = request.user
             ticket.save()
+            send_support_ticket_email(ticket)
+            send_admin_new_ticket_email(ticket)
             messages.success(request, 'Support ticket created!')
             return redirect('support_tickets')
     else:
@@ -89,12 +92,15 @@ def register_view(request):
             
             user = form.save()
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-            
+
+            if user.email:
+                send_welcome_email(user)
+
             # Restore cart after login
             if guest_cart_data:
                 request.session['cart'] = guest_cart_data
                 request.session.modified = True
-            
+
             return redirect('home')
     else:
         form = RegisterForm()
@@ -272,11 +278,13 @@ def request_otp(request):
         user.otp_expires_at = timezone.now() + timedelta(minutes=5)
         user.save()
         
-        # SIMULATION: Log OTP to console (since we don't have an SMS gateway yet)
         print(f"DEBUG: OTP for {phone} is {otp}")
-        
+
+        if user.email and not user.email.endswith('@example.com'):
+            send_otp_email(user, otp)
+
         request.session['otp_phone'] = phone
-        messages.success(request, f"OTP sent to {phone} (Check console for debug)")
+        messages.success(request, f"OTP sent to {phone}")
         return redirect('verify_otp')
         
     return render(request, 'users/otp_request.html')

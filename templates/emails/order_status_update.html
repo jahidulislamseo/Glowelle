@@ -1,0 +1,90 @@
+{% extends "emails/base_email.html" %}
+{% block title %}অর্ডার স্ট্যাটাস আপডেট - GlowElle{% endblock %}
+{% block tagline %}অর্ডার আপডেট 🔔{% endblock %}
+
+{% block content %}
+{% with status=order.status %}
+<p class="greeting">হ্যালো {{ customer_name }},</p>
+<p class="intro-text">
+  আপনার অর্ডার <strong>#{{ order.order_reference|default:order.id }}</strong>-এর স্ট্যাটাস আপডেট হয়েছে।
+</p>
+
+<div class="highlight-box">
+  {% if status == 'processing' %}
+    <div style="font-size:40px;">🔄</div>
+    <div style="font-size:20px; font-weight:800; color:#b45309; margin-top:8px;">প্রস্তুত করা হচ্ছে</div>
+    <div style="font-size:14px; color:#4b5563; margin-top:4px;">আপনার অর্ডার প্যাক করা হচ্ছে</div>
+  {% elif status == 'shipped' %}
+    <div style="font-size:40px;">🚚</div>
+    <div style="font-size:20px; font-weight:800; color:#1e40af; margin-top:8px;">রাস্তায় আছে</div>
+    <div style="font-size:14px; color:#4b5563; margin-top:4px;">আপনার অর্ডার পাঠানো হয়েছে</div>
+  {% elif status == 'delivered' %}
+    <div style="font-size:40px;">✅</div>
+    <div style="font-size:20px; font-weight:800; color:#15803d; margin-top:8px;">ডেলিভার হয়েছে</div>
+    <div style="font-size:14px; color:#4b5563; margin-top:4px;">আপনার অর্ডার পৌঁছে গেছে! ধন্যবাদ</div>
+  {% elif status == 'cancelled' %}
+    <div style="font-size:40px;">❌</div>
+    <div style="font-size:20px; font-weight:800; color:#991b1b; margin-top:8px;">বাতিল হয়েছে</div>
+    <div style="font-size:14px; color:#4b5563; margin-top:4px;">আপনার অর্ডার বাতিল করা হয়েছে</div>
+  {% elif status == 'returned' %}
+    <div style="font-size:40px;">↩️</div>
+    <div style="font-size:20px; font-weight:800; color:#6b21a8; margin-top:8px;">ফেরত প্রক্রিয়া</div>
+    <div style="font-size:14px; color:#4b5563; margin-top:4px;">আপনার অর্ডার ফেরত প্রক্রিয়া শুরু হয়েছে</div>
+  {% else %}
+    <div style="font-size:40px;">⏳</div>
+    <div style="font-size:20px; font-weight:800; color:#374151; margin-top:8px;">অপেক্ষমান</div>
+    <div style="font-size:14px; color:#4b5563; margin-top:4px;">আপনার অর্ডার পেন্ডিং আছে</div>
+  {% endif %}
+</div>
+
+<div class="card">
+  <div class="card-row">
+    <span class="card-label">অর্ডার নম্বর</span>
+    <span class="card-value">#{{ order.order_reference|default:order.id }}</span>
+  </div>
+  <div class="card-row">
+    <span class="card-label">মোট পরিমাণ</span>
+    <span class="card-value">৳{{ order.total }}</span>
+  </div>
+  <div class="card-row">
+    <span class="card-label">বর্তমান স্ট্যাটাস</span>
+    <span class="card-value">
+      {% if status == 'processing' %}<span class="badge badge-yellow">{{ order.get_status_display }}</span>
+      {% elif status == 'shipped' %}<span class="badge badge-blue">{{ order.get_status_display }}</span>
+      {% elif status == 'delivered' %}<span class="badge badge-green">{{ order.get_status_display }}</span>
+      {% elif status == 'cancelled' %}<span class="badge badge-red">{{ order.get_status_display }}</span>
+      {% else %}<span class="badge badge-gray">{{ order.get_status_display }}</span>
+      {% endif %}
+    </span>
+  </div>
+  {% if order.tracking_id %}
+  <div class="card-row">
+    <span class="card-label">Tracking ID</span>
+    <span class="card-value">{{ order.tracking_id }}</span>
+  </div>
+  {% endif %}
+  {% if order.courier %}
+  <div class="card-row">
+    <span class="card-label">Courier</span>
+    <span class="card-value">{{ order.courier.name }}</span>
+  </div>
+  {% endif %}
+</div>
+
+<div class="btn-center">
+  <a href="{{ site_url }}/dashboard" class="btn">📦 অর্ডার দেখুন</a>
+</div>
+
+{% if status == 'delivered' %}
+<div style="background:#f0fdf4; border-radius:12px; padding:16px; text-align:center; margin-top:20px;">
+  <p style="font-size:15px; color:#15803d; font-weight:600;">পণ্যটি কেমন লাগলো? আমাদের review দিন!</p>
+  <a href="{{ site_url }}" style="color:#16a34a; font-weight:700; font-size:14px;">⭐ Review লিখুন</a>
+</div>
+{% endif %}
+
+<hr class="divider">
+<p style="font-size:13px; color:#9ca3af; text-align:center;">
+  সাহায্যের জন্য কল করুন: <strong>{{ support_phone }}</strong>
+</p>
+{% endwith %}
+{% endblock %}
