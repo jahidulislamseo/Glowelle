@@ -1,5 +1,6 @@
 from django.core.cache import cache
 import time
+import traceback as tb_module
 
 class ActiveUserMiddleware:
     def __init__(self, get_response):
@@ -34,3 +35,30 @@ class ActiveUserMiddleware:
         
         # 5. Save back
         cache.set('online_users', valid_users, 3600)  # TTL 1 hour (rolling)
+
+
+class ErrorLogMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        return self.get_response(request)
+
+    def process_exception(self, request, exception):
+        from .models import ErrorLog
+        try:
+            ip = request.META.get('HTTP_X_FORWARDED_FOR', '').split(',')[0].strip() or \
+                 request.META.get('REMOTE_ADDR', '')
+            user = str(request.user) if request.user.is_authenticated else 'anonymous'
+            ErrorLog.objects.create(
+                level='ERROR',
+                message=f"{type(exception).__name__}: {exception}",
+                traceback=tb_module.format_exc(),
+                path=request.path,
+                method=request.method,
+                user=user,
+                ip_address=ip or None,
+            )
+        except Exception:
+            pass
+        return None

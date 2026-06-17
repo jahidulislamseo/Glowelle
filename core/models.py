@@ -65,6 +65,32 @@ class SiteSettings(models.Model):
             return
         super(SiteSettings, self).save(*args, **kwargs)
 
+class ErrorLog(models.Model):
+    LEVEL_CHOICES = [
+        ('ERROR', 'Error'),
+        ('WARNING', 'Warning'),
+        ('CRITICAL', 'Critical'),
+    ]
+
+    level = models.CharField(max_length=10, choices=LEVEL_CHOICES, default='ERROR', db_index=True)
+    message = models.TextField()
+    traceback = models.TextField(blank=True)
+    path = models.CharField(max_length=500, blank=True)
+    method = models.CharField(max_length=10, blank=True)
+    user = models.CharField(max_length=150, blank=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    is_resolved = models.BooleanField(default=False, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Error Log'
+        verbose_name_plural = 'Error Logs'
+
+    def __str__(self):
+        return f"[{self.level}] {self.message[:80]} — {self.created_at.strftime('%Y-%m-%d %H:%M')}"
+
+
 class ContactMessage(models.Model):
     name = models.CharField(max_length=100)
     email = models.EmailField()

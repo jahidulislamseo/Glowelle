@@ -16,7 +16,12 @@ class UserAdmin(ChangeHistoryMixin, BaseUserAdmin):
         (None, {'fields': ('username', 'password')}),
         (_('Personal info'), {'fields': ('first_name', 'last_name', 'email', 'image')}),
         (_('Permissions'), {
-            'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
+            'fields': ('is_active', 'is_staff', 'is_superuser', 'role'),
+        }),
+        (_('Groups & Advanced Permissions'), {
+            'fields': ('groups', 'user_permissions'),
+            'classes': ('collapse',),
+            'description': 'Advanced: শুধু দরকার হলে Groups বা নির্দিষ্ট Permission যোগ করুন।',
         }),
         (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
     )

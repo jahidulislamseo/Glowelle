@@ -1,0 +1,325 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    #content { padding: 30px 40px !important; }
+
+    .el-container { max-width: 1200px; margin: 0 auto; }
+
+    .el-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 24px;
+        padding-bottom: 18px;
+        border-bottom: 2px solid #f1f5f9;
+    }
+    .el-header h1 {
+        font-size: 24px !important;
+        font-weight: 800 !important;
+        color: #1e293b !important;
+        margin: 0 !important;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 16px;
+        background: #f1f5f9;
+        color: #475569;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 500;
+    }
+    .back-btn:hover { background: #e2e8f0; color: #1e293b; text-decoration: none; }
+
+    /* Stats Row */
+    .el-stats {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+    }
+    .el-stat {
+        background: #fff;
+        border-radius: 10px;
+        padding: 16px 24px;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+        flex: 1;
+        min-width: 130px;
+        text-align: center;
+    }
+    .el-stat .stat-num {
+        font-size: 28px;
+        font-weight: 800;
+        color: #1e293b;
+        line-height: 1;
+    }
+    .el-stat .stat-label {
+        font-size: 12px;
+        color: #94a3b8;
+        margin-top: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .el-stat.danger .stat-num { color: #ef4444; }
+    .el-stat.warning .stat-num { color: #f59e0b; }
+    .el-stat.critical .stat-num { color: #7c3aed; }
+
+    /* Filters */
+    .el-filters {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+    .el-filters a {
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 500;
+        text-decoration: none;
+        background: #f1f5f9;
+        color: #475569;
+        border: 1px solid #e2e8f0;
+        transition: all 0.15s;
+    }
+    .el-filters a:hover, .el-filters a.active { background: #1e293b; color: #fff; border-color: #1e293b; }
+    .el-filters a.level-error { }
+    .el-filters a.level-error.active { background: #ef4444; border-color: #ef4444; }
+    .el-filters a.level-warning.active { background: #f59e0b; border-color: #f59e0b; }
+    .el-filters a.level-critical.active { background: #7c3aed; border-color: #7c3aed; }
+
+    /* Clear All */
+    .clear-btn {
+        margin-left: auto;
+        padding: 6px 14px;
+        background: #fee2e2;
+        color: #dc2626;
+        border: 1px solid #fca5a5;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .clear-btn:hover { background: #fecaca; }
+
+    /* Table */
+    .el-table-wrap {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+        overflow: hidden;
+    }
+    table.el-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+    .el-table thead th {
+        background: #f8fafc;
+        padding: 12px 16px;
+        text-align: left;
+        font-weight: 600;
+        color: #64748b;
+        border-bottom: 1px solid #e2e8f0;
+        white-space: nowrap;
+    }
+    .el-table tbody tr { border-bottom: 1px solid #f1f5f9; }
+    .el-table tbody tr:hover { background: #fafafa; }
+    .el-table tbody td { padding: 12px 16px; vertical-align: top; color: #334155; }
+
+    .badge {
+        display: inline-block;
+        padding: 2px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.4px;
+        text-transform: uppercase;
+    }
+    .badge-error    { background: #fee2e2; color: #dc2626; }
+    .badge-warning  { background: #fef3c7; color: #d97706; }
+    .badge-critical { background: #ede9fe; color: #7c3aed; }
+    .badge-resolved { background: #dcfce7; color: #16a34a; }
+    .badge-open     { background: #fff7ed; color: #ea580c; }
+
+    .msg-text { font-family: 'Consolas', monospace; font-size: 12px; color: #1e293b; word-break: break-all; }
+    .path-text { font-size: 12px; color: #64748b; }
+
+    details summary {
+        cursor: pointer;
+        color: #3b82f6;
+        font-size: 12px;
+        margin-top: 4px;
+    }
+    details pre {
+        background: #1e293b;
+        color: #e2e8f0;
+        padding: 12px;
+        border-radius: 6px;
+        font-size: 11px;
+        line-height: 1.5;
+        overflow-x: auto;
+        margin-top: 6px;
+        max-height: 200px;
+        overflow-y: auto;
+    }
+
+    .resolve-btn {
+        padding: 4px 10px;
+        font-size: 11px;
+        font-weight: 600;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        background: #dcfce7;
+        color: #16a34a;
+    }
+    .resolve-btn:hover { background: #bbf7d0; }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #94a3b8;
+    }
+    .empty-state svg { opacity: 0.3; margin-bottom: 12px; }
+    .empty-state p { font-size: 16px; font-weight: 500; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="el-container">
+
+    <div class="el-header">
+        <h1>
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            Error Log
+        </h1>
+        <a href="/admin/" class="back-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+            Dashboard
+        </a>
+    </div>
+
+    <!-- Stats -->
+    <div class="el-stats">
+        <div class="el-stat">
+            <div class="stat-num">{{ total }}</div>
+            <div class="stat-label">Total Errors</div>
+        </div>
+        <div class="el-stat danger">
+            <div class="stat-num">{{ unresolved }}</div>
+            <div class="stat-label">Unresolved</div>
+        </div>
+        <div class="el-stat danger">
+            <div class="stat-num">{{ by_level.ERROR|default:0 }}</div>
+            <div class="stat-label">Error</div>
+        </div>
+        <div class="el-stat warning">
+            <div class="stat-num">{{ by_level.WARNING|default:0 }}</div>
+            <div class="stat-label">Warning</div>
+        </div>
+        <div class="el-stat critical">
+            <div class="stat-num">{{ by_level.CRITICAL|default:0 }}</div>
+            <div class="stat-label">Critical</div>
+        </div>
+    </div>
+
+    <!-- Filters + Clear -->
+    <form method="post">
+        {% csrf_token %}
+        <div class="el-filters">
+            <a href="?" {% if not level_filter and not resolved_filter %}class="active"{% endif %}>All</a>
+            <a href="?level=ERROR" class="level-error {% if level_filter == 'ERROR' %}active{% endif %}">Error</a>
+            <a href="?level=WARNING" class="level-warning {% if level_filter == 'WARNING' %}active{% endif %}">Warning</a>
+            <a href="?level=CRITICAL" class="level-critical {% if level_filter == 'CRITICAL' %}active{% endif %}">Critical</a>
+            <a href="?resolved=0" {% if resolved_filter == '0' %}class="active"{% endif %}">Unresolved</a>
+            <a href="?resolved=1" {% if resolved_filter == '1' %}class="active"{% endif %}">Resolved</a>
+
+            {% if total %}
+            <button type="submit" name="clear_all" value="1"
+                    class="clear-btn"
+                    onclick="return confirm('সব error log মুছে ফেলবেন?')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                Clear All
+            </button>
+            {% endif %}
+        </div>
+
+        <!-- Table -->
+        <div class="el-table-wrap">
+            {% if errors %}
+            <table class="el-table">
+                <thead>
+                    <tr>
+                        <th>Level</th>
+                        <th>Message</th>
+                        <th>Path</th>
+                        <th>User</th>
+                        <th>Time</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for err in errors %}
+                    <tr>
+                        <td>
+                            <span class="badge badge-{{ err.level|lower }}">{{ err.level }}</span>
+                        </td>
+                        <td style="max-width: 340px;">
+                            <div class="msg-text">{{ err.message|truncatechars:120 }}</div>
+                            {% if err.traceback %}
+                            <details>
+                                <summary>Traceback দেখুন</summary>
+                                <pre>{{ err.traceback }}</pre>
+                            </details>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="path-text">{{ err.method }} {{ err.path }}</span>
+                        </td>
+                        <td style="font-size:12px; color:#64748b;">{{ err.user|default:"—" }}</td>
+                        <td style="font-size:12px; white-space:nowrap; color:#64748b;">
+                            {{ err.created_at|date:"d M Y" }}<br>{{ err.created_at|time:"H:i:s" }}
+                        </td>
+                        <td>
+                            {% if err.is_resolved %}
+                                <span class="badge badge-resolved">Resolved</span>
+                            {% else %}
+                                <span class="badge badge-open">Open</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if not err.is_resolved %}
+                            <button type="submit" name="resolve_id" value="{{ err.pk }}" class="resolve-btn">
+                                ✓ Resolve
+                            </button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="none" stroke="#94a3b8" stroke-width="1.5" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                <p>কোনো error নেই!</p>
+            </div>
+            {% endif %}
+        </div>
+    </form>
+
+</div>
+{% endblock %}

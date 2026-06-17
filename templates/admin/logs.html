@@ -1,0 +1,306 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    #content { padding: 30px 40px !important; }
+    .logs-container { max-width: 1200px; margin: 0 auto; }
+
+    /* Header */
+    .logs-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 24px;
+        padding-bottom: 18px;
+        border-bottom: 2px solid #f1f5f9;
+    }
+    .logs-header h1 {
+        font-size: 24px !important;
+        font-weight: 800 !important;
+        color: #1e293b !important;
+        margin: 0 !important;
+    }
+    .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 16px;
+        background: #f1f5f9;
+        color: #475569;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 500;
+    }
+    .back-btn:hover { background: #e2e8f0; color: #1e293b; text-decoration: none; }
+
+    /* Tabs */
+    .tabs {
+        display: flex;
+        gap: 4px;
+        background: #f1f5f9;
+        border-radius: 10px;
+        padding: 4px;
+        margin-bottom: 28px;
+        width: fit-content;
+    }
+    .tab-btn {
+        padding: 9px 24px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+        color: #64748b;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.15s;
+    }
+    .tab-btn:hover { color: #1e293b; text-decoration: none; }
+    .tab-btn.active { background: #fff; color: #1e293b; box-shadow: 0 1px 4px rgba(0,0,0,0.10); }
+    .tab-btn .badge-count {
+        background: #ef4444;
+        color: #fff;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 1px 7px;
+        min-width: 20px;
+        text-align: center;
+    }
+    .tab-btn.active .badge-count { background: #ef4444; }
+
+    /* ── ERROR LOG ── */
+    .el-stats { display: flex; gap: 14px; margin-bottom: 22px; flex-wrap: wrap; }
+    .el-stat {
+        background: #fff;
+        border-radius: 10px;
+        padding: 14px 22px;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+        flex: 1;
+        min-width: 120px;
+        text-align: center;
+    }
+    .el-stat .snum { font-size: 26px; font-weight: 800; color: #1e293b; line-height: 1; }
+    .el-stat .slbl { font-size: 11px; color: #94a3b8; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.4px; }
+    .el-stat.s-red .snum   { color: #ef4444; }
+    .el-stat.s-amber .snum { color: #f59e0b; }
+    .el-stat.s-purple .snum{ color: #7c3aed; }
+
+    .el-filters { display: flex; align-items: center; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
+    .el-filters a {
+        padding: 5px 13px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+        text-decoration: none;
+        background: #f1f5f9;
+        color: #475569;
+        border: 1px solid #e2e8f0;
+    }
+    .el-filters a:hover, .el-filters a.active { background: #1e293b; color: #fff; border-color: #1e293b; text-decoration: none; }
+    .el-filters a.lv-error.active   { background: #ef4444; border-color: #ef4444; }
+    .el-filters a.lv-warning.active { background: #f59e0b; border-color: #f59e0b; }
+    .el-filters a.lv-critical.active{ background: #7c3aed; border-color: #7c3aed; }
+
+    .clear-btn {
+        margin-left: auto;
+        padding: 5px 13px;
+        background: #fee2e2;
+        color: #dc2626;
+        border: 1px solid #fca5a5;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .clear-btn:hover { background: #fecaca; }
+
+    .el-table-wrap { background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); overflow: hidden; }
+    table.el-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .el-table thead th {
+        background: #f8fafc;
+        padding: 11px 14px;
+        text-align: left;
+        font-weight: 600;
+        color: #64748b;
+        border-bottom: 1px solid #e2e8f0;
+        white-space: nowrap;
+    }
+    .el-table tbody tr { border-bottom: 1px solid #f1f5f9; }
+    .el-table tbody tr:hover { background: #fafafa; }
+    .el-table tbody td { padding: 11px 14px; vertical-align: top; color: #334155; }
+
+    .badge { display: inline-block; padding: 2px 9px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+    .badge-error    { background: #fee2e2; color: #dc2626; }
+    .badge-warning  { background: #fef3c7; color: #d97706; }
+    .badge-critical { background: #ede9fe; color: #7c3aed; }
+    .badge-resolved { background: #dcfce7; color: #16a34a; }
+    .badge-open     { background: #fff7ed; color: #ea580c; }
+
+    .msg-text { font-family: 'Consolas', monospace; font-size: 12px; color: #1e293b; word-break: break-all; }
+    details summary { cursor: pointer; color: #3b82f6; font-size: 12px; margin-top: 4px; }
+    details pre {
+        background: #1e293b; color: #e2e8f0;
+        padding: 10px; border-radius: 6px;
+        font-size: 11px; line-height: 1.5;
+        overflow-x: auto; margin-top: 6px;
+        max-height: 180px; overflow-y: auto;
+    }
+    .resolve-btn {
+        padding: 3px 10px; font-size: 11px; font-weight: 600;
+        border: none; border-radius: 6px; cursor: pointer;
+        background: #dcfce7; color: #16a34a;
+    }
+    .resolve-btn:hover { background: #bbf7d0; }
+
+    .empty-state { text-align: center; padding: 60px 20px; color: #94a3b8; }
+    .empty-state p { font-size: 15px; font-weight: 500; margin-top: 10px; }
+
+    /* ── WEBSITE LOG ── */
+    .wl-body h1 { font-size: 24px; font-weight: 800; color: #0f172a; margin: 30px 0 10px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
+    .wl-body h2 { font-size: 18px; font-weight: 700; color: #1e293b; margin: 26px 0 8px; }
+    .wl-body h3 { font-size: 15px; font-weight: 600; color: #334155; margin: 18px 0 6px; }
+    .wl-body table { width: 100%; border-collapse: collapse; margin: 12px 0 18px; font-size: 13px; }
+    .wl-body table th { background: #f8fafc; padding: 9px 13px; text-align: left; font-weight: 600; color: #475569; border: 1px solid #e2e8f0; }
+    .wl-body table td { padding: 8px 13px; border: 1px solid #e2e8f0; color: #334155; vertical-align: top; }
+    .wl-body table tr:hover td { background: #f8fafc; }
+    .wl-body pre { background: #1e293b; color: #e2e8f0; padding: 16px 20px; border-radius: 8px; overflow-x: auto; font-size: 12px; line-height: 1.6; margin: 12px 0; }
+    .wl-body code { background: #f1f5f9; color: #e11d48; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-family: 'Consolas', monospace; }
+    .wl-body pre code { background: transparent; color: #e2e8f0; padding: 0; }
+    .wl-body p { color: #475569; line-height: 1.7; margin: 6px 0; }
+    .wl-body ul, .wl-body ol { color: #475569; padding-left: 20px; line-height: 1.8; }
+    .wl-body hr { border: none; border-top: 1px solid #e2e8f0; margin: 24px 0; }
+    .wl-body strong { color: #1e293b; }
+    .wl-card { background: #fff; border-radius: 12px; padding: 36px 44px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="logs-container">
+
+    <div class="logs-header">
+        <h1>Logs</h1>
+        <a href="/admin/" class="back-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+            Dashboard
+        </a>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+        <a href="?tab=errors" class="tab-btn {% if active_tab == 'errors' %}active{% endif %}">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            Error Log
+            {% if unresolved %}<span class="badge-count">{{ unresolved }}</span>{% endif %}
+        </a>
+        <a href="?tab=website" class="tab-btn {% if active_tab == 'website' %}active{% endif %}">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            Website Log
+        </a>
+    </div>
+
+    <!-- ══ ERROR LOG TAB ══ -->
+    {% if active_tab == 'errors' %}
+
+    <div class="el-stats">
+        <div class="el-stat"><div class="snum">{{ total }}</div><div class="slbl">Total</div></div>
+        <div class="el-stat s-red"><div class="snum">{{ unresolved }}</div><div class="slbl">Unresolved</div></div>
+        <div class="el-stat s-red"><div class="snum">{{ by_level.ERROR|default:0 }}</div><div class="slbl">Error</div></div>
+        <div class="el-stat s-amber"><div class="snum">{{ by_level.WARNING|default:0 }}</div><div class="slbl">Warning</div></div>
+        <div class="el-stat s-purple"><div class="snum">{{ by_level.CRITICAL|default:0 }}</div><div class="slbl">Critical</div></div>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="el-filters">
+            <a href="?tab=errors" {% if not level_filter and not resolved_filter %}class="active"{% endif %}>All</a>
+            <a href="?tab=errors&level=ERROR" class="lv-error {% if level_filter == 'ERROR' %}active{% endif %}">Error</a>
+            <a href="?tab=errors&level=WARNING" class="lv-warning {% if level_filter == 'WARNING' %}active{% endif %}">Warning</a>
+            <a href="?tab=errors&level=CRITICAL" class="lv-critical {% if level_filter == 'CRITICAL' %}active{% endif %}">Critical</a>
+            <a href="?tab=errors&resolved=0" {% if resolved_filter == '0' %}class="active"{% endif %}>Unresolved</a>
+            <a href="?tab=errors&resolved=1" {% if resolved_filter == '1' %}class="active"{% endif %}>Resolved</a>
+            {% if total %}
+            <button type="submit" name="clear_all" value="1" class="clear-btn"
+                    onclick="return confirm('সব error log মুছে ফেলবেন?')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6M9 6V4h6v2"/></svg>
+                Clear All
+            </button>
+            {% endif %}
+        </div>
+
+        <div class="el-table-wrap">
+            {% if errors %}
+            <table class="el-table">
+                <thead>
+                    <tr>
+                        <th>Level</th>
+                        <th>Message</th>
+                        <th>Path</th>
+                        <th>User</th>
+                        <th>Time</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for err in errors %}
+                    <tr>
+                        <td><span class="badge badge-{{ err.level|lower }}">{{ err.level }}</span></td>
+                        <td style="max-width:320px;">
+                            <div class="msg-text">{{ err.message|truncatechars:110 }}</div>
+                            {% if err.traceback %}
+                            <details>
+                                <summary>Traceback দেখুন</summary>
+                                <pre>{{ err.traceback }}</pre>
+                            </details>
+                            {% endif %}
+                        </td>
+                        <td style="font-size:12px;color:#64748b;">{{ err.method }} {{ err.path }}</td>
+                        <td style="font-size:12px;color:#64748b;">{{ err.user|default:"—" }}</td>
+                        <td style="font-size:12px;white-space:nowrap;color:#64748b;">
+                            {{ err.created_at|date:"d M Y" }}<br>{{ err.created_at|time:"H:i:s" }}
+                        </td>
+                        <td>
+                            {% if err.is_resolved %}
+                                <span class="badge badge-resolved">Resolved</span>
+                            {% else %}
+                                <span class="badge badge-open">Open</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if not err.is_resolved %}
+                            <button type="submit" name="resolve_id" value="{{ err.pk }}" class="resolve-btn">✓ Resolve</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" fill="none" stroke="#94a3b8" stroke-width="1.5" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                <p>কোনো error নেই!</p>
+            </div>
+            {% endif %}
+        </div>
+    </form>
+
+    {% endif %}
+
+    <!-- ══ WEBSITE LOG TAB ══ -->
+    {% if active_tab == 'website' %}
+    <div class="wl-card">
+        <div class="wl-body">
+            {{ website_log_html|safe }}
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

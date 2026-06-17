@@ -123,6 +123,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
+    'core.middleware.ActiveUserMiddleware',
+    'core.middleware.ErrorLogMiddleware',
 ]
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'

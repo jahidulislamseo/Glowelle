@@ -5,6 +5,10 @@ class User(AbstractUser):
     ROLE_CHOICES = (
         ('user', 'User'),
         ('admin', 'Admin'),
+        ('manager', 'Manager'),
+        ('staff', 'Staff'),
+        ('delivery', 'Delivery'),
+        ('marketing', 'Marketing'),
     )
     email = models.EmailField(unique=True)
     phone_number = models.CharField(max_length=15, unique=True, null=True, blank=True)
@@ -32,6 +36,30 @@ class User(AbstractUser):
         related_name="custom_user_set",
         related_query_name="user",
     )
+
+    ROLE_STAFF = ('admin', 'manager', 'staff', 'delivery', 'marketing')
+    ROLE_GROUP_MAP = {
+        'manager': 'Manager',
+        'staff': 'Staff',
+        'delivery': 'Delivery',
+        'marketing': 'Marketing',
+    }
+
+    def save(self, *args, **kwargs):
+        self.is_staff = self.role in self.ROLE_STAFF
+        super().save(*args, **kwargs)
+        self._sync_role_groups()
+
+    def _sync_role_groups(self):
+        from django.contrib.auth.models import Group
+        role_group_names = list(self.ROLE_GROUP_MAP.values())
+        self.groups.remove(*Group.objects.filter(name__in=role_group_names))
+        group_name = self.ROLE_GROUP_MAP.get(self.role)
+        if group_name:
+            try:
+                self.groups.add(Group.objects.get(name=group_name))
+            except Group.DoesNotExist:
+                pass
 
     def __str__(self):
         return self.username

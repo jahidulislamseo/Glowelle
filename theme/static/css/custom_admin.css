@@ -69,87 +69,221 @@
     margin-top: -2px;
 }
 
-/* ── Changelist: Search + Actions on ONE line ── */
+/* ═══════════════════════════════════════════════════════════════
+   GLOW FILTER BAR  —  Modern card-style horizontal filter+search
+═══════════════════════════════════════════════════════════════ */
 
-/* The flex wrapper is injected by templates/admin/change_list.html */
+/* ── Top bar wrapper ── */
 .cl-top-bar {
     display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 12px;
-    padding: 0 0 12px 0;
+    flex-direction: column;
+    gap: 0;
+    padding: 0 0 8px 0;
+    width: 100%;
+}
+.cl-top-bar #change-list-filters { width: 100% !important; }
+.cl-top-bar-actions { display: flex; align-items: center; }
+.cl-top-bar-actions .actions { padding: 0 !important; margin: 0 !important; }
+.cl-top-bar .actions { display: flex !important; align-items: center; flex-wrap: wrap; gap: 8px; }
+.cl-top-bar .actions label { margin-bottom: 0 !important; display: flex; align-items: center; }
+.cl-top-bar .actions select { margin-bottom: 0 !important; min-width: 150px; height: 34px; }
+.cl-top-bar .actions button.btn { height: 34px; margin: 0 0 0 4px !important; }
+.cl-top-bar .actions .action-counter { margin-left: 10px; white-space: nowrap; }
+
+/* ── Filter Card ── */
+.glow-filter-card {
+    background: linear-gradient(135deg, #f4fff7 0%, #edf8f0 100%);
+    border: 1.5px solid #b2d8bb;
+    border-radius: 14px;
+    padding: 10px 16px 12px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 12px rgba(40,167,69,0.08);
 }
 
-/* Search form sits inline */
-/* Override Bootstrap col-12: flex:0 0 100% and max-width:100% must be reset */
-.cl-top-bar #change-list-filters {
-    flex: 0 0 auto !important;
-    max-width: none !important;
-    width: auto !important;
-    padding: 0 !important;
-    margin: 0 !important;
-}
-
-/* Also strip the col-12 bootstrap flex from the actions wrapper */
-.cl-top-bar-actions {
-    flex: 0 0 auto !important;
-    max-width: none !important;
-    width: auto !important;
-}
-
-.cl-top-bar #changelist-search {
-    display: flex !important;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin: 0 !important;
-}
-
-.cl-top-bar #changelist-search .form-group {
-    margin-bottom: 0 !important;
-}
-
-/* Strip wrapper div around actions inside the top bar */
-.cl-top-bar-actions {
+.glow-filter-header {
+    font-size: 10px;
+    font-weight: 800;
+    color: #28a745;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 8px;
     display: flex;
     align-items: center;
+    gap: 6px;
 }
 
-.cl-top-bar-actions .actions {
-    padding: 0 !important;
-    margin: 0 !important;
-}
-
-
-/* Actions block sits inline next to search */
-.cl-top-bar .actions {
+.glow-filter-body {
     display: flex !important;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 8px;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    align-items: flex-end !important;
 }
 
-.cl-top-bar .actions label {
-    margin-bottom: 0 !important;
-    display: flex;
-    align-items: center;
+/* Each filter: 135px wide — 7 filters fit in ~1050px (1 line on most screens) */
+.filter-item {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 3px !important;
+    flex: 0 0 135px !important;
+    width: 135px !important;
 }
 
-.cl-top-bar .actions select {
-    margin-bottom: 0 !important;
-    min-width: 150px;
-    height: 38px;
-}
-
-.cl-top-bar .actions button.btn {
-    height: 38px;
-    margin: 0 0 0 4px !important;
-}
-
-.cl-top-bar .actions .action-counter {
-    margin-left: 10px;
+.filter-label {
+    font-size: 9px;
+    font-weight: 800;
+    color: #8fa896;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    padding-left: 6px;
     white-space: nowrap;
 }
+
+/* ── Select2 pill style ── */
+.filter-item .select2-container { width: 100% !important; }
+
+.select2-container--default .select2-selection--single {
+    border: 1.5px solid #cde8d2 !important;
+    border-radius: 20px !important;
+    height: 30px !important;
+    background: #fff !important;
+    transition: border-color 0.18s, box-shadow 0.18s !important;
+}
+.select2-container--default.select2-container--focus .select2-selection--single,
+.select2-container--default.select2-container--open .select2-selection--single {
+    border-color: #28a745 !important;
+    box-shadow: 0 0 0 3px rgba(40,167,69,0.13) !important;
+    outline: none !important;
+}
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 28px !important;
+    padding-left: 12px !important;
+    padding-right: 26px !important;
+    color: #3d4852 !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+}
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 28px !important;
+    width: 20px !important;
+    right: 4px !important;
+}
+.select2-container--default .select2-selection--single .select2-selection__arrow b {
+    border-color: #28a745 transparent transparent !important;
+    border-width: 5px 4px 0 !important;
+}
+
+/* Selected (non-default) filter — green highlight */
+.select2-container--default.select2-active .select2-selection--single {
+    border-color: #28a745 !important;
+    background: #f0fff4 !important;
+}
+
+.select2-dropdown {
+    border: 1.5px solid #28a745 !important;
+    border-radius: 10px !important;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.13) !important;
+    overflow: hidden !important;
+    margin-top: 4px !important;
+}
+.select2-results__option {
+    font-size: 12.5px !important;
+    padding: 7px 14px !important;
+    transition: background 0.12s !important;
+}
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background: #28a745 !important; color: #fff !important;
+}
+.select2-container--default .select2-results__option[aria-selected=true] {
+    background: #e8f5e9 !important; color: #155724 !important; font-weight: 600 !important;
+}
+
+/* ── Filter footer: search + button ── */
+.glow-filter-footer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed #c3e6cb;
+    flex-wrap: wrap;
+}
+
+/* ── Standalone Search Row (no filters) ── */
+.glow-search-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+}
+
+.glow-search-wrap {
+    position: relative;
+    flex: 1;
+    min-width: 200px;
+    max-width: 380px;
+}
+.glow-search-icon {
+    position: absolute;
+    left: 13px; top: 50%;
+    transform: translateY(-50%);
+    color: #28a745; font-size: 12px;
+    pointer-events: none; z-index: 1;
+}
+.glow-search-input {
+    width: 100% !important;
+    height: 34px !important;
+    padding: 0 16px 0 34px !important;
+    border: 1.5px solid #c3dbc6 !important;
+    border-radius: 20px !important;
+    font-size: 13px !important;
+    color: #3d4852 !important;
+    background: #fff !important;
+    transition: border-color 0.2s, box-shadow 0.2s !important;
+    outline: none !important;
+}
+.glow-search-input:focus {
+    border-color: #28a745 !important;
+    box-shadow: 0 0 0 3px rgba(40,167,69,0.14) !important;
+}
+.glow-search-btn {
+    height: 34px !important;
+    padding: 0 20px !important;
+    background: #28a745 !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 20px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    cursor: pointer !important;
+    transition: background 0.2s, transform 0.1s !important;
+    white-space: nowrap !important;
+}
+.glow-search-btn:hover { background: #218838 !important; transform: translateY(-1px) !important; }
+.glow-search-btn:active { transform: translateY(0) !important; }
+.glow-result-count {
+    font-size: 12px; color: #6c757d;
+    margin-top: 6px; padding-left: 2px;
+}
+.glow-result-count a { color: #28a745; text-decoration: none; }
+.glow-result-count a:hover { text-decoration: underline; }
+
+/* Clear filters button */
+.glow-clear-btn {
+    font-size: 9.5px;
+    color: #dc3545;
+    text-decoration: none;
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    opacity: 0.75;
+    transition: opacity 0.15s;
+}
+.glow-clear-btn:hover { opacity: 1; color: #dc3545; text-decoration: none; }
 
 
 

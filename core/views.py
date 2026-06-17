@@ -3,6 +3,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.core.cache import cache
 from django.http import JsonResponse, HttpResponse
 from django.contrib.admin.views.decorators import staff_member_required
+import os
+import markdown
 from django.utils import timezone
 from django.db.models import Sum, Count, F, Avg, Q, ExpressionWrapper, fields
 from django.db.models.functions import TruncDate
@@ -359,3 +361,107 @@ def admin_stats_api(request):
     }
 
     return JsonResponse(data)
+
+
+@staff_member_required
+def error_log(request):
+    from .models import ErrorLog
+    from django.db.models import Count
+
+    level_filter = request.GET.get('level', '')
+    resolved_filter = request.GET.get('resolved', '')
+
+    qs = ErrorLog.objects.all()
+    if level_filter:
+        qs = qs.filter(level=level_filter)
+    if resolved_filter == '0':
+        qs = qs.filter(is_resolved=False)
+    elif resolved_filter == '1':
+        qs = qs.filter(is_resolved=True)
+
+    # Mark single error resolved via POST
+    if request.method == 'POST':
+        error_id = request.POST.get('resolve_id')
+        clear_all = request.POST.get('clear_all')
+        if clear_all:
+            ErrorLog.objects.all().delete()
+        elif error_id:
+            ErrorLog.objects.filter(pk=error_id).update(is_resolved=True)
+        from django.shortcuts import redirect
+        return redirect(request.path + ('?' + request.META.get('QUERY_STRING', '') if request.META.get('QUERY_STRING') else ''))
+
+    total = ErrorLog.objects.count()
+    unresolved = ErrorLog.objects.filter(is_resolved=False).count()
+    by_level = ErrorLog.objects.values('level').annotate(count=Count('id'))
+
+    return render(request, 'admin/error_log.html', {
+        'errors': qs[:200],
+        'total': total,
+        'unresolved': unresolved,
+        'by_level': {x['level']: x['count'] for x in by_level},
+        'level_filter': level_filter,
+        'resolved_filter': resolved_filter,
+    })
+
+
+@staff_member_required
+def website_log(request):
+    log_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'WEBSITE_LOG.md')
+    content_html = ''
+    if os.path.exists(log_path):
+        with open(log_path, 'r', encoding='utf-8') as f:
+            md_text = f.read()
+        content_html = markdown.markdown(md_text, extensions=['tables', 'fenced_code'])
+    return render(request, 'admin/website_log.html', {'content_html': content_html})
+
+
+@staff_member_required
+def admin_logs(request):
+    from .models import ErrorLog
+    from django.db.models import Count
+
+    active_tab = request.GET.get('tab', 'errors')
+    level_filter = request.GET.get('level', '')
+    resolved_filter = request.GET.get('resolved', '')
+
+    if request.method == 'POST':
+        error_id = request.POST.get('resolve_id')
+        clear_all = request.POST.get('clear_all')
+        if clear_all:
+            ErrorLog.objects.all().delete()
+        elif error_id:
+            ErrorLog.objects.filter(pk=error_id).update(is_resolved=True)
+        from django.shortcuts import redirect
+        qs_str = request.META.get('QUERY_STRING', '')
+        return redirect(request.path + ('?' + qs_str if qs_str else ''))
+
+    # Error log data
+    qs = ErrorLog.objects.all()
+    if level_filter:
+        qs = qs.filter(level=level_filter)
+    if resolved_filter == '0':
+        qs = qs.filter(is_resolved=False)
+    elif resolved_filter == '1':
+        qs = qs.filter(is_resolved=True)
+
+    total = ErrorLog.objects.count()
+    unresolved = ErrorLog.objects.filter(is_resolved=False).count()
+    by_level = ErrorLog.objects.values('level').annotate(count=Count('id'))
+
+    # Website log data
+    log_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'WEBSITE_LOG.md')
+    website_log_html = ''
+    if os.path.exists(log_path):
+        with open(log_path, 'r', encoding='utf-8') as f:
+            website_log_html = markdown.markdown(f.read(), extensions=['tables', 'fenced_code'])
+
+    return render(request, 'admin/logs.html', {
+        'active_tab': active_tab,
+        'errors': qs[:200],
+        'total': total,
+        'unresolved': unresolved,
+        'by_level': {x['level']: x['count'] for x in by_level},
+        'level_filter': level_filter,
+        'resolved_filter': resolved_filter,
+        'website_log_html': website_log_html,
+    })
