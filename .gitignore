@@ -58,3 +58,4 @@ htmlcov/
 *.pid
 *.sock
 error_log.txt
+.vercel

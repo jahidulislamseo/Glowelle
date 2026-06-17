@@ -183,7 +183,14 @@ class Order(models.Model):
         # Generate Reference & Invoice if missing
         if not self.order_reference:
             import uuid
-            self.order_reference = str(uuid.uuid4())[:8].upper()
+            from django.db import IntegrityError
+            for _ in range(5):
+                candidate = f"ORD-{uuid.uuid4().hex[:10].upper()}"
+                if not Order.objects.filter(order_reference=candidate).exists():
+                    self.order_reference = candidate
+                    break
+            else:
+                self.order_reference = f"ORD-{uuid.uuid4().hex.upper()}"
             
         if not self.invoice_number:
             self.invoice_number = f"INV-{self.order_reference}"
@@ -216,27 +223,26 @@ class Order(models.Model):
             elif self.status == 'returned':
                 should_refund = True
             
-            if should_refund:
+            if should_refund and self.user_id:
                 from users.models import Wallet, WalletTransaction
-                from decimal import Decimal
-                
-                wallet, _ = Wallet.objects.get_or_create(user=self.user)
+                from django.db import transaction as db_transaction
                 try:
-                    # refund_amount = Decimal(str(self.total)) # self.total is now Decimal
-                    refund_amount = self.total
-                    wallet.balance += refund_amount
-                    wallet.save()
-                    
-                    WalletTransaction.objects.create(
-                        wallet=wallet,
-                        amount=refund_amount,
-                        transaction_type='credit',
-                        description=f"Refund for Order #{self.id} ({self.get_status_display()})"
-                    )
-                    self.refund_amount = refund_amount
-                    self.payment_status = 'refunded'
+                    with db_transaction.atomic():
+                        refund_amount = self.total
+                        wallet, _ = Wallet.objects.select_for_update().get_or_create(user=self.user)
+                        wallet.balance += refund_amount
+                        wallet.save()
+                        WalletTransaction.objects.create(
+                            wallet=wallet,
+                            amount=refund_amount,
+                            transaction_type='credit',
+                            description=f"Refund for Order #{self.id} ({self.get_status_display()})"
+                        )
+                        self.refund_amount = refund_amount
+                        self.payment_status = 'refunded'
                 except Exception as e:
-                    print(f"Refund error: {e}")
+                    import logging
+                    logging.getLogger(__name__).error(f"Refund error for order {self.id}: {e}", exc_info=True)
                 
         super().save(*args, **kwargs)
         

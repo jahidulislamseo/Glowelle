@@ -2,7 +2,7 @@
 
 {% block content %}
 <!-- Full-Width Hero Slider Section -->
-<section class="relative overflow-hidden mb-12" id="hero-slider" style="height: 90vh; min-height: 520px; max-height: 800px;">
+<section class="relative overflow-hidden mb-12" id="hero-slider" style="min-height: 500px; max-height: 800px; height: 80vh;">
 
     <!-- Slides -->
     {% for slider in sliders %}
@@ -14,69 +14,69 @@
         <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1600"
             alt="Premium beauty collection" class="object-cover w-full h-full">
         {% endif %}
-        <!-- Dark gradient overlay for text readability -->
-        <div class="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent"></div>
+        <!-- Dark gradient overlay for text readability - better for mobile -->
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20 md:bg-gradient-to-r md:from-black/70 md:via-black/40 md:to-transparent"></div>
     </div>
     {% empty %}
     <div class="slide absolute inset-0 opacity-100">
         <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1600"
             alt="Premium beauty collection" class="object-cover w-full h-full">
-        <div class="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20 md:bg-gradient-to-r md:from-black/70 md:via-black/40 md:to-transparent"></div>
     </div>
     {% endfor %}
 
     <!-- Text Content Overlay -->
-    <div class="absolute inset-0 z-10 flex items-center">
-        <div class="container mx-auto px-6 lg:px-12">
+    <div class="absolute inset-0 z-10 flex items-end md:items-center pb-8 md:pb-0">
+        <div class="container mx-auto px-4 md:px-6 lg:px-12">
             <div class="max-w-2xl text-white">
-                <div class="inline-flex items-center gap-2 bg-white/15 border border-white/30 text-white px-4 py-2 rounded-full text-sm font-bold backdrop-blur mb-6">
-                    <span class="h-2.5 w-2.5 rounded-full bg-pink-400 animate-pulse"></span>
+                <div class="inline-flex items-center gap-2 bg-white/15 border border-white/30 text-white px-3 py-1.5 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-bold backdrop-blur mb-4 md:mb-6">
+                    <span class="h-2 w-2 md:h-2.5 md:w-2.5 rounded-full bg-pink-400 animate-pulse"></span>
                     Premium Beauty & Cosmetics
                 </div>
 
-                <h1 class="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold leading-[1.05] drop-shadow-lg">
+                <h1 class="text-2xl md:text-4xl lg:text-5xl xl:text-7xl font-extrabold leading-tight drop-shadow-lg">
                     Radiant skin for a
                     <span class="block text-pink-300">better everyday.</span>
                 </h1>
 
-                <p class="mt-6 text-lg md:text-xl text-white/85 leading-relaxed max-w-xl drop-shadow">
+                <p class="mt-4 md:mt-6 text-sm md:text-lg text-white/90 leading-relaxed max-w-xl drop-shadow">
                     Premium skincare, makeup, and cosmetic essentials from trusted global brands delivered straight to your doorstep.
                 </p>
 
-                <div class="mt-8 flex flex-col sm:flex-row gap-4">
+                <div class="mt-6 md:mt-8 flex flex-col sm:flex-row gap-3 md:gap-4">
                     <a href="{% url 'shop' %}"
-                        class="btn-primary inline-flex items-center justify-center h-14 px-8 text-lg font-bold rounded-full shadow-lg hover:shadow-hover transform hover:-translate-y-1 transition-all">
+                        class="btn-primary inline-flex items-center justify-center h-12 md:h-14 px-7 md:px-9 text-base md:text-lg font-extrabold rounded-full shadow-xl hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300">
                         Shop Now
-                        <i data-lucide="shopping-bag" class="ml-2 h-5 w-5"></i>
+                        <i data-lucide="shopping-bag" class="ml-2 h-4 w-4 md:h-5 md:w-5"></i>
                     </a>
                     <a href="#featured"
-                        class="inline-flex items-center justify-center h-14 px-8 text-lg font-bold text-white bg-white/15 border border-white/30 rounded-full hover:bg-white/25 transition-all backdrop-blur shadow-sm">
+                        class="inline-flex items-center justify-center h-12 md:h-14 px-7 md:px-9 text-base md:text-lg font-extrabold text-white bg-white/20 border border-white/40 rounded-full hover:bg-white/30 hover:scale-105 transition-all duration-300 backdrop-blur shadow-md">
                         View Offers
-                        <i data-lucide="arrow-right" class="ml-2 h-5 w-5"></i>
+                        <i data-lucide="arrow-right" class="ml-2 h-4 w-4 md:h-5 md:w-5"></i>
                     </a>
                 </div>
 
-                <!-- Stats -->
-                <div class="mt-10 flex flex-wrap gap-6">
-                    <div class="flex items-center gap-3 bg-white/10 backdrop-blur border border-white/20 px-5 py-3 rounded-2xl">
-                        <i data-lucide="star" class="h-5 w-5 text-yellow-400 fill-yellow-400"></i>
+                <!-- Stats - better mobile layout -->
+                <div class="mt-8 md:mt-10 flex flex-wrap gap-3 md:gap-6">
+                    <div class="flex items-center gap-2 md:gap-3 bg-white/10 backdrop-blur border border-white/20 px-3 py-2 md:px-5 md:py-3 rounded-xl md:rounded-2xl">
+                        <i data-lucide="star" class="h-4 w-4 md:h-5 md:w-5 text-yellow-400 fill-yellow-400"></i>
                         <div>
-                            <p class="text-xl font-extrabold">4.9</p>
-                            <p class="text-xs text-white/70 font-semibold">Rating</p>
+                            <p class="text-lg md:text-xl font-extrabold">4.9</p>
+                            <p class="text-[10px] md:text-xs text-white/70 font-semibold">Rating</p>
                         </div>
                     </div>
-                    <div class="flex items-center gap-3 bg-white/10 backdrop-blur border border-white/20 px-5 py-3 rounded-2xl">
-                        <i data-lucide="shield-check" class="h-5 w-5 text-green-400"></i>
+                    <div class="flex items-center gap-2 md:gap-3 bg-white/10 backdrop-blur border border-white/20 px-3 py-2 md:px-5 md:py-3 rounded-xl md:rounded-2xl">
+                        <i data-lucide="shield-check" class="h-4 w-4 md:h-5 md:w-5 text-green-400"></i>
                         <div>
-                            <p class="text-xl font-extrabold">100%</p>
-                            <p class="text-xs text-white/70 font-semibold">Genuine</p>
+                            <p class="text-lg md:text-xl font-extrabold">100%</p>
+                            <p class="text-[10px] md:text-xs text-white/70 font-semibold">Genuine</p>
                         </div>
                     </div>
-                    <div class="flex items-center gap-3 bg-white/10 backdrop-blur border border-white/20 px-5 py-3 rounded-2xl">
-                        <i data-lucide="truck" class="h-5 w-5 text-pink-300"></i>
+                    <div class="flex items-center gap-2 md:gap-3 bg-white/10 backdrop-blur border border-white/20 px-3 py-2 md:px-5 md:py-3 rounded-xl md:rounded-2xl">
+                        <i data-lucide="truck" class="h-4 w-4 md:h-5 md:w-5 text-pink-300"></i>
                         <div>
-                            <p class="text-xl font-extrabold">Fast</p>
-                            <p class="text-xs text-white/70 font-semibold">Delivery</p>
+                            <p class="text-lg md:text-xl font-extrabold">Fast</p>
+                            <p class="text-[10px] md:text-xs text-white/70 font-semibold">Delivery</p>
                         </div>
                     </div>
                 </div>
@@ -85,69 +85,57 @@
     </div>
 
     <!-- Slide Badges (top right) -->
-    <div class="absolute top-6 right-6 z-20 flex flex-col gap-2">
-        <span class="inline-flex items-center gap-1.5 bg-white/90 backdrop-blur text-pink-800 px-3 py-2 rounded-full text-xs font-bold shadow">
-            <i data-lucide="sparkles" class="h-4 w-4"></i>
+    <div class="absolute top-4 right-4 md:top-6 md:right-6 z-20 flex flex-col gap-2">
+        <span class="inline-flex items-center gap-1.5 bg-white/90 backdrop-blur text-pink-800 px-2.5 py-1.5 rounded-full text-[10px] md:text-xs font-bold shadow">
+            <i data-lucide="sparkles" class="h-3 w-3 md:h-4 md:w-4"></i>
             Beauty Picks
         </span>
-        <span class="inline-flex items-center gap-1.5 bg-white/90 backdrop-blur text-amber-700 px-3 py-2 rounded-full text-xs font-bold shadow">
-            <i data-lucide="badge-percent" class="h-4 w-4"></i>
+        <span class="inline-flex items-center gap-1.5 bg-white/90 backdrop-blur text-amber-700 px-2.5 py-1.5 rounded-full text-[10px] md:text-xs font-bold shadow">
+            <i data-lucide="badge-percent" class="h-3 w-3 md:h-4 md:w-4"></i>
             Hot Deals
         </span>
     </div>
 
-    <!-- Prev/Next Buttons -->
-    <button type="button" onclick="prevSlide()"
-        class="absolute left-4 top-1/2 -translate-y-1/2 z-20 h-12 w-12 inline-flex items-center justify-center bg-white/20 hover:bg-white/40 backdrop-blur rounded-full text-white border border-white/25 transition-colors shadow-lg"
-        aria-label="Previous slide">
-        <i data-lucide="chevron-left" class="h-6 w-6"></i>
-    </button>
-    <button type="button" onclick="nextSlide()"
-        class="absolute right-4 top-1/2 -translate-y-1/2 z-20 h-12 w-12 inline-flex items-center justify-center bg-white/20 hover:bg-white/40 backdrop-blur rounded-full text-white border border-white/25 transition-colors shadow-lg"
-        aria-label="Next slide">
-        <i data-lucide="chevron-right" class="h-6 w-6"></i>
-    </button>
-
-    <!-- Dot Indicators -->
-    <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2" id="hero-dots">
+    <!-- Dot Indicators - better mobile visibility -->
+    <div class="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2" id="hero-dots">
         {% for slider in sliders %}
         <button data-slide="{{ forloop.counter0 }}"
-            class="hero-dot h-2.5 rounded-full transition-all duration-300 {% if forloop.first %}w-8 bg-white{% else %}w-2.5 bg-white/40{% endif %}"
+            class="hero-dot h-2 md:h-2.5 rounded-full transition-all duration-300 {% if forloop.first %}w-6 md:w-8 bg-white{% else %}w-2 md:w-2.5 bg-white/40{% endif %}"
             aria-label="Slide {{ forloop.counter }}"></button>
         {% empty %}
-        <span class="h-2.5 w-8 rounded-full bg-white"></span>
+        <span class="h-2 md:h-2.5 w-6 md:w-8 rounded-full bg-white"></span>
         {% endfor %}
     </div>
 </section>
 
 <!-- Bottom Info Bar -->
 <div class="container mx-auto px-4 -mt-6 relative z-30 mb-12">
-    <div class="grid grid-cols-3 bg-white rounded-2xl border border-gray-100 shadow-xl overflow-hidden">
-        <div class="flex items-center gap-3 px-4 sm:px-6 py-4 border-r border-gray-100">
-            <span class="hidden sm:inline-flex h-10 w-10 items-center justify-center rounded-full bg-pink-100 text-pink-700">
+    <div class="grid grid-cols-3 bg-gradient-to-r from-white to-pink-50 rounded-2xl border border-pink-100 shadow-2xl overflow-hidden">
+        <div class="flex flex-col items-center justify-center gap-2 px-3 sm:px-6 py-5 border-r border-pink-100 text-center">
+            <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-pink-400 to-pink-600 text-white shadow-lg">
                 <i data-lucide="truck" class="h-5 w-5"></i>
             </span>
             <div>
-                <p class="text-sm font-extrabold text-gray-950">Fast Delivery</p>
-                <p class="text-xs text-gray-500 font-medium">Home delivery</p>
+                <p class="text-xs sm:text-sm font-extrabold text-gray-950">Fast Delivery</p>
+                <p class="text-[10px] sm:text-xs text-gray-500 font-medium">Home delivery</p>
             </div>
         </div>
-        <div class="flex items-center gap-3 px-4 sm:px-6 py-4 border-r border-gray-100">
-            <span class="hidden sm:inline-flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 text-amber-700">
-                <i data-lucide="star" class="h-5 w-5"></i>
+        <div class="flex flex-col items-center justify-center gap-2 px-3 sm:px-6 py-5 border-r border-pink-100 text-center">
+            <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-amber-600 text-white shadow-lg">
+                <i data-lucide="star" class="h-5 w-5 fill-current"></i>
             </span>
             <div>
-                <p class="text-sm font-extrabold text-gray-950">4.9/5 Rating</p>
-                <p class="text-xs text-gray-500 font-medium">Loved by buyers</p>
+                <p class="text-xs sm:text-sm font-extrabold text-gray-950">4.9/5 Rating</p>
+                <p class="text-[10px] sm:text-xs text-gray-500 font-medium">Loved by buyers</p>
             </div>
         </div>
-        <div class="flex items-center gap-3 px-4 sm:px-6 py-4">
-            <span class="hidden sm:inline-flex h-10 w-10 items-center justify-center rounded-full bg-pink-100 text-pink-700">
+        <div class="flex flex-col items-center justify-center gap-2 px-3 sm:px-6 py-5 text-center">
+            <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 text-white shadow-lg">
                 <i data-lucide="shield-check" class="h-5 w-5"></i>
             </span>
             <div>
-                <p class="text-sm font-extrabold text-gray-950">Secure Checkout</p>
-                <p class="text-xs text-gray-500 font-medium">SSL encrypted</p>
+                <p class="text-xs sm:text-sm font-extrabold text-gray-950">Secure Checkout</p>
+                <p class="text-[10px] sm:text-xs text-gray-500 font-medium">SSL encrypted</p>
             </div>
         </div>
     </div>
@@ -205,6 +193,45 @@
     if (totalHeroSlides > 1) {
         setInterval(nextSlide, 5000);
     }
+</script>
+
+<script>
+    // Testimonial Slider
+    let testimonialIndex = 0;
+    const testimonialSlides = document.getElementById('testimonial-slides');
+    const testimonialDots = document.querySelectorAll('.testimonial-dot');
+    const totalTestimonials = 3;
+
+    function updateTestimonialSlider() {
+        testimonialSlides.style.transform = `translateX(-${testimonialIndex * 100}%)`;
+        testimonialDots.forEach((dot, i) => {
+            dot.classList.toggle('bg-pink-500', i === testimonialIndex);
+            dot.classList.toggle('bg-pink-200', i !== testimonialIndex);
+        });
+    }
+
+    function nextTestimonial() {
+        testimonialIndex = (testimonialIndex + 1) % totalTestimonials;
+        updateTestimonialSlider();
+    }
+
+    function prevTestimonial() {
+        testimonialIndex = (testimonialIndex - 1 + totalTestimonials) % totalTestimonials;
+        updateTestimonialSlider();
+    }
+
+    document.getElementById('testimonial-next').addEventListener('click', nextTestimonial);
+    document.getElementById('testimonial-prev').addEventListener('click', prevTestimonial);
+
+    testimonialDots.forEach((dot, i) => {
+        dot.addEventListener('click', () => {
+            testimonialIndex = i;
+            updateTestimonialSlider();
+        });
+    });
+
+    // Auto slide
+    setInterval(nextTestimonial, 6000);
 </script>
 
 
@@ -372,81 +399,123 @@
 </section>
 
 <!-- Testimonials Section -->
-<section class="py-20 bg-gray-50 border-t border-gray-100 ">
+<section class="py-20 bg-gray-50 border-t border-gray-100">
     <div class="container mx-auto px-4">
-        <div class="text-center mb-16 reveal-on-scroll reveal-up">
+        <div class="text-center mb-12 reveal-on-scroll reveal-up">
             <h2 class="text-3xl font-bold mb-4">What Our Clients Say</h2>
             <div class="w-24 h-1 bg-pink-500 mx-auto rounded-full"></div>
         </div>
 
-        <div class="grid md:grid-cols-3 gap-8">
-            <!-- Testimonial 1 -->
-            <div
-                class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 relative hover:shadow-md transition-shadow reveal-on-scroll reveal-up hover-lift">
-                <i data-lucide="quote" class="absolute top-8 right-8 h-8 w-8 text-pink-100 fill-pink-50"></i>
-                <div class="flex items-center gap-4 mb-6">
-                    <div class="h-12 w-12 bg-gray-200 rounded-full overflow-hidden">
-                        <img src="https://ui-avatars.com/api/?name=Rahim+Ahmed&background=random" alt="User"
-                            class="w-full h-full object-cover">
-                    </div>
+        <!-- DESKTOP: 3-column grid -->
+        <div class="hidden md:grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+
+            <!-- Card 1 -->
+            <div class="bg-white p-7 rounded-2xl shadow-md border border-gray-100 relative hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                <i data-lucide="quote" class="absolute top-6 right-6 h-9 w-9 text-pink-100 fill-pink-50"></i>
+                <div class="flex items-center gap-3 mb-5">
+                    <img src="https://ui-avatars.com/api/?name=Rahim+Ahmed&background=f72d82&color=fff&bold=true" alt="Rahim Ahmed" class="h-14 w-14 rounded-full shadow-md">
                     <div>
-                        <h4 class="font-bold">Rahim Ahmed</h4>
-                        <div class="flex text-yellow-400">
-                            <i data-lucide="star" class="h-4 w-4 fill-current"></i>
-                            <i data-lucide="star" class="h-4 w-4 fill-current"></i>
-                            <i data-lucide="star" class="h-4 w-4 fill-current"></i>
-                            <i data-lucide="star" class="h-4 w-4 fill-current"></i>
-                            <i data-lucide="star" class="h-4 w-4 fill-current"></i>
+                        <h4 class="font-bold text-gray-900">Rahim Ahmed</h4>
+                        <div class="flex text-amber-400 mt-0.5">
+                            {% for i in "12345" %}<i data-lucide="star" class="h-4 w-4 fill-current"></i>{% endfor %}
                         </div>
                     </div>
                 </div>
-                <p class="text-gray-600 italic">"The serum I ordered worked wonders on my skin. Delivery was super fast and the packaging was beautiful. Highly recommended!"</p>
+                <p class="text-gray-600 italic text-sm leading-relaxed">"The serum I ordered worked wonders on my skin. Delivery was super fast and the packaging was beautiful. Highly recommended!"</p>
             </div>
 
-            <!-- Testimonial 2 -->
-            <div
-                class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 relative hover:shadow-md transition-shadow reveal-on-scroll reveal-up delay-100 hover-lift">
-                <i data-lucide="quote" class="absolute top-8 right-8 h-8 w-8 text-pink-100 fill-pink-50"></i>
-                <div class="flex items-center gap-4 mb-6">
-                    <div class="h-12 w-12 bg-gray-200 rounded-full overflow-hidden">
-                        <img src="https://ui-avatars.com/api/?name=Sarah+Islam&background=random" alt="User"
-                            class="w-full h-full object-cover">
-                    </div>
+            <!-- Card 2 -->
+            <div class="bg-white p-7 rounded-2xl shadow-md border border-gray-100 relative hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                <i data-lucide="quote" class="absolute top-6 right-6 h-9 w-9 text-pink-100 fill-pink-50"></i>
+                <div class="flex items-center gap-3 mb-5">
+                    <img src="https://ui-avatars.com/api/?name=Sarah+Islam&background=e0186a&color=fff&bold=true" alt="Sarah Islam" class="h-14 w-14 rounded-full shadow-md">
                     <div>
-                        <h4 class="font-bold">Sarah Islam</h4>
-                        <div class="flex text-yellow-400">
-                            <i data-lucide="star" class="h-4 w-4 fill-current"></i>
-                            <i data-lucide="star" class="h-4 w-4 fill-current"></i>
-                            <i data-lucide="star" class="h-4 w-4 fill-current"></i>
-                            <i data-lucide="star" class="h-4 w-4 fill-current"></i>
-                            <i data-lucide="star" class="h-4 w-4 fill-current"></i>
+                        <h4 class="font-bold text-gray-900">Sarah Islam</h4>
+                        <div class="flex text-amber-400 mt-0.5">
+                            {% for i in "12345" %}<i data-lucide="star" class="h-4 w-4 fill-current"></i>{% endfor %}
                         </div>
                     </div>
                 </div>
-                <p class="text-gray-600 italic">"Best online beauty store in Bangladesh. The products are 100% genuine and customer support is very helpful and responsive."</p>
+                <p class="text-gray-600 italic text-sm leading-relaxed">"Best online beauty store in Bangladesh. The products are 100% genuine and customer support is very helpful and responsive."</p>
             </div>
 
-            <!-- Testimonial 3 -->
-            <div
-                class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 relative hover:shadow-md transition-shadow reveal-on-scroll reveal-up delay-200 hover-lift">
-                <i data-lucide="quote" class="absolute top-8 right-8 h-8 w-8 text-pink-100 fill-pink-50"></i>
-                <div class="flex items-center gap-4 mb-6">
-                    <div class="h-12 w-12 bg-gray-200 rounded-full overflow-hidden">
-                        <img src="https://ui-avatars.com/api/?name=Karim+Uddin&background=random" alt="User"
-                            class="w-full h-full object-cover">
-                    </div>
+            <!-- Card 3 -->
+            <div class="bg-white p-7 rounded-2xl shadow-md border border-gray-100 relative hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                <i data-lucide="quote" class="absolute top-6 right-6 h-9 w-9 text-pink-100 fill-pink-50"></i>
+                <div class="flex items-center gap-3 mb-5">
+                    <img src="https://ui-avatars.com/api/?name=Karim+Uddin&background=bc0f58&color=fff&bold=true" alt="Karim Uddin" class="h-14 w-14 rounded-full shadow-md">
                     <div>
-                        <h4 class="font-bold">Karim Uddin</h4>
-                        <div class="flex text-yellow-400">
-                            <i data-lucide="star" class="h-4 w-4 fill-current"></i>
-                            <i data-lucide="star" class="h-4 w-4 fill-current"></i>
-                            <i data-lucide="star" class="h-4 w-4 fill-current"></i>
-                            <i data-lucide="star" class="h-4 w-4 fill-current"></i>
-                            <i data-lucide="star" class="h-4 w-4 fill-current"></i>
+                        <h4 class="font-bold text-gray-900">Karim Uddin</h4>
+                        <div class="flex text-amber-400 mt-0.5">
+                            {% for i in "12345" %}<i data-lucide="star" class="h-4 w-4 fill-current"></i>{% endfor %}
                         </div>
                     </div>
                 </div>
-                <p class="text-gray-600 italic">"I love their beauty deals! Got my favourite moisturizer and toner at a great price. The glow results are amazing. Keep it up!"</p>
+                <p class="text-gray-600 italic text-sm leading-relaxed">"I love their beauty deals! Got my favourite moisturizer and toner at a great price. The glow results are amazing. Keep it up!"</p>
+            </div>
+        </div>
+
+        <!-- MOBILE: Slider (1 at a time) -->
+        <div class="md:hidden relative max-w-lg mx-auto">
+            <div id="testimonial-slider" class="overflow-hidden">
+                <div id="testimonial-slides" class="flex transition-transform duration-500 ease-in-out">
+
+                    <div class="min-w-full px-2">
+                        <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 relative">
+                            <i data-lucide="quote" class="absolute top-5 right-5 h-8 w-8 text-pink-100 fill-pink-50"></i>
+                            <div class="flex items-center gap-3 mb-4">
+                                <img src="https://ui-avatars.com/api/?name=Rahim+Ahmed&background=f72d82&color=fff&bold=true" alt="Rahim Ahmed" class="h-12 w-12 rounded-full shadow">
+                                <div>
+                                    <h4 class="font-bold text-gray-900 text-sm">Rahim Ahmed</h4>
+                                    <div class="flex text-amber-400 mt-0.5">{% for i in "12345" %}<i data-lucide="star" class="h-3.5 w-3.5 fill-current"></i>{% endfor %}</div>
+                                </div>
+                            </div>
+                            <p class="text-gray-600 italic text-sm">"The serum I ordered worked wonders on my skin. Delivery was super fast and the packaging was beautiful. Highly recommended!"</p>
+                        </div>
+                    </div>
+
+                    <div class="min-w-full px-2">
+                        <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 relative">
+                            <i data-lucide="quote" class="absolute top-5 right-5 h-8 w-8 text-pink-100 fill-pink-50"></i>
+                            <div class="flex items-center gap-3 mb-4">
+                                <img src="https://ui-avatars.com/api/?name=Sarah+Islam&background=e0186a&color=fff&bold=true" alt="Sarah Islam" class="h-12 w-12 rounded-full shadow">
+                                <div>
+                                    <h4 class="font-bold text-gray-900 text-sm">Sarah Islam</h4>
+                                    <div class="flex text-amber-400 mt-0.5">{% for i in "12345" %}<i data-lucide="star" class="h-3.5 w-3.5 fill-current"></i>{% endfor %}</div>
+                                </div>
+                            </div>
+                            <p class="text-gray-600 italic text-sm">"Best online beauty store in Bangladesh. The products are 100% genuine and customer support is very helpful and responsive."</p>
+                        </div>
+                    </div>
+
+                    <div class="min-w-full px-2">
+                        <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 relative">
+                            <i data-lucide="quote" class="absolute top-5 right-5 h-8 w-8 text-pink-100 fill-pink-50"></i>
+                            <div class="flex items-center gap-3 mb-4">
+                                <img src="https://ui-avatars.com/api/?name=Karim+Uddin&background=bc0f58&color=fff&bold=true" alt="Karim Uddin" class="h-12 w-12 rounded-full shadow">
+                                <div>
+                                    <h4 class="font-bold text-gray-900 text-sm">Karim Uddin</h4>
+                                    <div class="flex text-amber-400 mt-0.5">{% for i in "12345" %}<i data-lucide="star" class="h-3.5 w-3.5 fill-current"></i>{% endfor %}</div>
+                                </div>
+                            </div>
+                            <p class="text-gray-600 italic text-sm">"I love their beauty deals! Got my favourite moisturizer and toner at a great price. The glow results are amazing. Keep it up!"</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <button id="testimonial-prev" class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-3 bg-white p-2.5 rounded-full shadow-lg hover:bg-pink-50 text-pink-600 transition-all">
+                <i data-lucide="chevron-left" class="h-5 w-5"></i>
+            </button>
+            <button id="testimonial-next" class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-3 bg-white p-2.5 rounded-full shadow-lg hover:bg-pink-50 text-pink-600 transition-all">
+                <i data-lucide="chevron-right" class="h-5 w-5"></i>
+            </button>
+
+            <div class="flex justify-center gap-2 mt-6">
+                <button class="testimonial-dot w-2.5 h-2.5 rounded-full bg-pink-500 transition-all" data-slide="0"></button>
+                <button class="testimonial-dot w-2.5 h-2.5 rounded-full bg-pink-200 transition-all" data-slide="1"></button>
+                <button class="testimonial-dot w-2.5 h-2.5 rounded-full bg-pink-200 transition-all" data-slide="2"></button>
             </div>
         </div>
     </div>
@@ -469,7 +538,7 @@
                         onerror="this.closest('.skeleton').classList.remove('skeleton')"
                         class="w-full h-full object-cover opacity-0 transition-opacity duration-500 group-hover/img:scale-110">
                     <!-- Mini Quick View for flex items -->
-                    <button onclick="openQuickView('{{ product.id }}')"
+                    <button onclick="event.preventDefault(); event.stopPropagation(); openQuickView('{{ product.id }}')"
                         class="absolute inset-0 bg-black/40 text-white opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
                         <i data-lucide="eye" class="h-6 w-6"></i>
                     </button>
@@ -498,31 +567,50 @@
 </section>
 
 <!-- Promotional Banner -->
-<!-- Promotional Banner -->
 {% if deal_of_the_day %}
-<section class="py-10 container mx-auto px-4">
-    <div class="relative rounded-3xl overflow-hidden bg-black h-[300px] md:h-[400px] shadow-xl group">
+<section class="py-6 px-4 container mx-auto">
+    <div class="relative rounded-3xl overflow-hidden shadow-2xl group" style="min-height: 320px;">
+        <!-- Background Image -->
         <img src="{% if deal_of_the_day.image %}{{ deal_of_the_day.image.url }}{% else %}https://images.unsplash.com/photo-1573246123716-6b1782bfc499?auto=format&fit=crop&q=80&w=1000{% endif %}"
             alt="{{ deal_of_the_day.title }}"
-            class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700">
-        <div class="relative z-10 flex flex-col items-center justify-center h-full text-center text-white px-4">
-            <span class="bg-yellow-400 text-yellow-900 px-4 py-1 rounded-full text-sm font-bold mb-6 animate-pulse">
-                LIMITED TIME OFFER
-            </span>
-            <h2 class="text-4xl md:text-6xl font-bold mb-4 tracking-tight">{{ deal_of_the_day.title }}</h2>
-            <p class="text-lg md:text-xl mb-8 max-w-xl text-gray-100">
-                {{ deal_of_the_day.subtitle|default:"Don't miss out on nature's goodness!" }}
-                {% if deal_of_the_day.discount_percentage %}
-                <br>
-                Get up to <span class="font-bold text-yellow-400">{{ deal_of_the_day.discount_percentage }}% OFF</span>
-                {% endif %}
-            </p>
-            <div class="flex gap-4">
-                <a href="{% url 'shop' %}"
-                    class="bg-white text-pink-900 px-8 py-3 rounded-full font-bold hover:bg-pink-50 transition-colors shadow-lg">
-                    Shop Now
-                </a>
+            class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+        <!-- Gradient Overlay -->
+        <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/50 to-black/20"></div>
+
+        <!-- Content -->
+        <div class="relative z-10 flex flex-col items-center justify-end h-full text-center text-white px-5 pb-8 pt-16">
+            <!-- Badge -->
+            <div class="absolute top-5 left-1/2 -translate-x-1/2">
+                <span class="inline-flex items-center gap-1.5 bg-yellow-400 text-yellow-900 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest shadow-lg animate-pulse">
+                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                    Limited Time Offer
+                </span>
             </div>
+
+            <!-- Title -->
+            <h2 class="text-2xl md:text-5xl font-black mb-3 leading-tight tracking-tight drop-shadow-lg">
+                {{ deal_of_the_day.title }}
+            </h2>
+
+            <!-- Subtitle -->
+            <p class="text-sm md:text-lg text-gray-200 mb-2 max-w-xs md:max-w-xl leading-relaxed">
+                {{ deal_of_the_day.subtitle|default:"Get the best beauty products at unbeatable prices!" }}
+            </p>
+
+            {% if deal_of_the_day.discount_percentage %}
+            <p class="text-sm text-gray-300 mb-5">
+                Get up to <span class="font-black text-yellow-400 text-base">{{ deal_of_the_day.discount_percentage }}% OFF</span>
+            </p>
+            {% else %}
+            <div class="mb-5"></div>
+            {% endif %}
+
+            <!-- CTA Button -->
+            <a href="{% url 'shop' %}"
+                class="inline-flex items-center gap-2 bg-white text-pink-700 px-8 py-3 rounded-full font-black text-sm shadow-xl hover:bg-pink-50 hover:scale-105 transition-all duration-300 active:scale-95">
+                Shop Now
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+            </a>
         </div>
     </div>
 </section>
@@ -538,10 +626,12 @@
             <h2 class="text-3xl font-bold mb-4">Shop by Category</h2>
             <p class="text-gray-500 mb-8">Quickly find what you need from our top categories</p>
 
-            <div class="flex flex-wrap justify-center gap-3 mb-10 overflow-x-auto pb-4 no-scrollbar" id="category-tabs">
+            <!-- Mobile: single-row horizontal scroll; Desktop: centered wrap -->
+            <div class="flex md:flex-wrap md:justify-center gap-3 mb-10 overflow-x-auto pb-3 no-scrollbar px-1" id="category-tabs"
+                style="scrollbar-width: none; -ms-overflow-style: none;">
                 {% for category_data in categorized_products %}
                 <button onclick="switchTab('{{ category_data.category.slug }}')"
-                    class="category-tab whitespace-nowrap px-6 py-2.5 rounded-full border border-gray-200 font-bold transition-all duration-300 hover:shadow-md {% if forloop.first %}bg-primary border-primary text-white active-tab{% else %}text-gray-600 bg-white hover:border-primary/30 hover:text-primary{% endif %}"
+                    class="category-tab flex-shrink-0 whitespace-nowrap px-5 py-2.5 rounded-full border border-gray-200 font-bold transition-all duration-300 hover:shadow-md text-sm md:text-base {% if forloop.first %}bg-primary border-primary text-white active-tab{% else %}text-gray-600 bg-white hover:border-primary/30 hover:text-primary{% endif %}"
                     data-category="{{ category_data.category.slug }}">
                     {{ category_data.category.name }}
                 </button>
@@ -631,47 +721,48 @@
 
         <div class="flex flex-wrap justify-center gap-6">
             {% for product in on_sale_products %}
-            <div
-                class="w-[calc(50%-12px)] md:w-[calc(20%-20px)] lg:w-[calc(20%-20px)] flex-shrink-0 bg-white rounded-lg p-4 relative border border-gray-100 group hover:border-pink-200 transition-colors">
+            <div class="w-[calc(50%-12px)] md:w-[calc(20%-20px)] flex-shrink-0 bg-white rounded-2xl p-4 relative border border-gray-100 group hover:border-pink-200 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+
                 <a href="{% url 'product_detail' product.slug %}"
-                    class="block mb-4 overflow-hidden rounded-lg aspect-square skeleton relative group/savers">
+                    class="block mb-3 overflow-hidden rounded-xl aspect-square skeleton relative group/savers">
                     <img src="{% if product.image %}{{ product.display_image_url }}{% else %}https://placehold.co/600?text=No+Image{% endif %}"
                         alt="{{ product.title }}"
                         onload="this.classList.remove('opacity-0'); this.closest('.skeleton').classList.remove('skeleton')"
                         onerror="this.closest('.skeleton').classList.remove('skeleton')"
                         class="w-full h-full object-cover group-hover:scale-105 transition-all duration-500 opacity-0 px-2 lg:px-4">
 
-                    <div
-                        class="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded shadow-sm z-10">
-                        SALE
+                    <!-- SALE Badge -->
+                    <div class="absolute top-2 left-2 z-10">
+                        <span class="bg-gradient-to-r from-red-500 to-rose-600 text-white text-[10px] font-black px-2 py-0.5 rounded-md shadow-sm">
+                            SALE{% if product.discount_percentage %} {{ product.discount_percentage }}%{% endif %}
+                        </span>
                     </div>
 
-                    <!-- Quick View Over Sale Img -->
-                    <button onclick="openQuickView('{{ product.id }}')"
+                    <!-- Quick View -->
+                    <button onclick="event.preventDefault(); event.stopPropagation(); openQuickView('{{ product.id }}')"
                         class="absolute inset-0 bg-black/20 opacity-0 group-hover/savers:opacity-100 transition-opacity flex items-center justify-center">
-                        <div
-                            class="bg-white/90 text-gray-800 p-2 rounded-full shadow-lg transform scale-90 group-hover/savers:scale-100 transition-transform">
+                        <div class="bg-white/90 text-gray-800 p-2 rounded-full shadow-lg transform scale-90 group-hover/savers:scale-100 transition-transform">
                             <i data-lucide="eye" class="h-5 w-5"></i>
                         </div>
                     </button>
                 </a>
 
                 <div>
-                    <h3 class="font-bold text-gray-900 mb-1 truncate">{{ product.title }}</h3>
-                    <div class="flex items-center gap-2 mb-3">
-                        <span class="text-lg font-bold text-pink-600">৳{{ product.price }}</span>
+                    <h3 class="font-bold text-gray-900 text-sm mb-1 truncate">{{ product.title }}</h3>
+                    <div class="flex items-baseline gap-1.5 mb-3">
+                        <span class="text-base font-black text-rose-600">৳{{ product.price }}</span>
                         {% if product.original_price %}
-                        <span class="text-sm text-gray-400 line-through">৳{{ product.original_price }}</span>
+                        <span class="text-xs text-gray-400 line-through">৳{{ product.original_price }}</span>
                         {% endif %}
                     </div>
 
                     {% if product.stock_quantity > 0 %}
-                    <div class="flex items-center gap-2 w-full">
+                    <div class="flex gap-2">
                         <form action="{% url 'cart_add' product.id %}" method="post" class="flex-1">
                             {% csrf_token %}
                             <input type="hidden" name="quantity" value="1">
                             <button type="submit" name="checkout" value="true"
-                                class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-bold h-10 px-2 w-full bg-orange-50 text-orange-600 hover:bg-orange-100 transition-colors shadow-sm">
+                                class="w-full h-8 rounded-lg text-[11px] font-black text-white bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 shadow-sm active:scale-95 transition-all">
                                 Buy Now
                             </button>
                         </form>
@@ -679,14 +770,13 @@
                             {% csrf_token %}
                             <input type="hidden" name="quantity" value="1">
                             <button type="submit"
-                                class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-bold h-10 px-2 w-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors shadow-sm">
-                                Add to Cart
+                                class="w-full h-8 rounded-lg text-[11px] font-bold text-pink-700 bg-pink-50 border border-pink-200 hover:bg-pink-100 active:scale-95 transition-all">
+                                + Cart
                             </button>
                         </form>
                     </div>
                     {% else %}
-                    <button disabled
-                        class="w-full bg-gray-200 text-gray-500 font-bold py-2 rounded-lg cursor-not-allowed">
+                    <button disabled class="w-full h-8 rounded-lg text-[11px] font-bold bg-gray-100 text-gray-400 cursor-not-allowed">
                         Out of Stock
                     </button>
                     {% endif %}

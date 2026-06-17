@@ -265,9 +265,10 @@ def add_review(request, slug):
     
     # Update product stats
     reviews = product.reviews.all()
-    product.reviews_count = reviews.count()
-    product.rating = sum(r.rating for r in reviews) / reviews.count()
-    product.save()
+    count = reviews.count()
+    product.reviews_count = count
+    product.rating = (sum(r.rating for r in reviews) / count) if count else 0
+    product.save(update_fields=['reviews_count', 'rating'])
     
     return redirect('product_detail', slug=slug)
 

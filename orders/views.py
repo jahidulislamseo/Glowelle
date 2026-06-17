@@ -180,19 +180,18 @@ def order_create(request):
                         )
                         
                         # Deduct Stock (Atomic update using F expression)
-                        Product.objects.filter(id=product.id).update(stock_quantity=models.F('stock_quantity') - item['quantity'])
-                        
-                        # Refresh product instance for logging or other needs if necessary, 
-                        # but StockLog just needs the reference.
-                        
+                        item_product = item['product']
+                        Product.objects.filter(id=item_product.id).update(stock_quantity=models.F('stock_quantity') - item['quantity'])
+
                         # Create Stock Log
                         StockLog.objects.create(
-                            product=product,
+                            product=item_product,
                             quantity=-item['quantity'],
                             reason=f"Order #{order.id}"
                         )
                     
                     if order.payment_method == 'online':
+                        request.session['pending_order_id'] = order.id
                         return redirect('payment_process', order_id=order.id)
                     
                     cart.clear()
@@ -226,7 +225,11 @@ def payment_process(request, order_id):
     if request.user.is_authenticated:
         order = get_object_or_404(Order, id=order_id, user=request.user)
     else:
-        order = get_object_or_404(Order, id=order_id)
+        # For guests: verify this order was created in the current session
+        if request.session.get('pending_order_id') != order_id:
+            from django.http import Http404
+            raise Http404
+        order = get_object_or_404(Order, id=order_id, user__isnull=True)
         
     gateways = PaymentGateway.objects.filter(is_active=True)
     return render(request, 'orders/payment.html', {'order': order, 'gateways': gateways})
@@ -236,7 +239,10 @@ def payment_success(request, order_id):
     if request.user.is_authenticated:
         order = get_object_or_404(Order, id=order_id, user=request.user)
     else:
-        order = get_object_or_404(Order, id=order_id)
+        if request.session.get('pending_order_id') != order_id:
+            from django.http import Http404
+            raise Http404
+        order = get_object_or_404(Order, id=order_id, user__isnull=True)
 
     cart = Cart(request)
     

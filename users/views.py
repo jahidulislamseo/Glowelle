@@ -133,7 +133,10 @@ def login_view(request):
                 else:
                     request.session.set_expiry(0) # Browser close
                     
-                next_url = request.POST.get('next') or request.GET.get('next') or 'home'
+                from django.utils.http import url_has_allowed_host_and_scheme
+                next_url = request.POST.get('next') or request.GET.get('next') or ''
+                if not url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}):
+                    next_url = 'home'
                 return redirect(next_url)
             else:
                 messages.error(request, "Invalid username or password.")

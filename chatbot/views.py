@@ -399,7 +399,6 @@ def save_chat_interaction(session_id, user_msg, bot_msg):
         upsert=True
     )
 
-@csrf_exempt
 @require_POST
 def chatbot_response(request):
     if not chat_client:
@@ -407,7 +406,7 @@ def chatbot_response(request):
     try:
         data = json.loads(request.body)
         user_message = data.get('message', '')
-        session_id = data.get('session_id', 'default')
+        session_id = data.get('session_id') or f"anon_{request.session.session_key or 'x'}"
         
         # Track session metrics
         metric, created = ChatbotMetric.objects.get_or_create(
@@ -598,7 +597,10 @@ ORDERING RULES FOR LOGGED-IN USER:
 
 @csrf_exempt
 def get_chat_history(request):
-    session_id = request.GET.get('session_id', 'default')
+    session_id = request.GET.get('session_id', '')
+    # Reject empty or the known-bad default sentinel
+    if not session_id or session_id == 'default':
+        return JsonResponse({"error": "Invalid session"}, status=400)
     history = get_chat_history_from_db(session_id)
     return JsonResponse({"history": history, "status": "success"})
 

@@ -1,83 +1,127 @@
 {% extends 'base.html' %} {% load markdownify %} {% block content %}
-<div class="container mx-auto px-4 py-8">
-  <!-- Breadcrumb -->
-  <nav class="flex mb-8 text-sm text-gray-500" aria-label="Breadcrumb">
+
+<!-- Sticky Bottom CTA for Mobile -->
+{% if product.stock_quantity > 0 %}
+<div id="mobile-sticky-cta" class="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white border-t border-gray-200 shadow-2xl px-4 py-3 flex gap-3 translate-y-full transition-transform duration-300">
+  <form action="{% url 'cart_add' product.id %}" method="post" class="flex-1">
+    {% csrf_token %}
+    <input type="hidden" name="quantity" value="1" id="qty-input-sticky" />
+    <button type="submit"
+      class="w-full h-12 rounded-xl font-bold text-pink-700 border-2 border-pink-300 bg-pink-50 hover:bg-pink-100 transition-all text-sm active:scale-95">
+      Cart এ যোগ করুন
+    </button>
+  </form>
+  <form action="{% url 'cart_add' product.id %}" method="post" class="flex-1">
+    {% csrf_token %}
+    <input type="hidden" name="quantity" value="1" id="qty-input-sticky2" />
+    <button type="submit" name="checkout" value="true"
+      class="w-full h-12 rounded-xl font-bold text-white btn-primary transition-all text-sm active:scale-95">
+      এখনই কিনুন
+    </button>
+  </form>
+</div>
+{% endif %}
+
+<div class="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
+  <!-- Breadcrumb (compact on mobile) -->
+  <nav class="flex mb-4 sm:mb-8 text-sm text-gray-500 overflow-x-auto whitespace-nowrap pb-1" aria-label="Breadcrumb">
     <ol class="inline-flex items-center space-x-1 md:space-x-3">
       <li class="inline-flex items-center">
         <a href="{% url 'home' %}" class="hover:text-pink-600 flex items-center gap-1">
-          <i data-lucide="home" class="h-3 w-3"></i> Home
+          <i data-lucide="home" class="h-3 w-3 flex-shrink-0"></i>
+          <span class="hidden sm:inline">Home</span>
         </a>
       </li>
       <li>
         <div class="flex items-center">
-          <i data-lucide="chevron-right" class="h-4 w-4 text-gray-400"></i>
-          <a href="{% url 'shop' %}" class="ml-1 md:ml-2 hover:text-pink-600">Shop</a>
+          <i data-lucide="chevron-right" class="h-4 w-4 text-gray-400 flex-shrink-0"></i>
+          <a href="{% url 'shop' %}" class="ml-1 hover:text-pink-600">Shop</a>
         </div>
       </li>
       <li>
         <div class="flex items-center">
-          <i data-lucide="chevron-right" class="h-4 w-4 text-gray-400"></i>
-          <a href="{% url 'shop' %}?category={{ product.category.slug }}" class="ml-1 md:ml-2 hover:text-pink-600">{{ product.category.name }}</a>
+          <i data-lucide="chevron-right" class="h-4 w-4 text-gray-400 flex-shrink-0"></i>
+          <a href="{% url 'shop' %}?category={{ product.category.slug }}" class="ml-1 hover:text-pink-600">{{ product.category.name }}</a>
         </div>
       </li>
-      <li aria-current="page">
+      <li aria-current="page" class="hidden sm:flex">
         <div class="flex items-center">
-          <i data-lucide="chevron-right" class="h-4 w-4 text-gray-400"></i>
-          <span class="ml-1 md:ml-2 font-medium text-gray-900 truncate max-w-[200px]">{{ product.title }}</span>
+          <i data-lucide="chevron-right" class="h-4 w-4 text-gray-400 flex-shrink-0"></i>
+          <span class="ml-1 font-medium text-gray-900 truncate max-w-[160px]">{{ product.title }}</span>
         </div>
       </li>
     </ol>
   </nav>
 
-  <div class="grid md:grid-cols-2 gap-8 lg:gap-12 mb-16">
+  <div class="grid md:grid-cols-2 gap-5 lg:gap-12 mb-10 sm:mb-16">
+
     <!-- Image Gallery -->
-    <div class="space-y-4 reveal-on-scroll reveal-right">
-      <div id="main-image-wrapper" class="aspect-square relative bg-white border rounded-lg overflow-hidden group" style="cursor: zoom-in;">
+    <div class="space-y-3 reveal-on-scroll reveal-right -mx-3 sm:mx-0">
+      <!-- Main Image -->
+      <div id="main-image-wrapper"
+        class="relative bg-white sm:border sm:rounded-xl overflow-hidden group sm:aspect-square"
+        style="cursor: zoom-in;">
+
         {% if product.is_new %}
-        <span
-          class="absolute top-4 left-4 bg-pink-600 text-white text-xs font-bold px-2 py-1 rounded-full z-20 animate-float">New</span>
+        <span class="absolute top-3 left-3 bg-pink-600 text-white text-[11px] font-bold px-2.5 py-1 rounded-full z-20 animate-float shadow">New</span>
         {% endif %}
 
-        <!-- Sliding Container -->
-        <div id="image-slider-container" class="flex w-full h-full transition-transform duration-500 ease-in-out">
-          <img src="{{ product.display_image_url }}" alt="{{ product.title }}" class="object-cover w-full h-full flex-shrink-0">
+        <!-- Slider Container -->
+        <div id="image-slider-container"
+          class="flex h-full transition-transform duration-500 ease-in-out"
+          style="touch-action: pan-y;">
+          <div class="relative w-full flex-shrink-0">
+            <img src="{{ product.display_image_url }}" alt="{{ product.title }}"
+              class="object-cover w-full"
+              style="aspect-ratio:1/1; display:block;">
+          </div>
           {% for img in product.additional_images.all %}
-          <img src="{{ img.display_image_url }}" alt="Extra" class="object-cover w-full h-full flex-shrink-0">
+          <div class="relative w-full flex-shrink-0">
+            <img src="{{ img.display_image_url }}" alt="Extra {{ forloop.counter }}"
+              class="object-cover w-full"
+              style="aspect-ratio:1/1; display:block;">
+          </div>
           {% endfor %}
         </div>
 
-        <!-- Zoom Overlay -->
+        <!-- Zoom Overlay (desktop only) -->
         <div id="zoom-overlay"
-          class="absolute inset-0 pointer-events-none opacity-0"
+          class="absolute inset-0 pointer-events-none opacity-0 hidden sm:block"
           style="background-repeat: no-repeat; background-size: 250%; z-index: 10; transition: opacity 0.15s ease;">
         </div>
 
         <!-- Navigation Arrows -->
         {% if product.additional_images.exists %}
-        <div
-          class="absolute inset-0 flex items-center justify-between p-4 opacity-0 group-hover:opacity-100 transition-opacity z-30">
-          <button onclick="prevImage(true)"
-            class="p-2 rounded-full bg-white/80 hover:bg-white text-gray-800 shadow-sm transition-all active:scale-95">
-            <i data-lucide="chevron-left" class="h-6 w-6"></i>
-          </button>
-          <button onclick="nextImage(true)"
-            class="p-2 rounded-full bg-white/80 hover:bg-white text-gray-800 shadow-sm transition-all active:scale-95">
-            <i data-lucide="chevron-right" class="h-6 w-6"></i>
-          </button>
+        <!-- Mobile arrows: always visible, smaller, on the sides -->
+        <button onclick="prevImage(true)"
+          class="absolute left-2 top-1/2 -translate-y-1/2 z-30 p-2 rounded-full bg-white/85 shadow-md text-gray-700 sm:opacity-0 sm:group-hover:opacity-100 transition-all active:scale-90 sm:left-3">
+          <i data-lucide="chevron-left" class="h-5 w-5"></i>
+        </button>
+        <button onclick="nextImage(true)"
+          class="absolute right-2 top-1/2 -translate-y-1/2 z-30 p-2 rounded-full bg-white/85 shadow-md text-gray-700 sm:opacity-0 sm:group-hover:opacity-100 transition-all active:scale-90 sm:right-3">
+          <i data-lucide="chevron-right" class="h-5 w-5"></i>
+        </button>
+
+        <!-- Dot Indicators (mobile only) -->
+        <div id="dot-indicators" class="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5 z-30 sm:hidden">
+          <button onclick="changeSlide(0,true)" class="dot-btn w-2 h-2 rounded-full bg-pink-600 transition-all"></button>
+          {% for img in product.additional_images.all %}
+          <button onclick="changeSlide({{ forloop.counter }},true)" class="dot-btn w-2 h-2 rounded-full bg-white/60 transition-all"></button>
+          {% endfor %}
         </div>
         {% endif %}
       </div>
 
-      <!-- Thumbnails -->
+      <!-- Thumbnails (desktop) -->
       {% if product.additional_images.exists %}
-      <div class="grid grid-cols-5 gap-3" id="thumbnail-container">
+      <div class="hidden sm:grid grid-cols-5 gap-3 px-3 sm:px-0" id="thumbnail-container">
         <button onclick="changeSlide(0, true)"
-          class="thumbnail-btn aspect-square relative border-2 border-pink-600 rounded-md overflow-hidden transition-all">
+          class="thumbnail-btn aspect-square border-2 border-pink-600 rounded-md overflow-hidden transition-all">
           <img src="{{ product.display_image_url }}" alt="Main" class="object-cover w-full h-full" />
         </button>
         {% for img in product.additional_images.all %}
         <button onclick="changeSlide({{ forloop.counter }}, true)"
-          class="thumbnail-btn aspect-square relative border-2 border-transparent rounded-md overflow-hidden hover:border-pink-600/50 transition-all">
+          class="thumbnail-btn aspect-square border-2 border-transparent rounded-md overflow-hidden hover:border-pink-600/50 transition-all">
           <img src="{{ img.display_image_url }}" alt="Thumbnail" class="object-cover w-full h-full" />
         </button>
         {% endfor %}
@@ -86,313 +130,237 @@
     </div>
 
     <!-- Product Info -->
-    <div class="space-y-6 reveal-on-scroll reveal-left">
+    <div class="space-y-4 sm:space-y-6 reveal-on-scroll reveal-left px-0">
+
+      <!-- Title & Rating -->
       <div class="reveal-on-scroll reveal-up delay-100">
-        <h1 class="text-3xl font-bold text-gray-900">{{ product.title }}</h1>
-        <div class="flex items-center gap-4 mt-2">
+        <h1 class="text-xl sm:text-3xl font-bold text-gray-900 leading-snug">{{ product.title }}</h1>
+        <div class="flex flex-wrap items-center gap-3 mt-2">
           <div class="flex items-center gap-1">
             <i data-lucide="star" class="h-4 w-4 fill-yellow-400 text-yellow-400"></i>
-            <span class="font-medium">{{ product.rating|default:"5.0" }}</span>
-            <span class="text-gray-500">({{ product.reviews_count }} reviews)</span>
+            <span class="font-semibold text-sm">{{ product.rating|default:"5.0" }}</span>
+            <span class="text-gray-400 text-sm">({{ product.reviews_count }} reviews)</span>
           </div>
           {% if product.stock_quantity > 0 %}
-          <div class="flex items-center gap-1 text-pink-600 text-sm font-medium">
-            <i data-lucide="check" class="h-4 w-4"></i> In Stock ({{ product.stock_quantity }} available)
-          </div>
+          <span class="inline-flex items-center gap-1 text-green-700 bg-green-50 border border-green-100 text-xs font-semibold px-2.5 py-1 rounded-full">
+            <i data-lucide="check-circle" class="h-3.5 w-3.5"></i> In Stock
+          </span>
           {% else %}
-          <div class="flex items-center gap-1 text-red-500 text-sm font-medium">
-            <i data-lucide="x-circle" class="h-4 w-4"></i> Out of Stock
-          </div>
+          <span class="inline-flex items-center gap-1 text-red-600 bg-red-50 border border-red-100 text-xs font-semibold px-2.5 py-1 rounded-full">
+            <i data-lucide="x-circle" class="h-3.5 w-3.5"></i> Out of Stock
+          </span>
           {% endif %}
         </div>
       </div>
 
-      <div class="flex items-end gap-3">
-        <span class="text-4xl font-bold text-pink-600">৳{{ product.price }}</span>
+      <!-- Price -->
+      <div class="flex items-end gap-3 bg-pink-50/60 border border-pink-100 rounded-xl px-4 py-3">
+        <span class="text-3xl sm:text-4xl font-black text-pink-600">৳{{ product.price }}</span>
         {% if product.original_price %}
-        <span class="text-xl text-gray-400 line-through mb-1">৳{{ product.original_price }}</span>
+        <div class="flex flex-col mb-0.5">
+          <span class="text-base sm:text-xl text-gray-400 line-through">৳{{ product.original_price }}</span>
+          {% if product.discount_percent %}
+          <span class="text-xs text-green-600 font-bold">{{ product.discount_percent }}% OFF</span>
+          {% endif %}
+        </div>
         {% endif %}
       </div>
 
+      <!-- Short Description -->
       <div class="prose prose-sm text-gray-600 prose-text">
         {% if product.short_description %}
         {{ product.short_description|markdownify }}
         {% else %}
         {{ product.description|markdownify|truncatewords_html:50 }}
         {% endif %}
-        <ul class="list-disc pl-4 mt-2 space-y-2">
+        <ul class="list-disc pl-4 mt-2 space-y-1 text-sm">
           <li>Dermatologist Tested &amp; Skin Safe</li>
           <li>100% Genuine &amp; Authenticated</li>
           <li>Secure &amp; Damage-free Packaging</li>
         </ul>
       </div>
 
-      <!-- Add to Cart Section -->
-      <div class="pt-6 border-t space-y-5">
-        <div class="flex items-center gap-6">
-          <span class="font-bold text-gray-900">Quantity:</span>
-          <div class="flex items-center bg-gray-50 rounded-xl p-1 border border-gray-200">
+      <!-- Quantity + Add to Cart (full buttons on desktop, hidden sticky bar on mobile) -->
+      <div class="pt-4 border-t space-y-4">
+        <!-- Quantity Picker -->
+        <div class="flex items-center gap-4">
+          <span class="font-bold text-gray-700 text-sm">পরিমাণ:</span>
+          <div class="flex items-center bg-gray-50 rounded-xl p-1 border border-gray-200 gap-1">
             <button type="button"
-              class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-white hover:shadow-sm text-gray-600 transition-all active:scale-90"
+              class="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-white hover:shadow-sm text-gray-600 transition-all active:scale-90"
               onclick="decrementQty()">
               <i data-lucide="minus" class="h-4 w-4"></i>
             </button>
-            <span id="qty-display" class="w-12 text-center font-bold text-lg text-gray-900">1</span>
+            <span id="qty-display" class="w-10 text-center font-bold text-base text-gray-900 select-none">1</span>
             <button type="button"
-              class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-white hover:shadow-sm text-gray-600 transition-all active:scale-90"
+              class="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-white hover:shadow-sm text-gray-600 transition-all active:scale-90"
               onclick="incrementQty()">
               <i data-lucide="plus" class="h-4 w-4"></i>
             </button>
           </div>
         </div>
-      </div>
 
-      <div class="space-y-4">
+        <!-- Action Buttons -->
         {% if product.stock_quantity > 0 %}
-        <form action="{% url 'cart_add' product.id %}" method="post" class="space-y-4">
+        <form action="{% url 'cart_add' product.id %}" method="post" class="space-y-3">
           {% csrf_token %}
           <input type="hidden" name="quantity" value="1" id="qty-input" />
-          <div class="flex flex-col sm:flex-row gap-3">
+          <!-- Desktop buttons (hidden on mobile via pb-24 trick, both shown) -->
+          <div class="hidden sm:flex flex-col sm:flex-row gap-3">
             <button type="submit" name="checkout" value="true"
-              class="flex-[2] btn-primary rounded-xl px-8 text-lg h-14 font-bold active:scale-[0.98] transition-transform">
-              Buy Now
+              class="flex-[2] btn-primary rounded-xl px-8 text-base h-13 font-bold active:scale-[0.98] transition-transform">
+              এখনই কিনুন
             </button>
             <div class="flex gap-3 flex-1">
               <button type="submit"
                 class="flex-1 inline-flex items-center justify-center whitespace-nowrap font-bold rounded-xl px-4 text-pink-700 border-2 border-pink-200 hover:bg-pink-50 transition-all active:scale-[0.98]">
-                Add to Cart
+                Cart এ যোগ করুন
               </button>
               <a href="{% url 'toggle_wishlist' product.id %}"
-                class="flex items-center justify-center w-14 h-14 rounded-xl border border-gray-200 hover:bg-gray-50 transition-all text-gray-400 hover:text-red-500 {% if is_in_wishlist %}text-red-500 bg-red-50 border-red-100{% endif %} active:scale-[0.98]">
-                <i data-lucide="heart" class="h-6 w-6 {% if is_in_wishlist %}fill-current{% endif %}"></i>
+                class="flex items-center justify-center w-12 h-12 rounded-xl border border-gray-200 hover:bg-gray-50 transition-all text-gray-400 hover:text-red-500 {% if is_in_wishlist %}text-red-500 bg-red-50 border-red-100{% endif %} active:scale-[0.98]">
+                <i data-lucide="heart" class="h-5 w-5 {% if is_in_wishlist %}fill-current{% endif %}"></i>
               </a>
             </div>
           </div>
+          <!-- Mobile: Wishlist + stock info row -->
+          <div class="flex sm:hidden items-center justify-between">
+            <p class="text-xs text-gray-500">{{ product.stock_quantity }} টি পণ্য বাকি আছে</p>
+            <a href="{% url 'toggle_wishlist' product.id %}"
+              class="flex items-center gap-1.5 text-sm font-semibold rounded-xl px-3 py-2 border border-gray-200 hover:bg-gray-50 transition-all {% if is_in_wishlist %}text-red-500 bg-red-50 border-red-100{% else %}text-gray-500{% endif %} active:scale-95">
+              <i data-lucide="heart" class="h-4 w-4 {% if is_in_wishlist %}fill-current{% endif %}"></i>
+              {% if is_in_wishlist %}Saved{% else %}Save{% endif %}
+            </a>
+          </div>
         </form>
         {% else %}
-        <form action="{% url 'create_stock_alert' product.id %}" method="post" class="space-y-4">
+        <form action="{% url 'create_stock_alert' product.id %}" method="post">
           {% csrf_token %}
           <button type="submit"
-            class="w-full h-14 rounded-xl bg-orange-50 text-orange-600 border border-orange-100 font-bold hover:bg-orange-100 transition-all active:scale-95 flex items-center justify-center gap-2">
+            class="w-full h-13 rounded-xl bg-orange-50 text-orange-600 border border-orange-100 font-bold hover:bg-orange-100 transition-all active:scale-95 flex items-center justify-center gap-2">
             <i data-lucide="bell" class="h-5 w-5"></i>
-            Notify Me When Back in Stock
+            স্টক আসলে জানান
           </button>
         </form>
         {% endif %}
       </div>
 
-      <script>
-        // Quantity logic
-        function incrementQty() {
-          const display = document.getElementById('qty-display');
-          const input = document.getElementById('qty-input');
-          let val = parseInt(display.innerText);
-          val++;
-          display.innerText = val;
-          input.value = val;
-        }
-        function decrementQty() {
-          const display = document.getElementById('qty-display');
-          const input = document.getElementById('qty-input');
-          let val = parseInt(display.innerText);
-          if (val > 1) {
-            val--;
-            display.innerText = val;
-            input.value = val;
-          }
-        }
-
-        // Image Slideshow logic
-        let currentImageIndex = 0;
-        let autoplayInterval;
-        const totalImages = {{ product.additional_images.count|add:1 }};
-
-        function startAutoplay() {
-          if (totalImages <= 1) return;
-          autoplayInterval = setInterval(() => {
-            nextImage();
-          }, 5000);
-        }
-
-        function stopAutoplay() {
-          if (autoplayInterval) clearInterval(autoplayInterval);
-        }
-
-        function changeSlide(index, isManual = false) {
-          if (isManual) stopAutoplay();
-
-          currentImageIndex = index;
-          const slider = document.getElementById('image-slider-container');
-          slider.style.transform = `translateX(-${index * 100}%)`;
-
-          // Update thumbnails
-          document.querySelectorAll('.thumbnail-btn').forEach((btn, i) => {
-            if (i === index) {
-              btn.classList.add('border-pink-600');
-              btn.classList.remove('border-transparent');
-            } else {
-              btn.classList.remove('border-pink-600');
-              btn.classList.add('border-transparent');
-            }
-          });
-
-          if (isManual) startAutoplay();
-        }
-
-        function nextImage(isManual = false) {
-          if (totalImages <= 1) return;
-          currentImageIndex = (currentImageIndex + 1) % totalImages;
-          changeSlide(currentImageIndex, isManual);
-        }
-
-        function prevImage(isManual = false) {
-          if (totalImages <= 1) return;
-          currentImageIndex = (currentImageIndex - 1 + totalImages) % totalImages;
-          changeSlide(currentImageIndex, isManual);
-        }
-
-        // Keyboard navigation
-        document.addEventListener('keydown', (e) => {
-          if (e.key === 'ArrowRight') nextImage(true);
-          if (e.key === 'ArrowLeft') prevImage(true);
-        });
-
-        // Initialize autoplay
-        document.addEventListener('DOMContentLoaded', startAutoplay);
-
-        // Image Zoom on Hover
-        (function () {
-          const wrapper = document.getElementById('main-image-wrapper');
-          const overlay = document.getElementById('zoom-overlay');
-          if (!wrapper || !overlay) return;
-
-          function getCurrentSrc() {
-            const imgs = document.querySelectorAll('#image-slider-container img');
-            return imgs[currentImageIndex] ? imgs[currentImageIndex].src : '';
-          }
-
-          wrapper.addEventListener('mouseenter', function () {
-            const src = getCurrentSrc();
-            if (!src) return;
-            overlay.style.backgroundImage = `url('${src}')`;
-            overlay.style.opacity = '1';
-          });
-
-          wrapper.addEventListener('mouseleave', function () {
-            overlay.style.opacity = '0';
-          });
-
-          wrapper.addEventListener('mousemove', function (e) {
-            const rect = wrapper.getBoundingClientRect();
-            const x = ((e.clientX - rect.left) / rect.width) * 100;
-            const y = ((e.clientY - rect.top) / rect.height) * 100;
-            overlay.style.backgroundPosition = `${x}% ${y}%`;
-            overlay.style.backgroundImage = `url('${getCurrentSrc()}')`;
-          });
-        })();
-      </script>
-
-      <!-- Additional Action Buttons -->
-      <div class="space-y-4 mt-8">
-        <!-- Cash on Delivery Button -->
+      <!-- COD + Chat Buttons -->
+      <div class="space-y-3">
         <a href="{% url 'order_create' %}"
-          class="w-full flex items-center justify-center gap-3 bg-orange-50 border border-orange-200 text-orange-700 font-bold py-4 px-6 rounded-xl hover:bg-orange-100 transition-all active:scale-95">
-          <i data-lucide="truck" class="h-5 w-5"></i>
+          class="w-full flex items-center justify-center gap-2.5 bg-orange-50 border border-orange-200 text-orange-700 font-bold py-3.5 px-5 rounded-xl hover:bg-orange-100 transition-all active:scale-95 text-sm sm:text-base">
+          <i data-lucide="truck" class="h-5 w-5 flex-shrink-0"></i>
           <span>ক্যাশ অন ডেলিভারিতে অর্ডার করুন</span>
         </a>
-
-        <!-- Messenger & WhatsApp Buttons -->
         <div class="grid grid-cols-2 gap-3">
           <a href="https://m.me/YOUR_PAGE_ID" target="_blank"
-            class="flex items-center justify-center gap-2 bg-blue-50 text-blue-700 border border-blue-100 font-semibold py-3 px-4 rounded-xl hover:bg-blue-100 transition-all">
-            <i data-lucide="message-circle" class="h-4 w-4"></i>
-            <span>Chat with us</span>
+            class="flex items-center justify-center gap-2 bg-blue-50 text-blue-700 border border-blue-100 font-semibold py-3 px-3 rounded-xl hover:bg-blue-100 transition-all text-sm active:scale-95">
+            <i data-lucide="message-circle" class="h-4 w-4 flex-shrink-0"></i>
+            <span>Messenger</span>
           </a>
-
           <a href="https://wa.me/8801234567890" target="_blank"
-            class="flex items-center justify-center gap-2 bg-pink-50 text-pink-700 border border-pink-100 font-semibold py-3 px-4 rounded-xl hover:bg-pink-100 transition-all">
-            <i data-lucide="phone" class="h-4 w-4"></i>
-            <span>WhatsApp Us</span>
+            class="flex items-center justify-center gap-2 bg-green-50 text-green-700 border border-green-100 font-semibold py-3 px-3 rounded-xl hover:bg-green-100 transition-all text-sm active:scale-95">
+            <i data-lucide="phone" class="h-4 w-4 flex-shrink-0"></i>
+            <span>WhatsApp</span>
           </a>
         </div>
       </div>
 
-      <div class="grid grid-cols-2 gap-4 text-sm text-gray-500 pt-6 border-t mt-6">
-        <div class="flex items-center gap-3 p-3 bg-pink-50 rounded-xl">
-          <i data-lucide="truck" class="h-5 w-5 text-pink-600"></i>
+      <!-- Trust Badges -->
+      <div class="grid grid-cols-2 gap-3 pt-4 border-t">
+        <div class="flex items-center gap-2.5 p-3 bg-pink-50 rounded-xl">
+          <div class="flex-shrink-0 h-9 w-9 flex items-center justify-center bg-pink-100 rounded-lg">
+            <i data-lucide="truck" class="h-4 w-4 text-pink-600"></i>
+          </div>
           <div>
-            <p class="font-bold text-gray-900 leading-none">Fast Delivery</p>
-            <p class="text-[10px]">Dhaka inside 24h</p>
+            <p class="font-bold text-gray-900 text-xs leading-none">দ্রুত ডেলিভারি</p>
+            <p class="text-[10px] text-gray-500 mt-0.5">ঢাকায় ২৪ ঘণ্টা</p>
           </div>
         </div>
-        <div class="flex items-center gap-3 p-3 bg-pink-50 rounded-xl">
-          <i data-lucide="shield-check" class="h-5 w-5 text-pink-600"></i>
+        <div class="flex items-center gap-2.5 p-3 bg-pink-50 rounded-xl">
+          <div class="flex-shrink-0 h-9 w-9 flex items-center justify-center bg-pink-100 rounded-lg">
+            <i data-lucide="shield-check" class="h-4 w-4 text-pink-600"></i>
+          </div>
           <div>
-            <p class="font-bold text-gray-900 leading-none">Secure Pay</p>
-            <p class="text-[10px]">Cash on delivery</p>
+            <p class="font-bold text-gray-900 text-xs leading-none">নিরাপদ পেমেন্ট</p>
+            <p class="text-[10px] text-gray-500 mt-0.5">ক্যাশ অন ডেলিভারি</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2.5 p-3 bg-blue-50 rounded-xl">
+          <div class="flex-shrink-0 h-9 w-9 flex items-center justify-center bg-blue-100 rounded-lg">
+            <i data-lucide="refresh-cw" class="h-4 w-4 text-blue-600"></i>
+          </div>
+          <div>
+            <p class="font-bold text-gray-900 text-xs leading-none">সহজ রিটার্ন</p>
+            <p class="text-[10px] text-gray-500 mt-0.5">৭ দিনের মধ্যে</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2.5 p-3 bg-green-50 rounded-xl">
+          <div class="flex-shrink-0 h-9 w-9 flex items-center justify-center bg-green-100 rounded-lg">
+            <i data-lucide="badge-check" class="h-4 w-4 text-green-600"></i>
+          </div>
+          <div>
+            <p class="font-bold text-gray-900 text-xs leading-none">১০০% অরিজিনাল</p>
+            <p class="text-[10px] text-gray-500 mt-0.5">গ্যারান্টিড</p>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Product Description & Reviews Tabs -->
-  <div class="mt-16 mb-16">
-    <div class="border-b border-gray-200">
-      <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+  <!-- Tabs Section -->
+  <div class="mt-8 sm:mt-16 mb-10 sm:mb-16">
+    <div class="border-b border-gray-200 overflow-x-auto">
+      <nav class="-mb-px flex space-x-2 min-w-max" aria-label="Tabs">
         <button id="tab-desc-btn" onclick="switchTab('desc')"
-          class="border-pink-600 text-pink-700 bg-pink-50/50 whitespace-nowrap border-b-2 py-4 px-6 text-sm font-bold transition-all rounded-t-lg">
-          Product Details
+          class="border-pink-600 text-pink-700 bg-pink-50/50 whitespace-nowrap border-b-2 py-3 px-4 sm:py-4 sm:px-6 text-sm font-bold transition-all rounded-t-lg">
+          পণ্যের বিবরণ
         </button>
         <button id="tab-reviews-btn" onclick="switchTab('reviews')"
-          class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap border-b-2 py-4 px-6 text-sm font-bold transition-all">
-          Customer Reviews ({% if reviews %}{{ reviews.count }}{% else %}0{% endif %})
+          class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap border-b-2 py-3 px-4 sm:py-4 sm:px-6 text-sm font-bold transition-all">
+          Reviews ({% if reviews %}{{ reviews.count }}{% else %}0{% endif %})
         </button>
       </nav>
     </div>
 
-    <div class="py-10">
+    <div class="py-6 sm:py-10">
       <!-- Description Content -->
       <div id="tab-desc-content" class="block animate-fade-in">
-        <div class="grid md:grid-cols-3 gap-8 mb-12">
-          <div
-            class="flex items-start gap-4 p-4 rounded-xl bg-pink-50/30 border border-pink-100 reveal-on-scroll reveal-up">
-            <div class="h-10 w-10 flex items-center justify-center rounded-lg bg-pink-600 text-white shadow-sm">
-              <i data-lucide="leaf" class="h-5 w-5"></i>
+        <div class="grid sm:grid-cols-3 gap-3 sm:gap-8 mb-8 sm:mb-12">
+          <div class="flex items-start gap-3 p-3.5 rounded-xl bg-pink-50/30 border border-pink-100 reveal-on-scroll reveal-up">
+            <div class="h-9 w-9 flex-shrink-0 flex items-center justify-center rounded-lg bg-pink-600 text-white shadow-sm">
+              <i data-lucide="leaf" class="h-4 w-4"></i>
             </div>
             <div>
-              <h4 class="font-bold text-gray-900">Dermatologist Tested</h4>
-              <p class="text-xs text-gray-500 mt-1">Clinically safe for all skin types.</p>
+              <h4 class="font-bold text-gray-900 text-sm">Dermatologist Tested</h4>
+              <p class="text-xs text-gray-500 mt-0.5">Clinically safe for all skin types.</p>
             </div>
           </div>
-          <div
-            class="flex items-start gap-4 p-4 rounded-xl bg-blue-50/30 border border-blue-100 reveal-on-scroll reveal-up delay-100">
-            <div class="h-10 w-10 flex items-center justify-center rounded-lg bg-blue-600 text-white shadow-sm">
-              <i data-lucide="shield-check" class="h-5 w-5"></i>
+          <div class="flex items-start gap-3 p-3.5 rounded-xl bg-blue-50/30 border border-blue-100 reveal-on-scroll reveal-up delay-100">
+            <div class="h-9 w-9 flex-shrink-0 flex items-center justify-center rounded-lg bg-blue-600 text-white shadow-sm">
+              <i data-lucide="shield-check" class="h-4 w-4"></i>
             </div>
             <div>
-              <h4 class="font-bold text-gray-900">Quality Checked</h4>
-              <p class="text-xs text-gray-500 mt-1">Rigorous quality standards applied.</p>
+              <h4 class="font-bold text-gray-900 text-sm">Quality Checked</h4>
+              <p class="text-xs text-gray-500 mt-0.5">Rigorous quality standards applied.</p>
             </div>
           </div>
-          <div
-            class="flex items-start gap-4 p-4 rounded-xl bg-orange-50/30 border border-orange-100 reveal-on-scroll reveal-up delay-200">
-            <div class="h-10 w-10 flex items-center justify-center rounded-lg bg-orange-600 text-white shadow-sm">
-              <i data-lucide="package-check" class="h-5 w-5"></i>
+          <div class="flex items-start gap-3 p-3.5 rounded-xl bg-orange-50/30 border border-orange-100 reveal-on-scroll reveal-up delay-200">
+            <div class="h-9 w-9 flex-shrink-0 flex items-center justify-center rounded-lg bg-orange-600 text-white shadow-sm">
+              <i data-lucide="package-check" class="h-4 w-4"></i>
             </div>
             <div>
-              <h4 class="font-bold text-gray-900">Secure Packaging</h4>
-              <p class="text-xs text-gray-500 mt-1">Safe delivery, no leaks or damage guaranteed.</p>
+              <h4 class="font-bold text-gray-900 text-sm">Secure Packaging</h4>
+              <p class="text-xs text-gray-500 mt-0.5">Safe delivery, no leaks or damage guaranteed.</p>
             </div>
           </div>
         </div>
 
-        <div class="max-w-4xl p-8 rounded-2xl bg-white border border-gray-100 shadow-sm">
-          <h3 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-            <span class="h-8 w-1 bg-pink-600 rounded-full"></span>
-            Product Overview
+        <div class="p-5 sm:p-8 rounded-2xl bg-white border border-gray-100 shadow-sm">
+          <h3 class="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6 flex items-center gap-3">
+            <span class="h-7 w-1 bg-pink-600 rounded-full"></span>
+            পণ্যের বিস্তারিত
           </h3>
-          <div class="prose prose-green prose-lg max-w-none text-gray-600 leading-relaxed">
+          <div class="prose prose-green prose-sm sm:prose-lg max-w-none text-gray-600 leading-relaxed">
             {{ product.description|markdownify }}
           </div>
         </div>
@@ -400,9 +368,9 @@
 
       <!-- Reviews Content -->
       <div id="tab-reviews-content" class="hidden animate-fade-in">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 sm:mb-10">
           <div>
-            <h3 class="text-2xl font-bold text-gray-900 mb-2">Customer Reviews</h3>
+            <h3 class="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Customer Reviews</h3>
             <div class="flex items-center gap-2">
               <div class="flex text-yellow-400">
                 {% for i in "12345"|make_list %}
@@ -413,77 +381,72 @@
             </div>
           </div>
           {% if user.is_authenticated %}
-          <a href="#write-review" class="btn-primary px-6 py-3 rounded-xl font-bold text-sm">Write a Review</a>
+          <a href="#write-review" class="btn-primary px-5 py-2.5 rounded-xl font-bold text-sm w-full sm:w-auto text-center">Write a Review</a>
           {% endif %}
         </div>
 
-        <div class="grid gap-6 mb-12">
+        <div class="grid gap-4 sm:gap-6 mb-10 sm:mb-12">
           {% for review in reviews %}
-          <div
-            class="p-6 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-shadow reveal-on-scroll reveal-up hover-lift">
-            <div class="flex items-center justify-between mb-4">
+          <div class="p-4 sm:p-6 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-shadow reveal-on-scroll reveal-up hover-lift">
+            <div class="flex items-center justify-between mb-3">
               <div class="flex items-center gap-3">
-                <div
-                  class="h-10 w-10 rounded-full bg-pink-100 flex items-center justify-center text-pink-700 font-bold">
+                <div class="h-9 w-9 rounded-full bg-pink-100 flex items-center justify-center text-pink-700 font-bold text-sm flex-shrink-0">
                   {{ review.user.username|slice:":1"|upper }}
                 </div>
                 <div>
-                  <div class="flex items-center gap-2 mb-1">
-                    <span class="font-bold text-gray-900 leading-none">{{ review.user.username }}</span>
+                  <div class="flex flex-wrap items-center gap-1.5 mb-0.5">
+                    <span class="font-bold text-gray-900 text-sm leading-none">{{ review.user.username }}</span>
                     {% if review.is_verified_purchase %}
-                    <span
-                      class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-pink-100 text-pink-700">
-                      <i data-lucide="shield-check" class="h-3 w-3"></i> Verified Purchase
+                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-pink-100 text-pink-700">
+                      <i data-lucide="shield-check" class="h-3 w-3"></i> Verified
                     </span>
                     {% endif %}
                   </div>
                   <span class="text-xs text-gray-400">{{ review.created_at|date:"M d, Y" }}</span>
                 </div>
               </div>
-              <div class="flex text-yellow-400">
+              <div class="flex text-yellow-400 flex-shrink-0">
                 {% for i in "12345"|make_list %}
-                {% if forloop.counter <= review.rating %} <i data-lucide="star" class="h-3 w-3 fill-current"></i>
-                  {% else %}
-                  <i data-lucide="star" class="h-3 w-3"></i>
-                  {% endif %}
-                  {% endfor %}
+                {% if forloop.counter <= review.rating %}
+                <i data-lucide="star" class="h-3.5 w-3.5 fill-current"></i>
+                {% else %}
+                <i data-lucide="star" class="h-3.5 w-3.5"></i>
+                {% endif %}
+                {% endfor %}
               </div>
             </div>
-            <p class="text-gray-600 italic">"{{ review.comment }}"</p>
+            <p class="text-gray-600 text-sm italic">"{{ review.comment }}"</p>
             {% if review.image %}
-            <div class="mt-4">
+            <div class="mt-3">
               <img src="{{ review.image.url }}" alt="Review Image"
-                class="w-24 h-24 object-cover rounded-lg border border-gray-200 cursor-pointer hover:opacity-90 transition-opacity"
+                class="w-20 h-20 object-cover rounded-lg border border-gray-200 cursor-pointer hover:opacity-90 transition-opacity"
                 onclick="window.open(this.src)">
             </div>
             {% endif %}
           </div>
           {% empty %}
-          <div class="text-center py-12 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
-            <div class="h-12 w-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
+          <div class="text-center py-10 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
+            <div class="h-12 w-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3 text-gray-400">
               <i data-lucide="message-square" class="h-6 w-6"></i>
             </div>
-            <p class="text-gray-500 font-medium">No reviews yet. Be the first to share your experience!</p>
+            <p class="text-gray-500 font-medium text-sm">No reviews yet. Be the first!</p>
           </div>
           {% endfor %}
         </div>
 
-        <!-- Add Review Form -->
         {% if user.is_authenticated %}
-        <div id="write-review" class="bg-gray-50 p-8 rounded-2xl border border-gray-200">
-          <form action="{% url 'add_review' product.slug %}" method="post" enctype="multipart/form-data"
-            class="space-y-6">
+        <div id="write-review" class="bg-gray-50 p-5 sm:p-8 rounded-2xl border border-gray-200">
+          <form action="{% url 'add_review' product.slug %}" method="post" enctype="multipart/form-data" class="space-y-5">
             {% csrf_token %}
             <div>
-              <h4 class="text-xl font-bold text-gray-900 mb-1">Share Your Feedback</h4>
-              <p class="text-sm text-gray-500">Your email address will not be published.</p>
+              <h4 class="text-lg sm:text-xl font-bold text-gray-900 mb-1">আপনার মতামত দিন</h4>
+              <p class="text-xs text-gray-500">Your email will not be published.</p>
             </div>
-
-            <div class="grid md:grid-cols-2 gap-6">
+            <div class="grid sm:grid-cols-2 gap-4 sm:gap-6">
               <div>
                 <label class="block text-sm font-bold text-gray-700 mb-2">Rating</label>
                 <select name="rating"
-                  class="w-full bg-white border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 outline-none transition-all">
+                  class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 outline-none transition-all text-sm">
                   <option value="5">⭐⭐⭐⭐⭐ (5/5 Excellent)</option>
                   <option value="4">⭐⭐⭐⭐ (4/5 Very Good)</option>
                   <option value="3">⭐⭐⭐ (3/5 Good)</option>
@@ -494,30 +457,26 @@
               <div>
                 <label class="block text-sm font-bold text-gray-700 mb-2">Upload Photo (Optional)</label>
                 <input type="file" name="image" accept="image/*"
-                  class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-pink-500 focus:border-pink-500 outline-none transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100" />
+                  class="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-pink-500 outline-none transition-all file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100" />
               </div>
             </div>
-
             <div>
               <label class="block text-sm font-bold text-gray-700 mb-2">Your Comment</label>
               <textarea name="comment" rows="4" required
-                class="w-full bg-white border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 outline-none transition-all"
+                class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 outline-none transition-all text-sm"
                 placeholder="How was your experience with this product?"></textarea>
             </div>
-
             <button type="submit"
-              class="btn-primary w-full md:w-auto px-10 py-4 h-auto rounded-xl font-bold text-lg shadow-lg hover:shadow-xl">
-              Post Review
+              class="btn-primary w-full sm:w-auto px-8 py-3.5 h-auto rounded-xl font-bold text-base shadow-lg hover:shadow-xl">
+              Review দিন
             </button>
           </form>
         </div>
         {% else %}
-        <div class="bg-gray-50 p-6 rounded-xl border border-gray-100 text-center">
-          <p class="text-gray-600">
-            Please
+        <div class="bg-gray-50 p-5 rounded-xl border border-gray-100 text-center">
+          <p class="text-gray-600 text-sm">
             <a href="{% url 'login' %}?next={{ request.path }}"
-              class="text-pink-600 font-bold hover:underline">login</a>
-            to write a review.
+              class="text-pink-600 font-bold hover:underline">Login</a> করুন review দিতে।
           </p>
         </div>
         {% endif %}
@@ -525,48 +484,16 @@
     </div>
   </div>
 
-  <script>
-    function switchTab(tab) {
-      const descBtn = document.getElementById("tab-desc-btn");
-      const reviewsBtn = document.getElementById("tab-reviews-btn");
-      const descContent = document.getElementById("tab-desc-content");
-      const reviewsContent = document.getElementById("tab-reviews-content");
-
-      if (tab === "desc") {
-        descContent.classList.remove("hidden");
-        reviewsContent.classList.add("hidden");
-
-        descBtn.classList.add("border-pink-500", "text-pink-600");
-        descBtn.classList.remove("border-transparent", "text-gray-500");
-
-        reviewsBtn.classList.remove("border-pink-500", "text-pink-600");
-        reviewsBtn.classList.add("border-transparent", "text-gray-500");
-      } else {
-        descContent.classList.add("hidden");
-        reviewsContent.classList.remove("hidden");
-
-        reviewsBtn.classList.add("border-pink-500", "text-pink-600");
-        reviewsBtn.classList.remove("border-transparent", "text-gray-500");
-
-        descBtn.classList.remove("border-pink-500", "text-pink-600");
-        descBtn.classList.add("border-transparent", "text-gray-500");
-      }
-    }
-  </script>
-
   <!-- Related Products -->
-  <div>
-    <h2 class="text-2xl font-bold mb-6">Related Products</h2>
-    <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+  <div class="mb-20 md:mb-8">
+    <h2 class="text-xl sm:text-2xl font-bold mb-5">সম্পর্কিত পণ্য</h2>
+    <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
       {% for p in related_products %}
-      <div
-        class="rounded-lg border bg-card text-card-foreground group relative overflow-hidden border-none shadow-sm hover:shadow-md transition-all bg-white">
-        <!-- Wishlist Button -->
+      <div class="rounded-xl border bg-white group relative overflow-hidden shadow-sm hover:shadow-md transition-all">
         <a href="{% url 'toggle_wishlist' p.id %}"
-          class="wishlist-btn absolute top-2 right-2 z-20 p-2.5 rounded-full bg-white/90 shadow-sm {% if p.id in wishlist_product_ids %}text-red-500{% else %}text-gray-500{% endif %} hover:text-red-500 hover:bg-white transition-all duration-300 group-hover:opacity-100 {% if p.id in wishlist_product_ids %}opacity-100{% else %}opacity-0{% endif %} min-w-[44px] min-h-[44px] flex items-center justify-center">
-          <i data-lucide="heart" class="h-5 w-5 {% if p.id in wishlist_product_ids %}fill-current{% endif %}"></i>
+          class="wishlist-btn absolute top-2 right-2 z-20 p-2 rounded-full bg-white/90 shadow-sm {% if p.id in wishlist_product_ids %}text-red-500{% else %}text-gray-400{% endif %} hover:text-red-500 hover:bg-white transition-all duration-300 min-w-[36px] min-h-[36px] flex items-center justify-center">
+          <i data-lucide="heart" class="h-4 w-4 {% if p.id in wishlist_product_ids %}fill-current{% endif %}"></i>
         </a>
-
         <a href="{% url 'product_detail' p.slug %}">
           <div class="aspect-square relative bg-gray-100 overflow-hidden skeleton">
             {% if p.image %}
@@ -582,43 +509,31 @@
             {% endif %}
           </div>
         </a>
-
-        <div class="p-3">
-          <div class="text-xs text-muted-foreground mb-1">
-            {{ p.category.name }}
-          </div>
+        <div class="p-2.5 sm:p-3">
+          <div class="text-[10px] text-gray-400 mb-0.5">{{ p.category.name }}</div>
           <a href="{% url 'product_detail' p.slug %}">
-            <h3 class="font-semibold truncate group-hover:text-pink-600 transition-colors text-sm text-gray-900">
+            <h3 class="font-semibold truncate group-hover:text-pink-600 transition-colors text-xs sm:text-sm text-gray-900 leading-snug">
               {{ p.title }}
             </h3>
           </a>
-          <div class="flex items-center gap-1 mt-1 mb-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-              class="lucide lucide-star h-3 w-3 fill-yellow-400 text-yellow-400">
-              <path
-                d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z">
-              </path>
-            </svg>
+          <div class="flex items-center gap-1 mt-1 mb-1.5">
+            <i data-lucide="star" class="h-3 w-3 fill-yellow-400 text-yellow-400 flex-shrink-0"></i>
             <span class="text-xs font-medium">{{ p.rating }}</span>
-            <span class="text-xs text-gray-500">({{ p.reviews_count }})</span>
+            <span class="text-xs text-gray-400">({{ p.reviews_count }})</span>
           </div>
-          <div class="flex items-baseline gap-2">
+          <div class="flex items-baseline gap-1.5 mb-2">
             <span class="font-bold text-sm text-pink-600">৳{{ p.price }}</span>
             {% if p.original_price %}
             <span class="text-xs text-gray-400 line-through">৳{{ p.original_price }}</span>
             {% endif %}
           </div>
-        </div>
-
-        <div class="flex items-center p-3 pt-0">
           {% if p.stock_quantity > 0 %}
-          <div class="flex items-center gap-2 w-full">
+          <div class="flex items-center gap-1.5">
             <form action="{% url 'cart_add' p.id %}" method="post" class="flex-1">
               {% csrf_token %}
               <input type="hidden" name="quantity" value="1" />
               <button type="submit" name="checkout" value="true"
-                class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-[10px] font-bold h-8 px-2 w-full bg-orange-50 text-orange-600 hover:bg-orange-100 transition-colors shadow-sm">
+                class="w-full h-8 rounded-lg text-[11px] font-bold bg-orange-50 text-orange-600 hover:bg-orange-100 transition-colors">
                 Buy Now
               </button>
             </form>
@@ -626,14 +541,14 @@
               {% csrf_token %}
               <input type="hidden" name="quantity" value="1" />
               <button type="submit"
-                class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-[10px] font-bold h-8 px-2 w-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors shadow-sm">
-                Add to Cart
+                class="w-full h-8 rounded-lg text-[11px] font-bold bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
+                Add Cart
               </button>
             </form>
           </div>
           {% else %}
           <button disabled
-            class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-xs font-medium bg-gray-100 text-gray-400 h-8 px-3 py-1 w-full gap-2 shadow-sm cursor-not-allowed">
+            class="w-full h-8 rounded-lg text-xs font-medium bg-gray-100 text-gray-400 cursor-not-allowed">
             Out of Stock
           </button>
           {% endif %}
@@ -642,6 +557,7 @@
       {% endfor %}
     </div>
   </div>
+
   <!-- Schema.org Structured Data -->
   <script type="application/ld+json">
     {
@@ -698,4 +614,187 @@
     }
   </script>
 </div>
+
+<script>
+  // ── Quantity ──────────────────────────────────────────────
+  function incrementQty() {
+    const display = document.getElementById('qty-display');
+    const input = document.getElementById('qty-input');
+    let val = parseInt(display.innerText);
+    val++;
+    display.innerText = val;
+    if (input) input.value = val;
+    // sync sticky inputs
+    ['qty-input-sticky','qty-input-sticky2'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = val;
+    });
+  }
+  function decrementQty() {
+    const display = document.getElementById('qty-display');
+    const input = document.getElementById('qty-input');
+    let val = parseInt(display.innerText);
+    if (val > 1) {
+      val--;
+      display.innerText = val;
+      if (input) input.value = val;
+      ['qty-input-sticky','qty-input-sticky2'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = val;
+      });
+    }
+  }
+
+  // ── Image Slider ──────────────────────────────────────────
+  let currentImageIndex = 0;
+  let autoplayInterval;
+  const totalImages = {{ product.additional_images.count|add:1 }};
+
+  function startAutoplay() {
+    if (totalImages <= 1) return;
+    autoplayInterval = setInterval(() => nextImage(), 5000);
+  }
+  function stopAutoplay() {
+    if (autoplayInterval) clearInterval(autoplayInterval);
+  }
+
+  function changeSlide(index, isManual = false) {
+    if (isManual) stopAutoplay();
+    currentImageIndex = index;
+    const slider = document.getElementById('image-slider-container');
+    slider.style.transform = `translateX(-${index * 100}%)`;
+
+    // Thumbnails
+    document.querySelectorAll('.thumbnail-btn').forEach((btn, i) => {
+      btn.classList.toggle('border-pink-600', i === index);
+      btn.classList.toggle('border-transparent', i !== index);
+    });
+
+    // Dots
+    document.querySelectorAll('.dot-btn').forEach((btn, i) => {
+      btn.classList.toggle('bg-pink-600', i === index);
+      btn.classList.toggle('w-4', i === index);
+      btn.classList.toggle('bg-white/60', i !== index);
+      btn.classList.toggle('w-2', i !== index);
+    });
+
+    if (isManual) startAutoplay();
+  }
+
+  function nextImage(isManual = false) {
+    if (totalImages <= 1) return;
+    currentImageIndex = (currentImageIndex + 1) % totalImages;
+    changeSlide(currentImageIndex, isManual);
+  }
+  function prevImage(isManual = false) {
+    if (totalImages <= 1) return;
+    currentImageIndex = (currentImageIndex - 1 + totalImages) % totalImages;
+    changeSlide(currentImageIndex, isManual);
+  }
+
+  // Keyboard nav
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') nextImage(true);
+    if (e.key === 'ArrowLeft') prevImage(true);
+  });
+
+  // ── Touch Swipe ───────────────────────────────────────────
+  (function() {
+    const wrapper = document.getElementById('main-image-wrapper');
+    if (!wrapper) return;
+    let startX = 0, startY = 0, isDragging = false;
+
+    wrapper.addEventListener('touchstart', (e) => {
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+      isDragging = true;
+    }, { passive: true });
+
+    wrapper.addEventListener('touchend', (e) => {
+      if (!isDragging) return;
+      const dx = e.changedTouches[0].clientX - startX;
+      const dy = e.changedTouches[0].clientY - startY;
+      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
+        if (dx < 0) nextImage(true);
+        else prevImage(true);
+      }
+      isDragging = false;
+    }, { passive: true });
+  })();
+
+  // ── Zoom (desktop only) ───────────────────────────────────
+  (function () {
+    if (window.matchMedia('(max-width: 640px)').matches) return;
+    const wrapper = document.getElementById('main-image-wrapper');
+    const overlay = document.getElementById('zoom-overlay');
+    if (!wrapper || !overlay) return;
+
+    function getCurrentSrc() {
+      const imgs = document.querySelectorAll('#image-slider-container img');
+      return imgs[currentImageIndex] ? imgs[currentImageIndex].src : '';
+    }
+
+    wrapper.addEventListener('mouseenter', function () {
+      const src = getCurrentSrc();
+      if (!src) return;
+      overlay.style.backgroundImage = `url('${src}')`;
+      overlay.style.opacity = '1';
+    });
+    wrapper.addEventListener('mouseleave', function () {
+      overlay.style.opacity = '0';
+    });
+    wrapper.addEventListener('mousemove', function (e) {
+      const rect = wrapper.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      overlay.style.backgroundPosition = `${x}% ${y}%`;
+      overlay.style.backgroundImage = `url('${getCurrentSrc()}')`;
+    });
+  })();
+
+  // ── Sticky CTA show on scroll ─────────────────────────────
+  (function() {
+    const cta = document.getElementById('mobile-sticky-cta');
+    if (!cta) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) {
+          cta.classList.remove('translate-y-full');
+        } else {
+          cta.classList.add('translate-y-full');
+        }
+      },
+      { threshold: 0.5 }
+    );
+    // Observe the main add-to-cart form area
+    const buyBtn = document.querySelector('.hidden.sm\\:flex');
+    if (buyBtn) observer.observe(buyBtn.closest('form') || buyBtn);
+  })();
+
+  // ── Tab Switcher ──────────────────────────────────────────
+  function switchTab(tab) {
+    const descBtn = document.getElementById("tab-desc-btn");
+    const reviewsBtn = document.getElementById("tab-reviews-btn");
+    const descContent = document.getElementById("tab-desc-content");
+    const reviewsContent = document.getElementById("tab-reviews-content");
+
+    if (tab === "desc") {
+      descContent.classList.remove("hidden");
+      reviewsContent.classList.add("hidden");
+      descBtn.classList.add("border-pink-600", "text-pink-700", "bg-pink-50/50");
+      descBtn.classList.remove("border-transparent", "text-gray-500");
+      reviewsBtn.classList.remove("border-pink-600", "text-pink-700", "bg-pink-50/50");
+      reviewsBtn.classList.add("border-transparent", "text-gray-500");
+    } else {
+      descContent.classList.add("hidden");
+      reviewsContent.classList.remove("hidden");
+      reviewsBtn.classList.add("border-pink-600", "text-pink-700", "bg-pink-50/50");
+      reviewsBtn.classList.remove("border-transparent", "text-gray-500");
+      descBtn.classList.remove("border-pink-600", "text-pink-700", "bg-pink-50/50");
+      descBtn.classList.add("border-transparent", "text-gray-500");
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', startAutoplay);
+</script>
 {% endblock %}

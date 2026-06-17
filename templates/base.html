@@ -1,10 +1,11 @@
 {% load static tailwind_tags %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" translate="no">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google" content="notranslate">
     <!-- SEO & Meta Tags -->
     <title>{% if product %}{{ product.get_meta_title }} | GlowElle{% elif category %}{{ category.get_meta_title }} | GlowElle{% else %}{{ site_settings.site_title|default:"GlowElle" }} | Premium Organic Grocery{% endif %}</title>
     <meta name="description"
@@ -147,36 +148,43 @@
                 extend: {
                     colors: {
                         pink: {
-                            50: '#fdf2f8',
-                            100: '#fce7f3',
-                            200: '#fbcfe8',
-                            300: '#f9a8d4',
-                            400: '#f472b6',
-                            500: '#ec4899', // Vibrant Pink
-                            600: '#db2777', // Brand Pink
-                            700: '#be185d',
-                            800: '#9d174d',
-                            900: '#831843',
+                            50:  '#fff0f6',
+                            100: '#ffe0ef',
+                            200: '#ffc0de',
+                            300: '#ff8fc2',
+                            400: '#ff5ba3',
+                            500: '#f72d82',
+                            600: '#e0186a',
+                            700: '#bc0f58',
+                            800: '#9b1049',
+                            900: '#82103f',
+                        },
+                        rose: {
+                            50:  '#fff1f3',
+                            100: '#ffe0e5',
+                            200: '#ffc6cf',
+                            300: '#ff99a8',
+                            400: '#ff5c74',
+                            500: '#f92f4a',
+                            600: '#e01033',
+                            700: '#bc0c2b',
+                            800: '#9b0d28',
+                            900: '#820e27',
                         },
                         primary: {
-                            light: '#ec4899',   // Pink-500
-                            DEFAULT: '#db2777', // Brand Pink
-                            dark: '#831843',    // Deep Rose
+                            light: '#ff5ba3',
+                            DEFAULT: '#e0186a',
+                            dark: '#9b1049',
                         },
-                        secondary: {
+                        gold: {
                             light: '#fef3c7',
-                            DEFAULT: '#f59e0b', // Amber Accent
-                            dark: '#b45309',
-                        },
-                        accent: {
-                            light: '#fbbf24',
-                            DEFAULT: '#f59e0b',
-                            dark: '#d97706',
+                            DEFAULT: '#d4a017',
+                            dark: '#92700f',
                         },
                         surface: {
-                            light: '#f8fafc', // Clean Slate
-                            DEFAULT: '#f1f5f9',
-                            dark: '#1e293b',
+                            light: '#fff8f9',
+                            DEFAULT: '#fdf0f4',
+                            dark: '#1e0a12',
                         }
                     },
                     borderRadius: {
@@ -185,9 +193,10 @@
                         '3xl': '2rem',
                     },
                     boxShadow: {
-                        'premium': '0 10px 25px -5px rgba(0, 0, 0, 0.04), 0 8px 10px -6px rgba(0, 0, 0, 0.04)',
-                        'hover': '0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -6px rgba(0, 0, 0, 0.08)',
-                        'soft': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+                        'premium': '0 10px 30px -5px rgba(224,24,106,0.08), 0 4px 10px -3px rgba(224,24,106,0.05)',
+                        'hover':   '0 20px 40px -8px rgba(224,24,106,0.18), 0 8px 16px -4px rgba(224,24,106,0.10)',
+                        'soft':    '0 4px 6px -1px rgba(0,0,0,0.04), 0 2px 4px -1px rgba(0,0,0,0.03)',
+                        'gold':    '0 4px 14px -2px rgba(212,160,23,0.30)',
                     }
                 }
             }
@@ -290,6 +299,11 @@
             padding-bottom: env(safe-area-inset-bottom);
         }
 
+        @keyframes shimmerBg {
+            0%   { background-position: 0% center; }
+            100% { background-position: 200% center; }
+        }
+
         /* Standard Transitions */
         .transition-standard {
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -297,28 +311,33 @@
 
         /* Primary Button Standard */
         .btn-primary {
-            background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+            background: linear-gradient(135deg, #f72d82 0%, #e0186a 60%, #bc0f58 100%);
             color: white;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 14px -2px rgba(224, 24, 106, 0.45);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 10px 15px -3px rgba(236, 72, 153, 0.2), 0 4px 6px -2px rgba(236, 72, 153, 0.1);
-            filter: brightness(1.05);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px -4px rgba(224, 24, 106, 0.55);
+            filter: brightness(1.07);
         }
 
         .btn-primary:active {
-            transform: translateY(0);
+            transform: translateY(0) scale(0.97);
         }
 
         .btn-primary:disabled {
             background: #d1d5db;
             cursor: not-allowed;
-            opacity: 0.7;
+            opacity: 0.6;
             transform: none;
             box-shadow: none;
+        }
+
+        /* Body warm tint */
+        body {
+            background-color: #fff8f9;
         }
 
         /* Glassmorphism Effect */
@@ -484,10 +503,10 @@
     </div>
 
     <!-- Navbar (Matching Header.tsx) -->
-    <header class="sticky top-0 z-50 w-full border-b glass shadow-sm transition-all duration-300">
+    <header class="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur-xl shadow-md transition-all duration-300">
         <!-- Benefit Bar Section -->
         <div
-            class="bg-gradient-to-r from-pink-600 via-pink-600 to-pink-700 text-white text-[10px] sm:text-xs py-1.5 overflow-hidden">
+            class="text-white text-[10px] sm:text-xs py-2 overflow-hidden" style="background: linear-gradient(90deg, #bc0f58 0%, #e0186a 40%, #f72d82 70%, #bc0f58 100%); background-size: 200% auto; animation: shimmerBg 4s linear infinite;">
             <div class="container mx-auto px-4">
                 <div class="flex items-center justify-center sm:justify-between gap-4">
                     <div class="flex items-center gap-2">
@@ -512,90 +531,90 @@
                 <div class="flex items-center gap-2">
                     <!-- Mobile Menu Button -->
                     <button id="mobile-menu-btn"
-                        class="md:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+                        class="hidden p-2.5 bg-gradient-to-r from-pink-100 to-pink-50 text-pink-700 hover:shadow-md rounded-xl transition-all duration-300">
                         <i data-lucide="menu" class="h-6 w-6"></i>
                     </button>
 
                     <!-- Mobile Menu Overlay -->
                     <div id="mobile-menu-overlay"
-                        class="fixed inset-0 bg-black/50 z-40 hidden transition-opacity opacity-0"></div>
+                        class="fixed inset-0 bg-black/80 z-40 hidden transition-opacity opacity-0"></div>
 
                     <!-- Mobile Menu Drawer -->
                     <div id="mobile-menu-drawer"
-                        class="fixed inset-y-0 left-0 w-72 bg-white z-50 transform -translate-x-full transition-transform duration-300 ease-in-out shadow-2xl">
-                        <div class="p-6 border-b bg-pink-600 text-white">
+                        class="fixed inset-y-0 left-0 w-80 bg-white z-50 transform -translate-x-full transition-transform duration-300 ease-in-out shadow-2xl flex flex-col">
+                        <div class="p-6 border-b bg-gradient-to-r from-pink-500 via-pink-600 to-pink-700 text-white">
                             <div class="flex items-center justify-between mb-4">
-                                <span class="font-bold text-xl">GlowElle</span>
+                                <span class="font-bold text-2xl drop-shadow-lg">GlowElle</span>
                                 <button id="mobile-menu-close"
-                                    class="p-1 hover:bg-white/20 rounded-full transition-colors">
+                                    class="p-2 hover:bg-white/20 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl">
                                     <i data-lucide="x" class="h-6 w-6"></i>
                                 </button>
                             </div>
                             {% if user.is_authenticated %}
-                            <div class="flex items-center gap-3">
+                            <div class="flex items-center gap-4">
                                 <div
-                                    class="h-12 w-12 rounded-full border-2 border-white/50 overflow-hidden bg-white/20 flex items-center justify-center shadow-inner">
+                                    class="h-14 w-14 rounded-full border-2 border-white overflow-hidden bg-white/20 flex items-center justify-center shadow-2xl">
                                     {% if user.image %}
                                     <img src="{{ user.image.url }}" class="h-full w-full object-cover">
                                     {% else %}
-                                    <i data-lucide="user" class="h-6 w-6"></i>
+                                    <i data-lucide="user" class="h-8 w-8"></i>
                                     {% endif %}
                                 </div>
                                 <div>
-                                    <p class="text-sm opacity-80">Welcome back,</p>
-                                    <p class="font-bold truncate max-w-[150px]">{{ user.username }}</p>
+                                    <p class="text-sm opacity-90">Welcome back,</p>
+                                    <p class="font-bold text-lg truncate max-w-[180px]">{{ user.username }}</p>
                                 </div>
                             </div>
                             {% else %}
                             <a href="{% url 'login' %}"
-                                class="inline-flex items-center gap-2 bg-white text-pink-600 px-6 py-2.5 rounded-full font-bold text-sm shadow-lg hover:shadow-xl transition-all">
-                                <i data-lucide="log-in" class="h-4 w-4"></i> Login / Register
+                                class="inline-flex items-center gap-2 bg-white text-pink-600 px-7 py-3 rounded-full font-bold shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
+                                <i data-lucide="log-in" class="h-5 w-5"></i> Login / Register
                             </a>
                             {% endif %}
                         </div>
-                        <nav class="p-4 space-y-1">
+                        <nav class="p-5 space-y-2 overflow-y-auto flex-1">
                             <a href="{% url 'home' %}"
-                                class="flex items-center gap-4 px-4 py-3.5 text-gray-700 hover:bg-pink-50 hover:text-pink-600 rounded-xl transition-all group {% if request.resolver_match.url_name == 'home' %}bg-pink-50 text-pink-600{% endif %}">
-                                <i data-lucide="home" class="h-5 w-5 transition-transform group-hover:scale-110"></i>
-                                <span class="font-medium">Home</span>
+                                class="flex items-center gap-4 px-5 py-4 text-gray-700 hover:bg-gradient-to-r hover:from-pink-50 hover:to-pink-100 hover:text-pink-600 rounded-2xl transition-all duration-300 group shadow-sm hover:shadow-md {% if request.resolver_match.url_name == 'home' %}bg-gradient-to-r from-pink-100 to-pink-50 text-pink-600 shadow-md{% endif %}">
+                                <i data-lucide="home" class="h-6 w-6 transition-transform group-hover:scale-125"></i>
+                                <span class="font-semibold">Home</span>
                             </a>
                             <a href="{% url 'shop' %}"
-                                class="flex items-center gap-4 px-4 py-3.5 text-gray-700 hover:bg-pink-50 hover:text-pink-600 rounded-xl transition-all group {% if request.resolver_match.url_name == 'shop' %}bg-pink-50 text-pink-600{% endif %}">
+                                class="flex items-center gap-4 px-5 py-4 text-gray-700 hover:bg-gradient-to-r hover:from-pink-50 hover:to-pink-100 hover:text-pink-600 rounded-2xl transition-all duration-300 group shadow-sm hover:shadow-md {% if request.resolver_match.url_name == 'shop' %}bg-gradient-to-r from-pink-100 to-pink-50 text-pink-600 shadow-md{% endif %}">
                                 <i data-lucide="shopping-bag"
-                                    class="h-5 w-5 transition-transform group-hover:scale-110"></i>
-                                <span class="font-medium">Shop All Products</span>
+                                    class="h-6 w-6 transition-transform group-hover:scale-125"></i>
+                                <span class="font-semibold">Shop All Products</span>
                             </a>
                             <a href="{% url 'wishlist' %}"
-                                class="flex items-center gap-4 px-4 py-3.5 text-gray-700 hover:bg-pink-50 hover:text-pink-600 rounded-xl transition-all group">
-                                <i data-lucide="heart" class="h-5 w-5 transition-transform group-hover:scale-110"></i>
-                                <span class="font-medium">My Wishlist</span>
+                                class="flex items-center gap-4 px-5 py-4 text-gray-700 hover:bg-gradient-to-r hover:from-pink-50 hover:to-pink-100 hover:text-pink-600 rounded-2xl transition-all duration-300 group shadow-sm hover:shadow-md">
+                                <i data-lucide="heart" class="h-6 w-6 transition-transform group-hover:scale-125"></i>
+                                <span class="font-semibold">My Wishlist</span>
                             </a>
                             <a href="{% url 'cart_detail' %}"
-                                class="flex items-center gap-4 px-4 py-3.5 text-gray-700 hover:bg-pink-50 hover:text-pink-600 rounded-xl transition-all group">
+                                class="flex items-center gap-4 px-5 py-4 text-gray-700 hover:bg-gradient-to-r hover:from-pink-50 hover:to-pink-100 hover:text-pink-600 rounded-2xl transition-all duration-300 group shadow-sm hover:shadow-md">
                                 <i data-lucide="shopping-cart"
-                                    class="h-5 w-5 transition-transform group-hover:scale-110"></i>
-                                <span class="font-medium">Shopping Cart</span>
+                                    class="h-6 w-6 transition-transform group-hover:scale-125"></i>
+                                <span class="font-semibold">Shopping Cart</span>
                                 {% if cart|length > 0 %}
                                 <span
-                                    class="ml-auto bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">{{ cart|length }}</span>
+                                    class="ml-auto bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">{{ cart|length }}</span>
                                 {% endif %}
                             </a>
 
-                            <div class="h-px bg-gray-100 my-4 mx-4"></div>
+                            <div class="h-px bg-gradient-to-r from-transparent via-pink-200 to-transparent my-6 mx-2"></div>
 
-                            <div class="px-4 py-2">
-                                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Account &
+                            <div class="px-5 py-3">
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Account &
                                     Support</p>
                                 <a href="{% url 'dashboard' %}"
-                                    class="block py-2.5 text-gray-600 hover:text-pink-600 transition-colors">My
+                                    class="block py-3 text-gray-600 hover:text-pink-600 transition-colors font-medium">My
                                     Account</a>
                                 <a href="{% url 'about' %}"
-                                    class="block py-2.5 text-gray-600 hover:text-pink-600 transition-colors">About GlowElle</a>
+                                    class="block py-3 text-gray-600 hover:text-pink-600 transition-colors font-medium">About GlowElle</a>
                                 <a href="{% url 'contact' %}"
-                                    class="block py-2.5 text-gray-600 hover:text-pink-600 transition-colors">Contact
+                                    class="block py-3 text-gray-600 hover:text-pink-600 transition-colors font-medium">Contact
                                     Support</a>
                                 <a href="{% url 'terms' %}"
-                                    class="block py-2.5 text-gray-600 hover:text-pink-600 transition-colors">Terms &
+                                    class="block py-3 text-gray-600 hover:text-pink-600 transition-colors font-medium">Terms &
                                     Privacy</a>
                             </div>
                         </nav>
@@ -638,7 +657,7 @@
                 <!-- User Actions -->
                 <div class="flex items-center gap-1 sm:gap-4">
                     <!-- Mobile Search Trigger -->
-                    <button id="mobile-search-trigger" class="md:hidden p-2 text-gray-500 hover:text-pink-600 transition-colors">
+                    <button id="mobile-search-trigger" class="md:hidden p-2.5 bg-gradient-to-r from-pink-100 to-pink-50 text-pink-700 hover:shadow-md rounded-xl transition-all duration-300">
                         <i data-lucide="search" class="h-6 w-6"></i>
                     </button>
 
@@ -730,93 +749,90 @@
 
     <!-- Footer -->
     <footer class="bg-white border-t mt-auto">
-        <div class="container mx-auto px-4 md:px-6 py-16">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 text-center sm:text-left">
-                <!-- Brand Info -->
-                <div class="space-y-4">
+        <div class="container mx-auto px-4 md:px-6 py-10 md:py-16">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-8">
+
+                <!-- Brand Info — full width on mobile -->
+                <div class="col-span-2 lg:col-span-1 space-y-4 text-center lg:text-left">
                     <a href="{% url 'home' %}" class="inline-block">
                         {% if site_settings.logo %}
-                        <img src="{{ site_settings.logo.url }}" alt="{{ site_settings.site_title }}" class="h-10 w-auto">
+                        <img src="{{ site_settings.logo.url }}" alt="{{ site_settings.site_title }}" class="h-10 w-auto mx-auto lg:mx-0">
                         {% else %}
-                        <img src="{% static 'images/logo.png' %}" alt="GlowElle" class="h-10 w-auto">
+                        <img src="{% static 'images/logo.png' %}" alt="GlowElle" class="h-10 w-auto mx-auto lg:mx-0">
                         {% endif %}
                     </a>
-
-                    <p class="text-sm text-gray-500">{{ site_settings.meta_description|default:"Your one-stop shop for fresh organic fruits, vegetables, meat, and daily essentials." }}</p>
-
-                    <div class="flex space-x-4">
+                    <p class="text-sm text-gray-500 max-w-xs mx-auto lg:mx-0">{{ site_settings.meta_description|default:"Your one-stop shop for skincare & beauty essentials." }}</p>
+                    <div class="flex justify-center lg:justify-start space-x-3">
                         {% if site_settings.facebook_url %}
                         <a href="{{ site_settings.facebook_url }}" target="_blank"
-                            class="h-11 w-11 text-gray-500 hover:text-pink-600 flex items-center justify-center transition-colors border border-gray-200 rounded-lg hover:border-pink-200 hover:bg-pink-50"><i
-                                data-lucide="facebook" class="h-5 w-5"></i></a>
+                            class="h-10 w-10 text-gray-500 hover:text-pink-600 flex items-center justify-center transition-colors border border-gray-200 rounded-lg hover:border-pink-200 hover:bg-pink-50">
+                            <i data-lucide="facebook" class="h-5 w-5"></i></a>
                         {% endif %}
-
                         {% if site_settings.instagram_url %}
                         <a href="{{ site_settings.instagram_url }}" target="_blank"
-                            class="h-11 w-11 text-gray-500 hover:text-pink-600 flex items-center justify-center transition-colors border border-gray-200 rounded-lg hover:border-pink-200 hover:bg-pink-50"><i
-                                data-lucide="instagram" class="h-5 w-5"></i></a>
+                            class="h-10 w-10 text-gray-500 hover:text-pink-600 flex items-center justify-center transition-colors border border-gray-200 rounded-lg hover:border-pink-200 hover:bg-pink-50">
+                            <i data-lucide="instagram" class="h-5 w-5"></i></a>
                         {% endif %}
-
                         {% if site_settings.twitter_url %}
                         <a href="{{ site_settings.twitter_url }}" target="_blank"
-                            class="h-11 w-11 text-gray-500 hover:text-pink-600 flex items-center justify-center transition-colors border border-gray-200 rounded-lg hover:border-pink-200 hover:bg-pink-50"><i
-                                data-lucide="twitter" class="h-5 w-5"></i></a>
+                            class="h-10 w-10 text-gray-500 hover:text-pink-600 flex items-center justify-center transition-colors border border-gray-200 rounded-lg hover:border-pink-200 hover:bg-pink-50">
+                            <i data-lucide="twitter" class="h-5 w-5"></i></a>
                         {% endif %}
-
                         {% if site_settings.youtube_url %}
                         <a href="{{ site_settings.youtube_url }}" target="_blank"
-                            class="h-11 w-11 text-gray-500 hover:text-pink-600 flex items-center justify-center transition-colors border border-gray-200 rounded-lg hover:border-pink-200 hover:bg-pink-50"><i
-                                data-lucide="youtube" class="h-5 w-5"></i></a>
+                            class="h-10 w-10 text-gray-500 hover:text-pink-600 flex items-center justify-center transition-colors border border-gray-200 rounded-lg hover:border-pink-200 hover:bg-pink-50">
+                            <i data-lucide="youtube" class="h-5 w-5"></i></a>
                         {% endif %}
                     </div>
                 </div>
 
                 <!-- Quick Links -->
                 <div>
-                    <h4 class="font-semibold mb-4">Quick Links</h4>
+                    <h4 class="font-semibold mb-3 text-gray-800 text-sm uppercase tracking-wide">Quick Links</h4>
                     <ul class="space-y-1 text-sm text-gray-500">
-                        <li><a href="{% url 'about' %}" class="block py-2 hover:text-pink-600">About Us</a></li>
-                        <li><a href="{% url 'contact' %}" class="block py-2 hover:text-pink-600">Contact Us</a></li>
-                        <li><a href="{% url 'privacy' %}" class="block py-2 hover:text-pink-600">Privacy Policy</a>
-                        </li>
-                        <li><a href="{% url 'terms' %}" class="block py-2 hover:text-pink-600">Terms of Service</a>
-                        </li>
-                        <li><a href="{% url 'faq' %}" class="block py-2 hover:text-pink-600">FAQ</a></li>
+                        <li><a href="{% url 'about' %}" class="block py-1.5 hover:text-pink-600 transition-colors">About Us</a></li>
+                        <li><a href="{% url 'contact' %}" class="block py-1.5 hover:text-pink-600 transition-colors">Contact Us</a></li>
+                        <li><a href="{% url 'privacy' %}" class="block py-1.5 hover:text-pink-600 transition-colors">Privacy Policy</a></li>
+                        <li><a href="{% url 'terms' %}" class="block py-1.5 hover:text-pink-600 transition-colors">Terms of Service</a></li>
+                        <li><a href="{% url 'faq' %}" class="block py-1.5 hover:text-pink-600 transition-colors">FAQ</a></li>
                     </ul>
                 </div>
 
                 <!-- Contact -->
                 <div>
-                    <h4 class="font-semibold mb-4">Contact Info</h4>
-                    <ul class="space-y-2 text-sm text-gray-500">
-                        <li class="flex items-center gap-2"><i data-lucide="map-pin" class="h-4 w-4 text-pink-600"></i>
+                    <h4 class="font-semibold mb-3 text-gray-800 text-sm uppercase tracking-wide">Contact</h4>
+                    <ul class="space-y-3 text-sm text-gray-500">
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="map-pin" class="h-4 w-4 text-pink-500 mt-0.5 flex-shrink-0"></i>
                             <span>{{ site_settings.address|default:"Dhaka, Bangladesh" }}</span>
                         </li>
-                        <li class="flex items-center gap-2"><i data-lucide="phone" class="h-4 w-4 text-pink-600"></i>
-                            <span>{{ site_settings.support_phone|default:"+880 1234 567890" }}</span>
+                        <li class="flex items-center gap-2">
+                            <i data-lucide="phone" class="h-4 w-4 text-pink-500 flex-shrink-0"></i>
+                            <a href="tel:{{ site_settings.support_phone }}" class="hover:text-pink-600 transition-colors">{{ site_settings.support_phone|default:"+880 1234 567890" }}</a>
                         </li>
-                        <li class="flex items-center gap-2"><i data-lucide="mail" class="h-4 w-4 text-pink-600"></i>
-                            <span>{{ site_settings.support_email|default:"contact@glowellebd.com" }}</span>
+                        <li class="flex items-center gap-2">
+                            <i data-lucide="mail" class="h-4 w-4 text-pink-500 flex-shrink-0"></i>
+                            <a href="mailto:{{ site_settings.support_email }}" class="hover:text-pink-600 transition-colors break-all">{{ site_settings.support_email|default:"contact@glowellebd.com" }}</a>
                         </li>
                     </ul>
                 </div>
 
-                <!-- Newsletter -->
-                <div>
-                    <h4 class="font-semibold mb-4">Newsletter</h4>
-                    <p class="text-sm text-gray-500 mb-4">Subscribe to our newsletter for latest updates.</p>
+                <!-- Newsletter — full width on mobile -->
+                <div class="col-span-2 lg:col-span-1">
+                    <h4 class="font-semibold mb-3 text-gray-800 text-sm uppercase tracking-wide">Newsletter</h4>
+                    <p class="text-sm text-gray-500 mb-3">Subscribe for latest updates & offers.</p>
                     <div class="flex gap-2">
-                        <input type="email" placeholder="Email address"
-                            class="flex h-10 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-pink-600">
+                        <input type="email" placeholder="Your email address"
+                            class="flex h-10 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-400">
                         <button
-                            class="bg-pink-600 text-white h-10 px-4 py-2 rounded-md hover:bg-pink-700 flex items-center justify-center">
-                            <i data-lucide="mail" class="h-4 w-4"></i>
+                            class="bg-pink-600 text-white h-10 px-4 rounded-md hover:bg-pink-700 flex items-center justify-center flex-shrink-0 transition-colors">
+                            <i data-lucide="send" class="h-4 w-4"></i>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <div class="mt-12 pt-8 border-t text-center text-sm text-gray-500">
+            <div class="mt-10 pt-6 border-t text-center text-xs text-gray-400">
                 <p>&copy; 2025 GlowElle. All rights reserved. | Developed by <a href="https://jahidulislam.dev/" target="_blank" class="hover:text-pink-600 font-medium transition-colors">Jahidul Islam</a></p>
             </div>
         </div>
@@ -824,21 +840,41 @@
 
     <!-- Back to Top Button -->
     <button id="back-to-top"
-        class="fixed bottom-20 md:bottom-8 right-4 md:right-8 z-40 p-3 bg-pink-600 text-white rounded-full shadow-lg hover:bg-pink-700 transition-all duration-300 opacity-0 invisible translate-y-10">
+        class="fixed bottom-20 md:bottom-8 right-20 md:right-24 z-40 p-3 bg-pink-600 text-white rounded-full shadow-lg hover:bg-pink-700 transition-all duration-300 opacity-0 invisible translate-y-10">
         <i data-lucide="arrow-up" class="h-6 w-6"></i>
     </button>
 
     <!-- Quick View Modal -->
     <div id="quick-view-modal" class="fixed inset-0 z-[60] hidden">
         <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeQuickView()"></div>
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl p-4">
-            <div class="bg-white rounded-2xl shadow-2xl overflow-hidden relative">
+
+        <!-- Mobile: Bottom Sheet | Desktop: Centered Modal -->
+        <div class="absolute bottom-0 left-0 right-0 w-full md:bottom-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:max-w-4xl md:p-4">
+            <div class="bg-white rounded-t-3xl md:rounded-2xl shadow-2xl overflow-hidden flex flex-col" style="max-height: 92vh;">
+
+                <!-- Mobile Header Bar -->
+                <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 md:hidden flex-shrink-0 bg-white">
+                    <button onclick="closeQuickView()" class="flex items-center gap-1.5 text-pink-600 font-bold text-sm py-1 px-2 rounded-lg active:bg-pink-50 transition-colors">
+                        <i data-lucide="chevron-left" class="h-5 w-5"></i>
+                        Back
+                    </button>
+                    <span class="font-bold text-gray-800 text-sm">Quick View</span>
+                    <button onclick="closeQuickView()" class="p-1.5 hover:bg-gray-100 rounded-full transition-colors">
+                        <i data-lucide="x" class="h-5 w-5 text-gray-500"></i>
+                    </button>
+                </div>
+
+                <!-- Desktop Close Button -->
                 <button onclick="closeQuickView()"
-                    class="absolute top-4 right-4 z-10 p-2 hover:bg-gray-100 rounded-full transition-colors">
+                    class="hidden md:block absolute top-4 right-4 z-10 p-2 hover:bg-gray-100 rounded-full transition-colors">
                     <i data-lucide="x" class="h-6 w-6 text-gray-500"></i>
                 </button>
-                <div id="quick-view-content" class="min-h-[400px]">
-                    <!-- Content loaded via AJAX -->
+
+                <!-- Scrollable Content -->
+                <div id="quick-view-content" class="overflow-y-auto flex-1 overscroll-contain">
+                    <div class="flex items-center justify-center min-h-[300px]">
+                        <div class="animate-spin rounded-full h-10 w-10 border-4 border-gray-200 border-b-pink-600"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -877,6 +913,18 @@
             document.body.style.overflow = '';
         }
 
+        function qvChangeImage(el, src) {
+            const mainImg = document.getElementById('qv-main-image');
+            if (!mainImg) return;
+            mainImg.style.opacity = '0';
+            setTimeout(() => {
+                mainImg.src = src;
+                mainImg.style.opacity = '1';
+            }, 150);
+            document.querySelectorAll('.qv-thumb').forEach(t => t.classList.remove('ring-2', 'ring-pink-500'));
+            el.classList.add('ring-2', 'ring-pink-500');
+        }
+
 
         // Mobile Menu Logic
         const mobileMenuBtn = document.getElementById('mobile-menu-btn');
@@ -887,13 +935,13 @@
         function openMenu() {
             mobileMenuDrawer.classList.remove('-translate-x-full');
             mobileMenuOverlay.classList.remove('hidden');
-            setTimeout(() => mobileMenuOverlay.classList.add('opacity-100'), 10);
+            setTimeout(() => mobileMenuOverlay.classList.remove('opacity-0'), 10);
             document.body.style.overflow = 'hidden';
         }
 
         function closeMenu() {
             mobileMenuDrawer.classList.add('-translate-x-full');
-            mobileMenuOverlay.classList.remove('opacity-100');
+            mobileMenuOverlay.classList.add('opacity-0');
             setTimeout(() => mobileMenuOverlay.classList.add('hidden'), 300);
             document.body.style.overflow = '';
         }
@@ -927,15 +975,6 @@
         backToTopBtn.addEventListener('click', () => {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
-
-        // Google Translate
-        function googleTranslateElementInit() {
-            new google.translate.TranslateElement({
-                pageLanguage: 'en',
-                includedLanguages: 'en,bn',
-                layout: google.translate.TranslateElement.InlineLayout.SIMPLE
-            }, 'google_translate_element');
-        }
 
         // Scroll Reveal Logic
         document.addEventListener('DOMContentLoaded', () => {
@@ -1069,7 +1108,6 @@
             });
         });
     </script>
-    <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
     <script src="{% static 'js/main.js' %}"></script>
 
     <!-- AI Chatbot -->

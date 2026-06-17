@@ -1,63 +1,76 @@
-<div class="rounded-lg border bg-card text-card-foreground group relative overflow-hidden border-none shadow-sm hover:shadow-md transition-standard bg-white reveal-on-scroll reveal-up hover-lift">
+<div class="rounded-2xl group relative overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 bg-white border border-gray-100 hover:border-pink-100 hover:-translate-y-1 reveal-on-scroll reveal-up">
+
     <!-- Wishlist Button -->
     <a href="{% url 'toggle_wishlist' product.id %}"
-        class="wishlist-btn absolute top-2 right-2 z-20 p-2.5 rounded-full bg-white/90 shadow-sm {% if product.id in wishlist_product_ids %}text-red-500{% else %}text-gray-500{% endif %} hover:text-red-500 hover:bg-white transition-all duration-300 group-hover:opacity-100 {% if product.id in wishlist_product_ids %}opacity-100{% else %}opacity-0{% endif %} min-w-[44px] min-h-[44px] flex items-center justify-center">
-        <i data-lucide="heart" class="h-5 w-5 {% if product.id in wishlist_product_ids %}fill-current{% endif %}"></i>
+        class="wishlist-btn absolute top-3 right-3 z-20 p-2 rounded-full bg-white shadow-md {% if product.id in wishlist_product_ids %}text-red-500{% else %}text-gray-400{% endif %} hover:text-red-500 hover:scale-110 transition-all duration-300 {% if product.id in wishlist_product_ids %}opacity-100{% else %}opacity-0 group-hover:opacity-100{% endif %} min-w-[38px] min-h-[38px] flex items-center justify-center">
+        <i data-lucide="heart" class="h-4 w-4 {% if product.id in wishlist_product_ids %}fill-current{% endif %}"></i>
     </a>
 
+    <!-- Product Image -->
     <a href="{% url 'product_detail' product.slug %}">
-        <div class="aspect-square relative bg-gray-100 overflow-hidden skeleton">
+        <div class="aspect-square relative bg-gray-50 overflow-hidden">
             {% if product.image %}
             <img src="{{ product.display_image_url }}" alt="{{ product.title }}"
-                onload="this.classList.remove('opacity-0'); this.closest('.skeleton').classList.remove('skeleton')"
-                onerror="this.closest('.skeleton').classList.remove('skeleton')"
-                class="object-cover w-full h-full transition-all duration-500 group-hover:scale-105 opacity-0">
+                onload="this.classList.remove('opacity-0'); this.closest('.skeleton')?.classList.remove('skeleton')"
+                class="object-cover w-full h-full transition-transform duration-500 group-hover:scale-107 opacity-0">
             {% else %}
             <img src="https://placehold.co/600x400?text=No+Image" alt="{{ product.title }}"
-                onload="this.classList.remove('opacity-0'); this.closest('.skeleton').classList.remove('skeleton')"
-                onerror="this.closest('.skeleton').classList.remove('skeleton')"
-                class="object-cover w-full h-full transition-all duration-500 group-hover:scale-105 opacity-0">
+                class="object-cover w-full h-full">
             {% endif %}
+
+            <!-- SALE Badge -->
             {% if product.discount_percentage %}
-            <div class="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded z-10">
-                -{{ product.discount_percentage }}%
+            <div class="absolute top-3 left-3 z-10">
+                <span class="bg-gradient-to-r from-red-500 to-rose-600 text-white text-[11px] font-black px-2.5 py-1 rounded-lg shadow-md tracking-wide">
+                    SALE {{ product.discount_percentage }}% OFF
+                </span>
             </div>
             {% endif %}
+
+            <!-- Quick View -->
+            <button onclick="event.preventDefault(); event.stopPropagation(); openQuickView('{{ product.id }}')"
+                class="absolute bottom-3 left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur-sm text-gray-800 px-4 py-2 rounded-full text-xs font-bold shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-pink-600 hover:text-white transform translate-y-2 group-hover:translate-y-0 z-20 flex items-center gap-1.5 whitespace-nowrap border border-gray-100">
+                <i data-lucide="eye" class="h-3.5 w-3.5"></i> Quick View
+            </button>
         </div>
     </a>
-    <!-- Quick View Button -->
-    <button onclick="openQuickView('{{ product.id }}')"
-        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/90 text-gray-800 px-4 py-2 rounded-full text-xs font-bold shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-pink-600 hover:text-white transform scale-90 group-hover:scale-100 z-20 flex items-center gap-2 whitespace-nowrap">
-        <i data-lucide="eye" class="h-3 w-3"></i> Quick View
-    </button>
 
-    <div class="p-4">
-        <div class="text-sm text-muted-foreground mb-1">{{ product.category.name }}</div>
+    <!-- Info -->
+    <div class="p-3.5">
+        <p class="text-[11px] text-gray-400 font-medium uppercase tracking-wider mb-0.5">{{ product.category.name }}</p>
         <a href="{% url 'product_detail' product.slug %}">
-            <h3 class="font-semibold truncate group-hover:text-pink-600 transition-colors text-gray-900">
-                {{ product.title }}</h3>
+            <h3 class="font-bold text-sm text-gray-800 truncate group-hover:text-pink-600 transition-colors leading-snug mb-1.5">
+                {{ product.title }}
+            </h3>
         </a>
-        <div class="flex items-center gap-1 mt-1 mb-2">
-            <i data-lucide="star" class="h-3 w-3 fill-yellow-400 text-yellow-400"></i>
-            <span class="text-xs font-medium">{{ product.rating|default:"5.0" }}</span>
-            <span class="text-xs text-gray-500">({{ product.reviews_count }})</span>
+
+        <!-- Rating -->
+        <div class="flex items-center gap-1 mb-2">
+            <div class="flex">
+                {% for i in "12345" %}
+                <i data-lucide="star" class="h-3 w-3 fill-amber-400 text-amber-400"></i>
+                {% endfor %}
+            </div>
+            <span class="text-[11px] font-semibold text-gray-600">{{ product.rating|default:"5.0" }}</span>
+            <span class="text-[11px] text-gray-400">({{ product.reviews_count }})</span>
         </div>
-        <div class="flex items-baseline gap-2">
-            <span class="font-bold text-lg text-pink-600">৳{{ product.price }}</span>
+
+        <!-- Price -->
+        <div class="flex items-baseline gap-1.5 mb-3">
+            <span class="font-black text-lg text-rose-600">৳{{ product.price }}</span>
             {% if product.original_price %}
-            <span class="text-sm text-gray-400 line-through">৳{{ product.original_price }}</span>
+            <span class="text-xs text-gray-400 line-through">৳{{ product.original_price }}</span>
             {% endif %}
         </div>
-    </div>
 
-    <div class="flex items-center p-4 pt-0">
+        <!-- CTA Buttons -->
         {% if product.stock_quantity > 0 %}
-        <div class="flex items-center gap-2 w-full">
+        <div class="flex gap-2">
             <form action="{% url 'cart_add' product.id %}" method="post" class="flex-1">
                 {% csrf_token %}
                 <input type="hidden" name="quantity" value="1">
                 <button type="submit" name="checkout" value="true"
-                    class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-bold h-10 px-2 w-full bg-orange-500 text-white hover:bg-orange-600 transition-all shadow-md hover:shadow-lg active:scale-95">
+                    class="w-full h-9 rounded-xl text-xs font-black text-white bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 shadow-md hover:shadow-pink-200 hover:shadow-lg active:scale-95 transition-all duration-200">
                     Buy Now
                 </button>
             </form>
@@ -65,14 +78,14 @@
                 {% csrf_token %}
                 <input type="hidden" name="quantity" value="1">
                 <button type="submit"
-                    class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-bold h-10 px-2 w-full bg-pink-50 text-pink-700 border border-pink-200 hover:bg-pink-100 transition-all shadow-sm hover:shadow-md active:scale-95">
-                    Add to Cart
+                    class="w-full h-9 rounded-xl text-xs font-bold text-pink-700 bg-pink-50 border border-pink-200 hover:bg-pink-100 hover:border-pink-300 active:scale-95 transition-all duration-200">
+                    + Cart
                 </button>
             </form>
         </div>
         {% else %}
-        <button type="button" disabled
-            class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium h-10 px-4 py-2 w-full gap-2 shadow-sm bg-gray-100 text-gray-400 cursor-not-allowed">
+        <button disabled
+            class="w-full h-9 rounded-xl text-xs font-bold bg-gray-100 text-gray-400 cursor-not-allowed">
             Out of Stock
         </button>
         {% endif %}

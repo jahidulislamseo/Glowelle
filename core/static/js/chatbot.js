@@ -214,10 +214,11 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'),
                 },
                 body: JSON.stringify({
                     message: message,
-                    session_id: sessionId  // Send session ID for conversation history
+                    session_id: sessionId
                 })
             });
 
