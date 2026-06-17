@@ -58,11 +58,13 @@ class LowStockFilter(admin.SimpleListFilter):
 # class ProductAdmin(admin.ModelAdmin, ImportExportModelAdmin): # ImportExport might be compatible, trying without first to be safe
 class ProductAdmin(ChangeHistoryMixin, admin.ModelAdmin):
     list_display = ['title', 'price', 'in_stock', 'stock_quantity', 'category', 'brand', 'display_image', 'rating', 'chatbot_priority']
+    list_display_links = ['title']
+    list_editable = ['chatbot_priority']
     list_filter = ['category', 'brand', LowStockFilter, 'in_stock', 'is_new', 'is_best_seller', 'chatbot_priority']
     search_fields = ['title', 'description', 'sku']
     prepopulated_fields = {'slug': ('title',)}
     inlines = [ProductImageInline, ProductVideoInline, ProductVariantInline]
-    actions = ['make_out_of_stock', 'add_stock_10']
+    actions = ['make_out_of_stock', 'add_stock_10', 'enable_chatbot_priority', 'disable_chatbot_priority']
     
     # Optimization
     list_select_related = ['category', 'brand']
@@ -78,6 +80,16 @@ class ProductAdmin(ChangeHistoryMixin, admin.ModelAdmin):
         updated = queryset.update(stock_quantity=F('stock_quantity') + 10, in_stock=True)
         self.message_user(request, f"{updated} products stock increased by 10.")
     add_stock_10.short_description = "Add 10 units to stock"
+
+    def enable_chatbot_priority(self, request, queryset):
+        updated = queryset.update(chatbot_priority=True)
+        self.message_user(request, f"{updated} products enabled for chatbot priority.")
+    enable_chatbot_priority.short_description = "✅ Enable chatbot priority"
+
+    def disable_chatbot_priority(self, request, queryset):
+        updated = queryset.update(chatbot_priority=False)
+        self.message_user(request, f"{updated} products disabled from chatbot priority.")
+    disable_chatbot_priority.short_description = "❌ Disable chatbot priority"
     
     fieldsets = (
         ('General Information', {

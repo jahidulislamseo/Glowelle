@@ -1113,6 +1113,302 @@
     <!-- AI Chatbot -->
     {% include 'partials/chatbot_bubble.html' %}
     <script src="{% static 'js/chatbot.js' %}"></script>
+
+    <!-- =============================================
+         MARKETING FEATURES
+         ============================================= -->
+
+    <!-- 1. WhatsApp Floating Button -->
+    {% if site_settings.support_phone %}
+    <a href="https://wa.me/{{ site_settings.support_phone|cut:'+' }}" target="_blank" rel="noopener"
+        id="whatsapp-btn"
+        title="WhatsApp এ যোগাযোগ করুন"
+        class="fixed bottom-36 md:bottom-28 right-4 md:right-6 z-40 flex items-center justify-center h-13 w-13 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 group"
+        style="height:52px;width:52px;">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 fill-white" viewBox="0 0 24 24">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+            <path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.555 4.118 1.528 5.845L0 24l6.335-1.508A11.937 11.937 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.799 9.799 0 01-5.003-1.367l-.36-.213-3.76.895.952-3.658-.234-.374A9.786 9.786 0 012.182 12C2.182 6.58 6.58 2.182 12 2.182 17.42 2.182 21.818 6.58 21.818 12c0 5.42-4.398 9.818-9.818 9.818z"/>
+        </svg>
+        <!-- Tooltip -->
+        <span class="absolute right-full mr-3 bg-gray-900 text-white text-xs font-semibold px-3 py-1.5 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+            WhatsApp করুন
+        </span>
+    </a>
+    {% endif %}
+
+    <!-- 2. Cookie Consent Bar -->
+    <div id="cookie-consent" class="fixed bottom-0 left-0 right-0 z-[80] translate-y-full transition-transform duration-500">
+        <div class="bg-gray-900 text-white px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-3 text-center sm:text-left">
+                <span class="text-2xl flex-shrink-0">🍪</span>
+                <p class="text-sm text-gray-300">We use cookies to enhance your experience. Please read our <a href="{% url 'privacy' %}" class="text-pink-400 underline hover:text-pink-300">Privacy Policy</a> for more details.</p>
+            </div>
+            <div class="flex gap-2 flex-shrink-0">
+                <button onclick="acceptCookies()" class="bg-pink-600 hover:bg-pink-700 text-white px-5 py-2 rounded-full text-sm font-bold transition-colors">
+                    Accept
+                </button>
+                <button onclick="declineCookies()" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-full text-sm transition-colors">
+                    Decline
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Exit Intent Popup -->
+    <div id="exit-popup" class="fixed inset-0 z-[75] hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 transition-opacity duration-400" onclick="closeExitPopup()"></div>
+        <div id="exit-modal" class="relative z-10 w-full max-w-sm bg-white rounded-3xl shadow-2xl overflow-hidden transform scale-90 opacity-0 transition-all duration-400">
+            <button onclick="closeExitPopup()" class="absolute top-3 right-3 z-20 p-2 bg-white/80 hover:bg-gray-100 rounded-full transition-colors">
+                <i data-lucide="x" class="h-4 w-4 text-gray-500"></i>
+            </button>
+            <div class="bg-gradient-to-br from-rose-500 via-pink-600 to-pink-700 px-8 py-8 text-center text-white">
+                <div class="text-5xl mb-3">✋</div>
+                <h3 class="text-2xl font-black mb-1">যাওয়ার আগে!</h3>
+                <p class="text-pink-100 text-sm">আপনার জন্য বিশেষ offer রেখে গেলাম</p>
+            </div>
+            <div class="p-6 text-center">
+                <p class="text-gray-500 text-sm mb-3">আজকের অর্ডারে extra ছাড় পাচ্ছেন</p>
+                <div class="bg-pink-50 border-2 border-dashed border-pink-300 rounded-2xl px-6 py-3 mb-4 flex items-center justify-between gap-3">
+                    <span class="text-pink-700 font-black text-xl tracking-widest" id="exit-code">STAYGLOW</span>
+                    <button onclick="copyExitCode()" id="exit-copy-btn" class="flex-shrink-0 p-2 bg-pink-600 hover:bg-pink-700 text-white rounded-lg transition-colors">
+                        <i data-lucide="copy" class="h-4 w-4"></i>
+                    </button>
+                </div>
+                <p class="text-xs text-gray-400 mb-5">৳500+ এর উপর অর্ডারে প্রযোজ্য</p>
+                <a href="{% url 'shop' %}" onclick="closeExitPopup()"
+                    class="btn-primary w-full flex items-center justify-center gap-2 h-11 rounded-full font-bold text-sm">
+                    এখনই Shop করুন <i data-lucide="arrow-right" class="h-4 w-4"></i>
+                </a>
+                <button onclick="closeExitPopup()" class="mt-3 text-xs text-gray-400 hover:text-gray-600 transition-colors w-full">
+                    না, ধন্যবাদ
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Social Proof Toast -->
+    <div id="social-toast" class="fixed bottom-32 md:bottom-12 left-4 z-40 pointer-events-none"
+        style="transform:translateX(-110%); transition:transform 0.5s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s ease; opacity:0;">
+        <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-3 flex items-center gap-3 max-w-[260px] pointer-events-auto">
+            <div id="toast-avatar" class="h-10 w-10 rounded-full bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0"></div>
+            <div class="flex-1 min-w-0">
+                <p id="toast-name" class="text-xs font-bold text-gray-800"></p>
+                <p id="toast-action" class="text-xs text-gray-500 leading-tight mt-0.5"></p>
+                <p id="toast-time" class="text-[10px] text-pink-500 font-semibold mt-0.5"></p>
+            </div>
+            <span class="h-2 w-2 rounded-full bg-green-400 flex-shrink-0 animate-pulse"></span>
+        </div>
+    </div>
+
+    <!-- 5. Cart Abandonment Reminder -->
+    {% if cart|length > 0 %}
+    {% if request.resolver_match.url_name != 'cart_detail' and request.resolver_match.url_name != 'checkout' %}
+    <div id="cart-reminder" class="fixed bottom-32 md:bottom-12 right-4 z-40"
+        style="transform:translateX(110%); transition:transform 0.5s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s ease; opacity:0;">
+        <div class="bg-white rounded-2xl shadow-xl border border-pink-100 p-4 max-w-[260px]">
+            <div class="flex items-start gap-3">
+                <div class="h-10 w-10 rounded-full bg-pink-100 flex items-center justify-center flex-shrink-0">
+                    <i data-lucide="shopping-cart" class="h-5 w-5 text-pink-600"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-bold text-gray-800">Cart ভুলে গেছেন?</p>
+                    <p class="text-xs text-gray-500 mt-0.5">{{ cart|length }}টি পণ্য অপেক্ষা করছে!</p>
+                    <a href="{% url 'cart_detail' %}" onclick="closeCartReminder()"
+                        class="mt-2 inline-flex items-center gap-1 bg-pink-600 hover:bg-pink-700 text-white px-3 py-1.5 rounded-full text-xs font-bold transition-colors">
+                        Checkout করুন <i data-lucide="arrow-right" class="h-3 w-3"></i>
+                    </a>
+                </div>
+                <button onclick="closeCartReminder()" class="text-gray-300 hover:text-gray-500 transition-colors flex-shrink-0">
+                    <i data-lucide="x" class="h-4 w-4"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% endif %}
+
+    <script>
+    // =============================================
+    // 1. COOKIE CONSENT
+    // =============================================
+    (function() {
+        const bar = document.getElementById('cookie-consent');
+        if (!bar) return;
+        if (!localStorage.getItem('glowelle_cookie_consent')) {
+            setTimeout(() => {
+                bar.style.transform = 'translateY(0)';
+            }, 2000);
+        }
+    })();
+
+    window.acceptCookies = function() {
+        localStorage.setItem('glowelle_cookie_consent', 'accepted');
+        const bar = document.getElementById('cookie-consent');
+        if (bar) { bar.style.transform = 'translateY(100%)'; }
+    };
+    window.declineCookies = function() {
+        localStorage.setItem('glowelle_cookie_consent', 'declined');
+        const bar = document.getElementById('cookie-consent');
+        if (bar) { bar.style.transform = 'translateY(100%)'; }
+    };
+
+    // =============================================
+    // 2. EXIT INTENT POPUP
+    // =============================================
+    (function() {
+        if (sessionStorage.getItem('glowelle_exit_shown')) return;
+        let triggered = false;
+
+        function showExitPopup() {
+            if (triggered) return;
+            triggered = true;
+            sessionStorage.setItem('glowelle_exit_shown', '1');
+
+            const popup = document.getElementById('exit-popup');
+            const backdrop = popup.querySelector('.absolute');
+            const modal = document.getElementById('exit-modal');
+            popup.classList.remove('hidden');
+            popup.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+            requestAnimationFrame(() => {
+                backdrop.style.opacity = '1';
+                modal.style.transform = 'scale(1)';
+                modal.style.opacity = '1';
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+            });
+        }
+
+        window.closeExitPopup = function() {
+            const popup = document.getElementById('exit-popup');
+            const backdrop = popup.querySelector('.absolute');
+            const modal = document.getElementById('exit-modal');
+            backdrop.style.opacity = '0';
+            modal.style.transform = 'scale(0.9)';
+            modal.style.opacity = '0';
+            setTimeout(() => {
+                popup.classList.add('hidden');
+                popup.classList.remove('flex');
+                document.body.style.overflow = '';
+            }, 400);
+        };
+
+        window.copyExitCode = function() {
+            navigator.clipboard.writeText('STAYGLOW').then(() => {
+                const btn = document.getElementById('exit-copy-btn');
+                btn.innerHTML = '<i data-lucide="check" class="h-4 w-4"></i>';
+                btn.classList.replace('bg-pink-600', 'bg-green-500');
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+                setTimeout(() => {
+                    btn.innerHTML = '<i data-lucide="copy" class="h-4 w-4"></i>';
+                    btn.classList.replace('bg-green-500', 'bg-pink-600');
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
+                }, 2000);
+            });
+        };
+
+        // Desktop: mouseleave at top of page
+        document.addEventListener('mouseleave', function(e) {
+            if (e.clientY < 20 && window.innerWidth > 768) {
+                showExitPopup();
+            }
+        });
+
+        // Mobile: back button / visibility change after 45s
+        let mobileTimer;
+        if (window.innerWidth <= 768) {
+            mobileTimer = setTimeout(() => {
+                document.addEventListener('visibilitychange', function handler() {
+                    if (document.hidden) {
+                        showExitPopup();
+                        document.removeEventListener('visibilitychange', handler);
+                    }
+                });
+            }, 45000);
+        }
+    })();
+
+    // =============================================
+    // 3. SOCIAL PROOF TOAST
+    // =============================================
+    (function() {
+        const proofs = [
+            { name: 'Fatema A.', action: 'Rose Glow Face Wash কিনেছেন', time: '২ মিনিট আগে', avatar: 'F' },
+            { name: 'Ruhul H.', action: 'Vitamin C Serum order করেছেন', time: '৫ মিনিট আগে', avatar: 'R' },
+            { name: 'Sadia I.', action: 'Moisturizer Cream কার্টে যোগ করেছেন', time: '৮ মিনিট আগে', avatar: 'S' },
+            { name: 'Karim M.', action: 'Sunscreen SPF50 কিনেছেন', time: '১২ মিনিট আগে', avatar: 'K' },
+            { name: 'Nusrat J.', action: 'Eye Cream order করেছেন', time: '১৫ মিনিট আগে', avatar: 'N' },
+            { name: 'Tanvir R.', action: 'Hair Serum কিনেছেন', time: '২০ মিনিট আগে', avatar: 'T' },
+            { name: 'Mitu B.', action: 'BB Cream order করেছেন', time: '২৫ মিনিট আগে', avatar: 'M' },
+            { name: 'Arif H.', action: 'Lip Balm কার্টে যোগ করেছেন', time: '৩০ মিনিট আগে', avatar: 'A' },
+        ];
+
+        const toast = document.getElementById('social-toast');
+        if (!toast) return;
+
+        let index = 0;
+
+        function showToast() {
+            const p = proofs[index % proofs.length];
+            index++;
+
+            document.getElementById('toast-avatar').textContent = p.avatar;
+            document.getElementById('toast-name').textContent = p.name;
+            document.getElementById('toast-action').textContent = p.action;
+            document.getElementById('toast-time').textContent = p.time;
+
+            // Slide in
+            toast.style.transform = 'translateX(0)';
+            toast.style.opacity = '1';
+
+            // Slide out after 4s
+            setTimeout(() => {
+                toast.style.transform = 'translateX(-110%)';
+                toast.style.opacity = '0';
+            }, 4000);
+        }
+
+        // Start after 12s, repeat every 9s
+        setTimeout(() => {
+            showToast();
+            setInterval(showToast, 9000);
+        }, 12000);
+    })();
+
+    // =============================================
+    // 4. CART ABANDONMENT REMINDER
+    // =============================================
+    (function() {
+        const reminder = document.getElementById('cart-reminder');
+        if (!reminder) return;
+        if (sessionStorage.getItem('glowelle_cart_reminded')) return;
+
+        let inactivityTimer;
+
+        function showReminder() {
+            sessionStorage.setItem('glowelle_cart_reminded', '1');
+            reminder.style.transform = 'translateX(0)';
+            reminder.style.opacity = '1';
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        function resetTimer() {
+            clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(showReminder, 30000);
+        }
+
+        window.closeCartReminder = function() {
+            reminder.style.transform = 'translateX(110%)';
+            reminder.style.opacity = '0';
+        };
+
+        ['mousemove', 'keypress', 'scroll', 'click', 'touchstart'].forEach(e => {
+            document.addEventListener(e, resetTimer, { passive: true });
+        });
+
+        // Start the timer on load
+        resetTimer();
+    })();
+    </script>
 </body>
 
 </html>

@@ -1,6 +1,62 @@
 {% extends 'base.html' %}
 
 {% block content %}
+
+<!-- Flash Sale Countdown Banner -->
+{% if deal_of_the_day and deal_of_the_day.end_date %}
+<div id="flash-sale-bar" class="w-full text-white py-2.5 px-4 relative overflow-hidden"
+    style="background: linear-gradient(90deg, #7c0d35 0%, #bc0f58 30%, #e0186a 60%, #f72d82 85%, #bc0f58 100%); background-size: 200% auto; animation: shimmerBg 3s linear infinite;">
+    <div class="container mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6 text-center">
+        <div class="flex items-center gap-2 font-black text-sm sm:text-base">
+            <span class="text-yellow-300 text-lg">⚡</span>
+            <span class="uppercase tracking-wide">Flash Sale!</span>
+            <span class="bg-yellow-400 text-yellow-900 text-xs font-black px-2.5 py-0.5 rounded-full animate-pulse">
+                {{ deal_of_the_day.discount_percentage }}% OFF
+            </span>
+        </div>
+        <div class="flex items-center gap-2 text-sm">
+            <span class="text-pink-200 text-xs">শেষ হতে বাকি:</span>
+            <div id="flash-countdown" class="flex items-center gap-1 font-mono font-black text-sm">
+                <span class="bg-white/20 px-2 py-0.5 rounded-md min-w-[36px] text-center" id="flash-h">00</span>
+                <span class="text-pink-300 font-bold">:</span>
+                <span class="bg-white/20 px-2 py-0.5 rounded-md min-w-[36px] text-center" id="flash-m">00</span>
+                <span class="text-pink-300 font-bold">:</span>
+                <span class="bg-white/20 px-2 py-0.5 rounded-md min-w-[36px] text-center" id="flash-s">00</span>
+            </div>
+        </div>
+        <a href="{% url 'shop' %}"
+            class="bg-white text-pink-700 hover:bg-pink-50 px-5 py-1.5 rounded-full text-xs font-black transition-colors shadow-sm flex-shrink-0">
+            Shop Now →
+        </a>
+        <button onclick="document.getElementById('flash-sale-bar').remove()" class="absolute right-3 top-1/2 -translate-y-1/2 text-white/60 hover:text-white transition-colors">
+            <i data-lucide="x" class="h-4 w-4"></i>
+        </button>
+    </div>
+</div>
+<script>
+(function() {
+    const endTime = new Date("{{ deal_of_the_day.end_date|date:'c' }}").getTime();
+    function updateFlash() {
+        const diff = endTime - Date.now();
+        if (diff <= 0) {
+            const bar = document.getElementById('flash-sale-bar');
+            if (bar) bar.remove();
+            return;
+        }
+        const h = Math.floor(diff / 3600000);
+        const m = Math.floor((diff % 3600000) / 60000);
+        const s = Math.floor((diff % 60000) / 1000);
+        const pad = n => String(n).padStart(2, '0');
+        document.getElementById('flash-h').textContent = pad(h);
+        document.getElementById('flash-m').textContent = pad(m);
+        document.getElementById('flash-s').textContent = pad(s);
+    }
+    updateFlash();
+    setInterval(updateFlash, 1000);
+})();
+</script>
+{% endif %}
+
 <!-- Full-Width Hero Slider Section -->
 <section class="relative overflow-hidden mb-12" id="hero-slider" style="min-height: 500px; max-height: 800px; height: 80vh;">
 
@@ -1017,4 +1073,153 @@
             <p class="text-xs text-pink-300 mt-4">We respect your privacy. Unsubscribe at any time.</p>
         </div>
     </section>
+
+<!-- 5-Second Promo Popup -->
+<div id="promo-popup" class="fixed inset-0 z-[70] hidden items-center justify-center p-4">
+    <!-- Backdrop -->
+    <div id="promo-backdrop" class="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 transition-opacity duration-500" onclick="closePromoPopup()"></div>
+
+    <!-- Modal -->
+    <div id="promo-modal" class="relative z-10 w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden transform scale-90 opacity-0 transition-all duration-500">
+
+        <!-- Close Button -->
+        <button onclick="closePromoPopup()" class="absolute top-3 right-3 z-20 p-2 bg-white/80 hover:bg-gray-100 rounded-full transition-colors shadow-md">
+            <i data-lucide="x" class="h-4 w-4 text-gray-600"></i>
+        </button>
+
+        <!-- Top Banner -->
+        <div class="relative bg-gradient-to-br from-pink-500 via-pink-600 to-rose-700 px-8 pt-10 pb-16 text-center text-white overflow-hidden">
+            <!-- Decorative circles -->
+            <div class="absolute -top-6 -right-6 h-24 w-24 rounded-full bg-white/10"></div>
+            <div class="absolute -bottom-8 -left-8 h-32 w-32 rounded-full bg-white/10"></div>
+            <div class="absolute top-4 left-8 h-8 w-8 rounded-full bg-pink-400/30"></div>
+
+            <div class="relative z-10">
+                <div class="inline-flex items-center gap-2 bg-white/20 border border-white/30 px-4 py-1.5 rounded-full text-xs font-bold mb-4">
+                    <span class="h-2 w-2 rounded-full bg-yellow-300 animate-pulse"></span>
+                    LIMITED TIME OFFER
+                </div>
+                <h2 class="text-4xl font-black mb-1">10% OFF</h2>
+                <p class="text-pink-100 text-sm font-semibold">আপনার প্রথম অর্ডারে বিশেষ ছাড়!</p>
+            </div>
+        </div>
+
+        <!-- Coupon Code Section -->
+        <div class="relative -mt-8 mx-6">
+            <div class="bg-white rounded-2xl shadow-lg border border-pink-100 px-6 py-4 text-center">
+                <p class="text-xs text-gray-500 mb-2 font-medium">Use coupon code</p>
+                <div class="flex items-center justify-center gap-3">
+                    <div class="flex-1 bg-pink-50 border-2 border-dashed border-pink-300 rounded-xl px-4 py-2.5">
+                        <span id="promo-code" class="text-pink-700 font-black text-xl tracking-widest">WELCOME10</span>
+                    </div>
+                    <button onclick="copyPromoCode()" id="copy-btn" class="flex-shrink-0 p-2.5 bg-pink-600 hover:bg-pink-700 text-white rounded-xl transition-colors shadow-sm">
+                        <i data-lucide="copy" class="h-4 w-4"></i>
+                    </button>
+                </div>
+                <p class="text-xs text-gray-400 mt-2">Valid on orders above ৳500</p>
+            </div>
+        </div>
+
+        <!-- CTA Buttons -->
+        <div class="px-6 pt-4 pb-6 space-y-3">
+            <a href="{% url 'shop' %}" onclick="closePromoPopup()"
+                class="btn-primary w-full flex items-center justify-center gap-2 h-12 rounded-full font-bold text-sm shadow-lg">
+                <i data-lucide="shopping-bag" class="h-4 w-4"></i>
+                Shop Now & Save
+            </a>
+            <button onclick="closePromoPopup()" class="w-full text-xs text-gray-400 hover:text-gray-600 transition-colors py-1">
+                No thanks, I'll pay full price
+            </button>
+        </div>
+
+        <!-- Timer Bar -->
+        <div class="absolute bottom-0 left-0 right-0 h-1 bg-gray-100">
+            <div id="promo-timer-bar" class="h-full bg-gradient-to-r from-pink-500 to-rose-500 transition-none" style="width: 100%"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    const POPUP_KEY = 'glowelle_promo_shown';
+    const POPUP_COOLDOWN = 24 * 60 * 60 * 1000; // 24 hours
+
+    function shouldShowPopup() {
+        const lastShown = localStorage.getItem(POPUP_KEY);
+        if (!lastShown) return true;
+        return Date.now() - parseInt(lastShown) > POPUP_COOLDOWN;
+    }
+
+    function openPromoPopup() {
+        const popup = document.getElementById('promo-popup');
+        const backdrop = document.getElementById('promo-backdrop');
+        const modal = document.getElementById('promo-modal');
+        const timerBar = document.getElementById('promo-timer-bar');
+
+        popup.classList.remove('hidden');
+        popup.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+
+        requestAnimationFrame(() => {
+            backdrop.style.opacity = '1';
+            modal.style.transform = 'scale(1)';
+            modal.style.opacity = '1';
+            lucide.createIcons();
+        });
+
+        // Auto-close timer (30s)
+        let remaining = 100;
+        const interval = setInterval(() => {
+            remaining -= (100 / 300); // 30s = 300 steps (100ms each)
+            timerBar.style.width = Math.max(0, remaining) + '%';
+            if (remaining <= 0) {
+                clearInterval(interval);
+                closePromoPopup();
+            }
+        }, 100);
+        popup._timerInterval = interval;
+
+        localStorage.setItem(POPUP_KEY, Date.now().toString());
+    }
+
+    window.closePromoPopup = function() {
+        const popup = document.getElementById('promo-popup');
+        const backdrop = document.getElementById('promo-backdrop');
+        const modal = document.getElementById('promo-modal');
+        if (popup._timerInterval) clearInterval(popup._timerInterval);
+
+        backdrop.style.opacity = '0';
+        modal.style.transform = 'scale(90%)';
+        modal.style.opacity = '0';
+
+        setTimeout(() => {
+            popup.classList.add('hidden');
+            popup.classList.remove('flex');
+            document.body.style.overflow = '';
+        }, 400);
+    };
+
+    window.copyPromoCode = function() {
+        const code = document.getElementById('promo-code').textContent;
+        navigator.clipboard.writeText(code).then(() => {
+            const btn = document.getElementById('copy-btn');
+            btn.innerHTML = '<i data-lucide="check" class="h-4 w-4"></i>';
+            btn.classList.remove('bg-pink-600', 'hover:bg-pink-700');
+            btn.classList.add('bg-green-500');
+            lucide.createIcons();
+            setTimeout(() => {
+                btn.innerHTML = '<i data-lucide="copy" class="h-4 w-4"></i>';
+                btn.classList.add('bg-pink-600', 'hover:bg-pink-700');
+                btn.classList.remove('bg-green-500');
+                lucide.createIcons();
+            }, 2000);
+        });
+    };
+
+    if (shouldShowPopup()) {
+        setTimeout(openPromoPopup, 5000);
+    }
+})();
+</script>
+
     {% endblock %}
