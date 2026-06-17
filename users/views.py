@@ -88,7 +88,7 @@ def register_view(request):
             guest_cart_data = request.session.get('cart', {}).copy()
             
             user = form.save()
-            login(request, user)
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             
             # Restore cart after login
             if guest_cart_data:
