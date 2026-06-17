@@ -5,73 +5,93 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}GlowElle{% endblock %}</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background-color: #f0fdf4; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; -webkit-font-smoothing: antialiased; }
-    .wrapper { width: 100%; background-color: #f0fdf4; padding: 40px 16px; }
-    .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 24px; overflow: hidden; box-shadow: 0 4px 24px rgba(22,163,74,0.08); border: 1px solid #dcfce7; }
-    .header { background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); padding: 36px 40px; text-align: center; }
-    .logo-text { font-size: 32px; font-weight: 900; color: #ffffff; letter-spacing: -1px; text-decoration: none; }
-    .logo-text span { color: #bbf7d0; }
-    .header-tagline { color: #bbf7d0; font-size: 13px; margin-top: 6px; letter-spacing: 2px; text-transform: uppercase; }
-    .body { padding: 40px 40px 32px; }
-    .greeting { font-size: 22px; font-weight: 700; color: #14532d; margin-bottom: 12px; }
-    .intro-text { font-size: 15px; color: #4b5563; line-height: 1.7; margin-bottom: 28px; }
-    .card { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 16px; padding: 24px; margin-bottom: 24px; }
-    .card-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #dcfce7; }
-    .card-row:last-child { border-bottom: none; }
-    .card-label { font-size: 13px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; }
-    .card-value { font-size: 15px; font-weight: 700; color: #111827; }
-    .btn { display: inline-block; background: linear-gradient(135deg, #16a34a, #15803d); color: #ffffff !important; text-decoration: none; padding: 16px 36px; border-radius: 50px; font-size: 16px; font-weight: 700; text-align: center; box-shadow: 0 4px 16px rgba(22,163,74,0.3); }
-    .btn-center { text-align: center; margin: 28px 0; }
-    .divider { border: none; border-top: 1px dashed #d1fae5; margin: 28px 0; }
-    .footer { background: #f9fafb; padding: 28px 40px; text-align: center; border-top: 1px solid #f3f4f6; }
-    .footer-brand { font-size: 18px; font-weight: 800; color: #16a34a; margin-bottom: 8px; }
-    .footer-text { font-size: 13px; color: #9ca3af; line-height: 1.6; }
-    .footer-links { margin: 14px 0; }
-    .footer-links a { color: #6b7280; text-decoration: none; font-size: 13px; font-weight: 600; margin: 0 10px; }
-    .badge { display: inline-block; padding: 4px 14px; border-radius: 50px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-    .badge-green { background: #dcfce7; color: #15803d; }
-    .badge-yellow { background: #fef9c3; color: #854d0e; }
-    .badge-blue { background: #dbeafe; color: #1e40af; }
-    .badge-red { background: #fee2e2; color: #991b1b; }
-    .badge-gray { background: #f3f4f6; color: #374151; }
-    .highlight-box { background: linear-gradient(135deg, #f0fdf4, #dcfce7); border: 2px solid #16a34a; border-radius: 16px; padding: 20px 24px; text-align: center; margin: 20px 0; }
-    .highlight-amount { font-size: 36px; font-weight: 900; color: #16a34a; }
-    .highlight-label { font-size: 13px; color: #4b5563; margin-top: 4px; }
-    .items-table { width: 100%; border-collapse: collapse; }
-    .items-table th { font-size: 11px; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px; padding: 10px 0; border-bottom: 2px solid #dcfce7; }
-    .items-table td { padding: 14px 0; border-bottom: 1px solid #f3f4f6; font-size: 14px; color: #374151; }
-    .items-table .item-name { font-weight: 600; color: #111827; }
-    .items-table .item-price { text-align: right; font-weight: 700; color: #111827; }
-    .total-row td { font-size: 18px; font-weight: 800; color: #16a34a; padding-top: 16px; border-bottom: none; }
-    .status-timeline { margin: 20px 0; }
-    .status-step { display: flex; align-items: center; margin-bottom: 14px; }
-    .status-dot { width: 14px; height: 14px; border-radius: 50%; background: #dcfce7; border: 3px solid #16a34a; flex-shrink: 0; }
-    .status-dot.active { background: #16a34a; }
-    .status-line { width: 2px; height: 20px; background: #dcfce7; margin: 0 6px 0 5px; }
-    .status-label { font-size: 14px; color: #374151; margin-left: 12px; }
-    .status-label.active { font-weight: 700; color: #15803d; }
-    @media (max-width: 600px) {
-      .body { padding: 28px 24px; }
-      .footer { padding: 20px 24px; }
-      .highlight-amount { font-size: 28px; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background-color:#fff0f6; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif; -webkit-font-smoothing:antialiased; }
+    .wrapper { width:100%; background-color:#fff0f6; padding:40px 16px; }
+    .container { max-width:600px; margin:0 auto; background:#ffffff; border-radius:24px; overflow:hidden; box-shadow:0 4px 24px rgba(224,24,106,0.10); border:1px solid #ffe0ef; }
+
+    /* Header */
+    .header { background:linear-gradient(135deg,#e0186a 0%,#bc0f58 100%); padding:36px 40px; text-align:center; }
+    .logo-text { font-size:34px; font-weight:900; color:#ffffff; letter-spacing:-1px; text-decoration:none; }
+    .logo-text span { color:#ffc0de; }
+    .header-tagline { color:#ffc0de; font-size:12px; margin-top:6px; letter-spacing:3px; text-transform:uppercase; }
+
+    /* Body */
+    .body { padding:40px 40px 32px; }
+    .greeting { font-size:22px; font-weight:700; color:#9b1049; margin-bottom:12px; }
+    .intro-text { font-size:15px; color:#4b5563; line-height:1.7; margin-bottom:28px; }
+
+    /* Card */
+    .card { background:#fff8f9; border:1px solid #ffe0ef; border-radius:16px; padding:24px; margin-bottom:24px; }
+    .card-row { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #ffe0ef; }
+    .card-row:last-child { border-bottom:none; }
+    .card-label { font-size:12px; font-weight:700; color:#9ca3af; text-transform:uppercase; letter-spacing:0.8px; }
+    .card-value { font-size:15px; font-weight:700; color:#111827; }
+
+    /* Button */
+    .btn { display:inline-block; background:linear-gradient(135deg,#e0186a,#bc0f58); color:#ffffff !important; text-decoration:none; padding:16px 36px; border-radius:50px; font-size:15px; font-weight:700; text-align:center; box-shadow:0 6px 20px rgba(224,24,106,0.35); }
+    .btn-center { text-align:center; margin:28px 0; }
+
+    /* Divider */
+    .divider { border:none; border-top:1px dashed #ffc0de; margin:28px 0; }
+
+    /* Highlight box */
+    .highlight-box { background:linear-gradient(135deg,#fff0f6,#ffe0ef); border:2px solid #e0186a; border-radius:16px; padding:24px; text-align:center; margin:20px 0; }
+    .highlight-amount { font-size:38px; font-weight:900; color:#e0186a; }
+    .highlight-label { font-size:13px; color:#6b7280; margin-top:4px; }
+
+    /* Items table */
+    .items-table { width:100%; border-collapse:collapse; }
+    .items-table th { font-size:11px; font-weight:700; color:#9ca3af; text-transform:uppercase; letter-spacing:1px; padding:10px 0; border-bottom:2px solid #ffe0ef; }
+    .items-table td { padding:14px 0; border-bottom:1px solid #fff0f6; font-size:14px; color:#374151; }
+    .items-table .item-name { font-weight:700; color:#111827; }
+    .items-table .item-price { text-align:right; font-weight:700; color:#111827; }
+    .total-row td { font-size:18px; font-weight:900; color:#e0186a; padding-top:16px; border-bottom:none; }
+
+    /* Badges */
+    .badge { display:inline-block; padding:4px 14px; border-radius:50px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; }
+    .badge-pink   { background:#ffe0ef; color:#bc0f58; }
+    .badge-yellow { background:#fef9c3; color:#854d0e; }
+    .badge-blue   { background:#dbeafe; color:#1e40af; }
+    .badge-red    { background:#fee2e2; color:#991b1b; }
+    .badge-gray   { background:#f3f4f6; color:#374151; }
+    .badge-green  { background:#dcfce7; color:#15803d; }
+
+    /* Footer */
+    .footer { background:#fff0f6; padding:28px 40px; text-align:center; border-top:1px solid #ffe0ef; }
+    .footer-brand { font-size:20px; font-weight:900; color:#e0186a; margin-bottom:8px; letter-spacing:-0.5px; }
+    .footer-text { font-size:13px; color:#9ca3af; line-height:1.7; }
+    .footer-links { margin:14px 0; }
+    .footer-links a { color:#bc0f58; text-decoration:none; font-size:13px; font-weight:600; margin:0 10px; }
+
+    /* Responsive */
+    @media(max-width:600px){
+      .body { padding:28px 20px; }
+      .footer { padding:20px; }
+      .highlight-amount { font-size:28px; }
     }
   </style>
 </head>
 <body>
   <div class="wrapper">
     <div class="container">
+
+      <!-- Header -->
       <div class="header">
         <div class="logo-text">Glow<span>Elle</span></div>
         <div class="header-tagline">{% block tagline %}Your Trusted Online Shop{% endblock %}</div>
       </div>
+
+      <!-- Body -->
       <div class="body">
         {% block content %}{% endblock %}
       </div>
+
+      <!-- Footer -->
       <div class="footer">
         <div class="footer-brand">GlowElle BD</div>
         <div class="footer-text">
-          সাহায্যের জন্য: <a href="mailto:{{ support_email }}" style="color:#16a34a;">{{ support_email }}</a> | {{ support_phone }}<br>
+          সাহায্যের জন্য: <a href="mailto:{{ support_email }}" style="color:#e0186a;">{{ support_email }}</a> | {{ support_phone }}<br>
           এই email স্বয়ংক্রিয়ভাবে পাঠানো হয়েছে, reply করবেন না।
         </div>
         <div class="footer-links">
@@ -81,6 +101,7 @@
         </div>
         <div class="footer-text">&copy; {% now "Y" %} GlowElle BD. All rights reserved.</div>
       </div>
+
     </div>
   </div>
 </body>

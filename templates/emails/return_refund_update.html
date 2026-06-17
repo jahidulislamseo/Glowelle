@@ -11,20 +11,20 @@
 <div class="highlight-box">
   {% if order.return_status == 'approved' %}
     <div style="font-size:40px;">✅</div>
-    <div style="font-size:20px; font-weight:800; color:#15803d; margin-top:8px;">Return অনুমোদিত</div>
-    <div style="font-size:14px; color:#4b5563; margin-top:4px;">আপনার return request অনুমোদন করা হয়েছে</div>
+    <div style="font-size:20px; font-weight:800; color:#bc0f58; margin-top:8px;">Return অনুমোদিত</div>
+    <div style="font-size:14px; color:#6b7280; margin-top:4px;">আপনার return request অনুমোদন করা হয়েছে</div>
   {% elif order.return_status == 'rejected' %}
     <div style="font-size:40px;">❌</div>
     <div style="font-size:20px; font-weight:800; color:#991b1b; margin-top:8px;">Return প্রত্যাখ্যাত</div>
-    <div style="font-size:14px; color:#4b5563; margin-top:4px;">দুঃখিত, আপনার return request গ্রহণ করা সম্ভব হয়নি</div>
+    <div style="font-size:14px; color:#6b7280; margin-top:4px;">দুঃখিত, আপনার return request গ্রহণ করা সম্ভব হয়নি</div>
   {% elif order.return_status == 'completed' %}
     <div style="font-size:40px;">💰</div>
-    <div style="font-size:20px; font-weight:800; color:#15803d; margin-top:8px;">Refund সম্পন্ন</div>
-    <div style="font-size:14px; color:#4b5563; margin-top:4px;">আপনার Refund সফলভাবে প্রক্রিয়া করা হয়েছে</div>
+    <div style="font-size:20px; font-weight:800; color:#bc0f58; margin-top:8px;">Refund সম্পন্ন</div>
+    <div style="font-size:14px; color:#6b7280; margin-top:4px;">আপনার Refund সফলভাবে প্রক্রিয়া করা হয়েছে</div>
   {% else %}
     <div style="font-size:40px;">🔄</div>
     <div style="font-size:20px; font-weight:800; color:#b45309; margin-top:8px;">প্রক্রিয়াধীন</div>
-    <div style="font-size:14px; color:#4b5563; margin-top:4px;">আপনার return request পর্যালোচনা করা হচ্ছে</div>
+    <div style="font-size:14px; color:#6b7280; margin-top:4px;">আপনার return request পর্যালোচনা করা হচ্ছে</div>
   {% endif %}
 </div>
 
@@ -36,9 +36,9 @@
   <div class="card-row">
     <span class="card-label">Return স্ট্যাটাস</span>
     <span class="card-value">
-      {% if order.return_status == 'approved' %}<span class="badge badge-green">{{ order.get_return_status_display }}</span>
+      {% if order.return_status == 'approved' %}<span class="badge badge-pink">{{ order.get_return_status_display }}</span>
       {% elif order.return_status == 'rejected' %}<span class="badge badge-red">{{ order.get_return_status_display }}</span>
-      {% elif order.return_status == 'completed' %}<span class="badge badge-green">{{ order.get_return_status_display }}</span>
+      {% elif order.return_status == 'completed' %}<span class="badge badge-pink">{{ order.get_return_status_display }}</span>
       {% else %}<span class="badge badge-yellow">{{ order.get_return_status_display }}</span>
       {% endif %}
     </span>
@@ -46,7 +46,7 @@
   <div class="card-row">
     <span class="card-label">Refund স্ট্যাটাস</span>
     <span class="card-value">
-      {% if order.refund_status == 'processed' %}<span class="badge badge-green">{{ order.get_refund_status_display }}</span>
+      {% if order.refund_status == 'processed' %}<span class="badge badge-pink">{{ order.get_refund_status_display }}</span>
       {% elif order.refund_status == 'failed' %}<span class="badge badge-red">{{ order.get_refund_status_display }}</span>
       {% elif order.refund_status == 'pending' %}<span class="badge badge-yellow">{{ order.get_refund_status_display }}</span>
       {% else %}<span class="badge badge-gray">{{ order.get_refund_status_display }}</span>

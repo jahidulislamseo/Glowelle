@@ -9,13 +9,13 @@
 </p>
 
 <div class="highlight-box">
-  <div style="font-size:13px; font-weight:600; color:#6b7280; text-transform:uppercase; letter-spacing:1px;">মোট পরিমাণ</div>
+  <div style="font-size:13px; font-weight:700; color:#bc0f58; text-transform:uppercase; letter-spacing:1px;">মোট পরিমাণ</div>
   <div class="highlight-amount">৳{{ order.total }}</div>
-  <div style="margin-top:8px;">
+  <div style="margin-top:10px;">
     {% if order.payment_method == 'cod' %}
       <span class="badge badge-yellow">Cash on Delivery</span>
     {% else %}
-      <span class="badge badge-green">Online Payment</span>
+      <span class="badge badge-pink">Online Payment</span>
     {% endif %}
   </div>
 </div>
@@ -47,7 +47,7 @@
   </div>
 </div>
 
-<p style="font-size:14px; font-weight:700; color:#111827; margin-bottom:12px; text-transform:uppercase; letter-spacing:1px;">অর্ডারকৃত পণ্য</p>
+<p style="font-size:13px; font-weight:700; color:#9b1049; margin-bottom:12px; text-transform:uppercase; letter-spacing:1px;">অর্ডারকৃত পণ্য</p>
 <table class="items-table">
   <thead>
     <tr>
