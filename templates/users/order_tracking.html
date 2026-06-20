@@ -96,8 +96,7 @@
                     <p class="text-sm font-bold text-gray-800 leading-none">{{ history.get_status_display }}</p>
                     <p class="text-[10px] text-gray-500 mt-1">{{ history.created_at|date:"M d, g:i a" }}</p>
                     {% if history.description %}
-                    <p class="text-xs text-gray-500 mt-2 bg-gray-50 p-2 rounded border border-gray-100">{{
-                        history.description }}</p>
+                    <p class="text-xs text-gray-500 mt-2 bg-gray-50 p-2 rounded border border-gray-100">{{ history.description }}</p>
                     {% endif %}
                 </div>
             </div>
