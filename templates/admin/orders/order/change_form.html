@@ -5,589 +5,708 @@
 {{ block.super }}
 <style>
     :root {
-        --primary:#4F46E5;
-        --bg-gray:#F3F4F6;
-        --card-bg:#FFFFFF;
-        --text-main:#111827;
-        --text-muted:#6B7280;
-        --border:#E5E7EB;
+        --primary: #6366F1;
+        --primary-dark: #4F46E5;
+        --primary-light: #818CF8;
+        --success: #10B981;
+        --warning: #F59E0B;
+        --danger: #EF4444;
+        --info: #3B82F6;
+        --border-light: #F3F4F6;
+        --border: #E5E7EB;
+        --border-dark: #D1D5DB;
+        --bg-light: #F9FAFB;
+        --bg: #F3F4F6;
+        --text-dark: #111827;
+        --text: #1F2937;
+        --text-light: #6B7280;
+        --card: #FFFFFF;
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
     }
+
+    * { box-sizing: border-box; }
 
     #content-main {
-        background:transparent !important;
-        border:none !important;
+        background: transparent !important;
+        border: none !important;
+        padding: 0 !important;
     }
 
-    .oms-container {
-        font-family:'Inter', system-ui, -apple-system, sans-serif;
-        color:var(--text-main);
-        max-width:1400px;
-        /* Limit width on large screens */
+    body, html { background: var(--bg-light); }
+
+    .oms-wrap {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        color: var(--text);
+        max-width: 1600px;
+        padding: 0;
     }
 
+    /* ── Header ── */
     .oms-header {
-        display:flex;
-        align-items:center;
-        justify-content:space-between;
-        margin-bottom:20px;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: 32px;
+        padding-bottom: 24px;
+        border-bottom: 2px solid var(--border);
+        gap: 20px;
     }
-
     .oms-header h1 {
-        margin:0;
-        font-size:24px;
-        font-weight:700;
-        color:var(--text-main);
+        margin: 0;
+        font-size: 32px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        color: var(--text-dark);
+    }
+    .oms-header .meta {
+        font-size: 14px;
+        color: var(--text-light);
+        margin-top: 6px;
+        font-weight: 500;
+    }
+    .oms-header > div:last-child {
+        display: flex;
+        align-items: center;
+        gap: 12px;
     }
 
-    .oms-meta {
-        font-size:14px;
-        color:var(--text-muted);
-    }
-
-    .oms-grid {
-        display:grid;
-        grid-template-columns:2fr 1fr;
-        gap:24px;
-    }
-
-    @media (max-width:1024px) {
-        .oms-grid {
-            grid-template-columns:1fr;
-        }
-    }
-
-    .oms-card {
-        background:var(--card-bg);
-        border-radius:12px;
-        box-shadow:0 1px 3px rgba(0, 0, 0, 0.05);
-        /* Modern subtle shadow */
-        padding:24px;
-        margin-bottom:24px;
-        border:1px solid var(--border);
-    }
-
-    .oms-card h2 {
-        font-size:18px;
-        font-weight:600;
-        margin-top:0;
-        margin-bottom:16px;
-        padding-bottom:12px;
-        border-bottom:1px solid var(--border);
-        color:var(--text-main);
-    }
-
-    .oms-field-row {
-        display:flex;
-        justify-content:space-between;
-        margin-bottom:12px;
-        font-size:14px;
-    }
-
-    .oms-label {
-        color:var(--text-muted);
-        font-weight:500;
-    }
-
-    .oms-value {
-        font-weight:600;
-        text-align:right;
-    }
-
-    .oms-section-title {
-        text-transform:uppercase;
-        font-size:12px;
-        letter-spacing:0.05em;
-        color:var(--text-muted);
-        margin-top:20px;
-        margin-bottom:10px;
-        font-weight:700;
-    }
-
-    /* Status Badge */
+    /* ── Status Badge ── */
     .status-badge {
-        padding:6px 16px;
-        border-radius:20px;
-        font-weight:600;
-        font-size:14px;
-        text-transform:capitalize;
-        display:inline-block;
+        padding: 6px 16px;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 12px;
+        text-transform: capitalize;
+        letter-spacing: 0.5px;
+        box-shadow: var(--shadow-sm);
+    }
+    .status-pending    { background: #FEF3C7; color: #92400E; }
+    .status-processing { background: #DBEAFE; color: #0C4A6E; }
+    .status-shipped    { background: #E0E7FF; color: #312E81; }
+    .status-delivered  { background: #D1FAE5; color: #065F46; }
+    .status-cancelled  { background: #FEE2E2; color: #7F1D1D; }
+    .status-returned   { background: #F3F4F6; color: #374151; }
+
+    /* ── Layout ── */
+    .oms-layout {
+        display: grid;
+        grid-template-columns: 1fr 340px;
+        gap: 24px;
+        align-items: start;
+    }
+    @media (max-width: 1200px) {
+        .oms-layout { grid-template-columns: 1fr 280px; gap: 20px; }
+    }
+    @media (max-width: 900px) {
+        .oms-layout { grid-template-columns: 1fr; }
     }
 
-    .status-pending {
-        background:#FEF3C7;
-        color:#D97706;
+    /* ── Card ── */
+    .oms-card {
+        background: var(--card);
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        padding: 24px;
+        margin-bottom: 20px;
+        box-shadow: var(--shadow-sm);
+        transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    .oms-card:hover {
+        box-shadow: var(--shadow);
+        border-color: var(--border-dark);
+    }
+    .oms-card h2 {
+        font-size: 16px;
+        font-weight: 700;
+        margin: 0 0 16px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid var(--border-light);
+        color: var(--text-dark);
+        letter-spacing: -0.3px;
     }
 
-    .status-processing {
-        background:#DBEAFE;
-        color:#2563EB;
-    }
-
-    .status-shipped {
-        background:#E0E7FF;
-        color:#4F46E5;
-    }
-
-    .status-delivered {
-        background:#D1FAE5;
-        color:#059669;
-    }
-
-    .status-cancelled {
-        background:#FEE2E2;
-        color:#DC2626;
-    }
-
-    /* Timeline */
-    .timeline-item {
-        position:relative;
-        padding-left:20px;
-        padding-bottom:20px;
-        border-left:2px solid var(--border);
-    }
-
-    .timeline-item:last-child {
-        border-left:none;
-    }
-
-    .timeline-dot {
-        position:absolute;
-        left:-6px;
-        top:0;
-        width:10px;
-        height:10px;
-        border-radius:50%;
-        background:var(--primary);
-    }
-
-    .timeline-date {
-        font-size:12px;
-        color:var(--text-muted);
-    }
-
-    .timeline-status {
-        font-weight:600;
-    }
-
-    .timeline-desc {
-        font-size:13px;
-        margin-top:4px;
-    }
-
-    /* Tables inside cards */
+    /* ── Products Table ── */
     .oms-table {
-        width:100%;
-        border-collapse:collapse;
-        font-size:14px;
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
     }
-
     .oms-table th {
-        text-align:left;
-        color:var(--text-muted);
-        font-weight:500;
-        padding:8px 0;
-        border-bottom:1px solid var(--border);
+        text-align: left;
+        color: var(--text-light);
+        font-weight: 700;
+        padding: 12px 0;
+        border-bottom: 2px solid var(--border);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 12px;
     }
-
     .oms-table td {
-        padding:12px 0;
-        border-bottom:1px solid #f3f4f6;
+        padding: 14px 0;
+        border-bottom: 1px solid var(--border-light);
+        vertical-align: top;
+    }
+    .oms-table tr:hover { background: var(--bg-light); }
+    .oms-table tr:last-child td { border-bottom: none; }
+
+    /* ── Totals ── */
+    .oms-totals {
+        margin-top: 20px;
+        padding-top: 16px;
+        border-top: 2px dashed var(--border);
+        background: var(--bg-light);
+        padding: 16px;
+        border-radius: 8px;
+    }
+    .oms-total-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 14px;
+        padding: 6px 0;
+        color: var(--text);
+    }
+    .oms-total-grand {
+        font-size: 18px;
+        font-weight: 800;
+        color: var(--text-dark);
+        border-top: 2px solid var(--border);
+        margin-top: 8px;
+        padding-top: 12px;
+    }
+    .oms-total-grand span:last-child {
+        color: var(--primary-dark);
     }
 
-    .oms-table tr:last-child td {
-        border-bottom:none;
+    /* ── Django Admin Fieldsets ── */
+    .oms-main fieldset.module {
+        background: var(--card);
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        padding: 24px;
+        margin-bottom: 20px;
+        box-shadow: var(--shadow-sm);
+    }
+    .oms-main fieldset.module > h2 {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--text-dark);
+        background: transparent;
+        padding: 0 0 12px;
+        margin: 0 0 16px;
+        border-bottom: 2px solid var(--border-light);
+        letter-spacing: -0.3px;
+    }
+    .oms-main .form-row {
+        padding: 12px 0;
+        border: none;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+    .oms-main .form-row > div,
+    .oms-main .flex-container {
+        gap: 8px;
+    }
+    .oms-main label {
+        font-weight: 600;
+        color: var(--text);
+        font-size: 14px;
+        display: block;
+        margin-bottom: 8px;
+        letter-spacing: -0.2px;
+    }
+    .oms-main input[type="text"],
+    .oms-main input[type="number"],
+    .oms-main input[type="email"],
+    .oms-main input[type="date"],
+    .oms-main input[type="datetime-local"],
+    .oms-main select,
+    .oms-main textarea {
+        border: 1.5px solid var(--border);
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-size: 14px;
+        width: 100%;
+        box-sizing: border-box;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        background: var(--card);
+        font-family: inherit;
+    }
+    .oms-main input[type="text"]:focus,
+    .oms-main input[type="number"]:focus,
+    .oms-main input[type="email"]:focus,
+    .oms-main input[type="date"]:focus,
+    .oms-main input[type="datetime-local"]:focus,
+    .oms-main select:focus,
+    .oms-main textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+    .oms-main textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+    .oms-main input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+        accent-color: var(--primary);
+    }
+    .oms-main .readonly {
+        font-size: 14px;
+        color: var(--text);
+        padding: 10px 12px;
+        background: var(--bg-light);
+        border-radius: 6px;
+        border: 1px solid var(--border-light);
+    }
+    .oms-main .readonly-val {
+        font-weight: 500;
     }
 
-    /* Form inputs override partial */
-    .oms-card input[type="text"],
-    .oms-card input[type="number"],
-    .oms-card select,
-    .oms-card textarea {
-        width:100%;
-        padding:8px;
-        border:1px solid var(--border);
-        border-radius:6px;
-        box-sizing:border-box;
-        /* Fix input overflow */
-        margin-top:4px;
+    /* ── Help Text ── */
+    .oms-help-text {
+        font-size: 13px;
+        color: var(--text-light);
+        margin-top: 6px;
+        font-style: italic;
     }
 
+    /* ── Sidebar ── */
+    .oms-sidebar .oms-card h2 { font-size: 15px; }
+
+    .customer-avatar {
+        width: 64px;
+        height: 64px;
+        background: linear-gradient(135deg, var(--primary), var(--primary-light));
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        font-weight: 800;
+        margin: 0 auto 12px;
+        box-shadow: var(--shadow);
+    }
+    .customer-name {
+        text-align: center;
+        font-weight: 700;
+        font-size: 16px;
+        color: var(--text-dark);
+    }
+    .customer-sub  {
+        text-align: center;
+        font-size: 13px;
+        color: var(--text-light);
+        margin-top: 2px;
+    }
+
+    .oms-stat {
+        display: flex;
+        justify-content: space-between;
+        font-size: 14px;
+        padding: 8px 0;
+    }
+    .oms-stat span:first-child {
+        color: var(--text-light);
+        font-weight: 500;
+    }
+    .oms-stat span:last-child  {
+        font-weight: 700;
+        color: var(--text-dark);
+    }
+
+    .oms-divider {
+        border: none;
+        border-top: 1px solid var(--border-light);
+        margin: 16px 0;
+    }
+
+    /* ── Timeline ── */
+    .timeline-item {
+        position: relative;
+        padding-left: 20px;
+        padding-bottom: 18px;
+        border-left: 2px solid var(--border-light);
+    }
+    .timeline-item:last-child { border-left: none; padding-bottom: 0; }
+    .timeline-dot {
+        position: absolute;
+        left: -7px;
+        top: 5px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--primary);
+        border: 3px solid var(--card);
+        box-shadow: 0 0 0 2px var(--primary-light);
+    }
+    .timeline-time   {
+        font-size: 12px;
+        color: var(--text-light);
+        font-weight: 500;
+    }
+    .timeline-status {
+        font-weight: 700;
+        font-size: 14px;
+        color: var(--text-dark);
+    }
+    .timeline-by     {
+        font-size: 12px;
+        color: var(--text-light);
+        margin-top: 2px;
+    }
+
+    /* ── Badge chips ── */
+    .badge {
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .badge-green { background: #ECFDF5; color: #065F46; }
+    .badge-blue  { background: #EFF6FF; color: #0C4A6E; }
+    .badge-red   { background: #FEF2F2; color: #7F1D1D; }
+
+    /* ── Buttons ── */
+    .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 16px;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        box-shadow: var(--shadow-sm);
+    }
+    .button:hover {
+        background: var(--primary-dark);
+        box-shadow: var(--shadow);
+        transform: translateY(-1px);
+    }
+    .button:active {
+        transform: translateY(0);
+    }
+    .button.default {
+        background: var(--primary);
+    }
+
+    /* ── Submit Row ── */
     .submit-row {
-        background:white !important;
-        border:1px solid var(--border);
-        border-radius:8px;
-        margin-top:20px;
-        padding:15px !important;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 16px 24px;
+        margin-top: 24px;
+        box-shadow: var(--shadow-sm);
+    }
+    .submit-row .deletelink {
+        margin-left: auto;
+        padding: 10px 16px;
+        background: var(--danger);
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 14px;
+        transition: all 0.2s ease;
+    }
+    .submit-row .deletelink:hover {
+        background: #DC2626;
+        box-shadow: var(--shadow);
+    }
+
+    /* ── Error Messages ── */
+    .errornote {
+        background: #FEF2F2;
+        border: 1.5px solid var(--danger);
+        color: var(--danger);
+        padding: 14px 16px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-weight: 600;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+        .oms-header {
+            flex-direction: column;
+            margin-bottom: 24px;
+        }
+        .oms-header > div:last-child {
+            width: 100%;
+            flex-direction: column;
+        }
+        .oms-main .form-row {
+            grid-template-columns: 1fr;
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="oms-container">
-    <form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="{{ form_url }}" method="post"
-        id="{{ opts.model_name }}_form" novalidate>
-        {% csrf_token %}
-        {% if is_popup %}<input type="hidden" name="{{ is_popup_var }}" value="1">{% endif %}
+<div class="oms-wrap">
 
-        <!-- Custom Header -->
-        <div class="oms-header">
-            <div>
-                <h1>{% if original %}Order #{{ original.order_reference|default:original.id }}{% else %}Create New Order{% endif %}</h1>
-                {% if original %}
-                <div class="oms-meta">
-                    Created on {{ original.created_at|date:"F j, Y g:i A" }} • via {{ original.get_source_display }}
-                </div>
-                {% endif %}
-            </div>
+<form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="{{ form_url }}" method="post" id="{{ opts.model_name }}_form" novalidate>
+    {% csrf_token %}
+    {% if is_popup %}<input type="hidden" name="{{ is_popup_var }}" value="1">{% endif %}
+
+    <!-- ── Page Header ── -->
+    <div class="oms-header">
+        <div>
+            <h1>{% if original %}Order #{{ original.order_reference|default:original.id }}{% else %}New Order{% endif %}</h1>
             {% if original %}
-            <div class="status-badge status-{{ original.status }}">
-                {{ original.get_status_display }}
-            </div>
+            <div class="meta">{{ original.created_at|date:"d M Y, g:i A" }} • {{ original.get_source_display }}</div>
             {% endif %}
         </div>
+        <div>
+            {% if original %}
+            <span class="status-badge status-{{ original.status }}">{{ original.get_status_display }}</span>
+            <a href="{% url 'admin_order_pdf' original.id %}" class="button" target="_blank">📄 PDF Invoice</a>
+            {% endif %}
+        </div>
+    </div>
 
-        {% if errors %}
-        <p class="errornote">
-            {% if errors|length == 1 %}{% translate "Please correct the error below." %}{% else %}{% translate "Please
-            correct the errors below." %}{% endif %}
-        </p>
-        {{ adminform.form.non_field_errors }}
-        {% endif %}
+    <!-- ── Errors ── -->
+    {% if errors %}
+    <p class="errornote">
+        {% if errors|length == 1 %}{% translate "Please correct the error below." %}{% else %}{% translate "Please correct the errors below." %}{% endif %}
+    </p>
+    {{ adminform.form.non_field_errors }}
+    {% endif %}
 
-        <div class="oms-grid">
-            <!-- LEFT COLUMN (Main Content) -->
-            <div class="oms-col-main">
-                <!-- Products Section -->
-                <div class="oms-card">
-                    <h2>Product Details</h2>
-                    <!-- We render the 'items' inline formset here manually or simply include it -->
-                    <!-- Custom Product Table -->
-                    <table class="oms-table">
-                        <thead>
-                            <tr>
-                                <th>Product</th>
-                                <th>Qty</th>
-                                <th>Unit Price</th>
-                                <th>Stock @ Order</th>
-                                <th>Current Stock</th>
-                                <th>Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% if original %}
-                            {% for item in original.items.all %}
-                            <tr>
-                                <td>
-                                    <div style="font-weight:600;">{{ item.product.title }}</div>
-                                    <div style="font-size:11px; color:var(--text-muted);">SKU:{{ item.product.slug|default:"N/A" }}</div>
-                                </td>
-                                <td>{{ item.quantity }}</td>
-                                <td>{{ item.price }}</td>
-                                <td>{{ item.stock_at_order|default:"-" }}</td>
-                                <td>
-                                    {% if item.product.stock_quantity <= 0 %} <span
-                                        style="color:#DC2626; font-weight:bold;">OUT OF STOCK</span>
-                                        {% else %}
-                                        {{ item.product.stock_quantity }}
-                                        {% endif %}
-                                </td>
-                                <td>{{ item.get_total }}</td>
-                            </tr>
-                            {% endfor %}
-                            {% else %}
-                            <tr>
-                                <td colspan="6" style="text-align:center; color:var(--text-muted); padding:20px;">
-                                    Products can be added using the inline form below after saving, or via the POS system.
-                                </td>
-                            </tr>
-                            {% endif %}
-                        </tbody>
-                    </table>
+    <!-- ── Main 2-Column Layout ── -->
+    <div class="oms-layout">
 
-                    <!-- Include default inline for editing if needed, but maybe hidden or minimized? 
-                         User requested 'clean', so a read-only table is better for the 'Dashboard' feel.
-                         However, to allow editing, we might keep the hidden formset or just rely on the read-only view here.
-                         For now, let's keep the custom view as it matches the "Analysis" requirement. 
-                    -->
+        <!-- LEFT: Products + All Form Fieldsets -->
+        <div class="oms-main">
 
-                    <!-- Financial Summary -->
-                    <div style="margin-top:20px; padding-top:20px; border-top:1px dashed var(--border);">
-                        {% if original %}
-                        <div class="oms-field-row">
-                            <span class="oms-label">Subtotal</span>
-                            <span class="oms-value">{{ original.subtotal }} BDT</span>
-                        </div>
-                        {% if original.discount_amount > 0 %}
-                        <div class="oms-field-row" style="color:#059669;">
-                            <span class="oms-label">Discount</span>
-                            <span class="oms-value">- {{ original.discount_amount }} BDT</span>
-                        </div>
-                        {% endif %}
-                        <div class="oms-field-row">
-                            <span class="oms-label">Delivery Charge</span>
-                            <span class="oms-value">{{ original.delivery_charge }} BDT</span>
-                        </div>
-                        {% if original.tax_amount > 0 %}
-                        <div class="oms-field-row">
-                            <span class="oms-label">Tax</span>
-                            <span class="oms-value">{{ original.tax_amount }} BDT</span>
-                        </div>
-                        {% endif %}
-                        <div class="oms-field-row" style="font-size:18px; margin-top:10px;">
-                            <span class="oms-label" style="color:var(--text-main);">Total Payable</span>
-                            <span class="oms-value" style="color:var(--primary);">{{ original.total }} BDT</span>
-                        </div>
-                        {% endif %}
-                        <!-- Edit Fields for financials -->
-                        <div class="oms-section-title">Edit Financials</div>
-                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                            <div>
-                                <label class="oms-label">{{ adminform.form.total.label }}</label>
-                                {{ adminform.form.total }}
-                            </div>
-                            <div>
-                                <label class="oms-label">{{ adminform.form.delivery_charge.label }}</label>
-                                {{ adminform.form.delivery_charge }}
-                            </div>
-                        </div>
+            <!-- Products (read-only display) -->
+            {% if original %}
+            <div class="oms-card">
+                <h2>🛍️ Order Items</h2>
+                <table class="oms-table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th style="width:70px;">Qty</th>
+                            <th style="width:110px;">Unit Price</th>
+                            <th style="width:110px; text-align:right;">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in original.items.all %}
+                        <tr>
+                            <td>
+                                <div style="font-weight:700; color:var(--text-dark);">{{ item.product.title }}</div>
+                                {% if item.variant %}<div style="font-size:12px; color:var(--text-light); margin-top:2px;">{{ item.variant }}</div>{% endif %}
+                            </td>
+                            <td style="text-align:center; font-weight:600;">{{ item.quantity }}</td>
+                            <td style="font-weight:600;">{{ item.price }} ৳</td>
+                            <td style="text-align:right; font-weight:700; color:var(--primary-dark);">{{ item.get_total }} ৳</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4" style="text-align:center; color:var(--text-light); padding:20px 0;">No items found.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <!-- Totals -->
+                <div class="oms-totals">
+                    <div class="oms-total-row">
+                        <span style="color:var(--text-light);">Subtotal</span>
+                        <span style="font-weight:600;">{{ original.subtotal }} ৳</span>
                     </div>
-                </div>
-
-                <!-- Logistics & Delivery Section -->
-                <div class="oms-card">
-                    <h2>Delivery & Logistics</h2>
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
-                        <div>
-                            <label class="oms-label">Courier</label>
-                            {{ adminform.form.courier }}
-                        </div>
-                        <div>
-                            <label class="oms-label">Tracking ID</label>
-                            {{ adminform.form.tracking_id }}
-                        </div>
-                        <label class="oms-label">Est. Delivery Date</label>
-                        {{ adminform.form.estimated_delivery_date }}
+                    {% if original.discount_amount > 0 %}
+                    <div class="oms-total-row" style="color:var(--success);">
+                        <span>Discount</span>
+                        <span style="font-weight:700;">-{{ original.discount_amount }} ৳</span>
                     </div>
-                    <div>
-                        <label class="oms-label">Actual Delivery Date</label>
-                        {{ adminform.form.actual_delivery_date }}
-                        {% if original and original.actual_delivery_date and original.estimated_delivery_date %}
-                        {% if original.actual_delivery_date.date > original.estimated_delivery_date %}
-                        <div style="color:#DC2626; font-size:11px; margin-top:4px; font-weight:700;">
-                            DELAYED (Late Delivery)
-                        </div>
-                        {% endif %}
-                        {% endif %}
-
-
+                    {% endif %}
+                    <div class="oms-total-row">
+                        <span style="color:var(--text-light);">Delivery Charge</span>
+                        <span style="font-weight:600;">{{ original.delivery_charge }} ৳</span>
                     </div>
-                </div>
-
-                <div style="margin-top:15px;">
-                    <label class="oms-label">Delivery Notes (Customer)</label>
-                    <div style="background:#f9fafb; padding:10px; border-radius:6px; font-size:14px;">
-                        {% if original %}
-                            {{ original.delivery_note|default:"No notes provided." }}
-                        {% else %}
-                            <span class="oms-meta">Notes will appear here after customer provides them.</span>
-                        {% endif %}
+                    {% if original.tax_amount > 0 %}
+                    <div class="oms-total-row">
+                        <span style="color:var(--text-light);">Tax</span>
+                        <span style="font-weight:600;">{{ original.tax_amount }} ৳</span>
                     </div>
-                </div>
-
-                <div style="margin-top:15px;">
-                    <label class="oms-label">Shipping Label</label>
-                    {{ adminform.form.shipping_label }}
+                    {% endif %}
+                    <div class="oms-total-grand">
+                        <span style="color:var(--text-light);">Total Payable</span>
+                        <span style="color:var(--primary-dark);">{{ original.total }} ৳</span>
+                    </div>
                 </div>
             </div>
+            {% endif %}
 
-            <!-- Timeline Section (Status History) -->
+            <!-- All Admin Fieldsets -->
+            {% for fieldset in adminform %}
             <div class="oms-card">
-                <h2>Order Timeline</h2>
+                {% if fieldset.name %}<h2>{{ fieldset.name }}</h2>{% endif %}
+                {% for line in fieldset %}
+                <div class="oms-row">
+                    {% for field in line %}
+                    <div class="oms-field-box{% if field.is_readonly %} readonly{% endif %}">
+                        {% if field.is_checkbox %}
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                {{ field.field }}{{ field.label_tag }}
+                            </div>
+                        {% elif field.is_readonly %}
+                            {{ field.label_tag }}
+                            <div class="oms-readonly-val">{{ field.contents }}</div>
+                        {% else %}
+                            {{ field.label_tag }}
+                            {{ field.field }}
+                            {% if field.field.errors %}
+                            <ul class="errorlist" style="margin:4px 0 0; padding-left:16px; font-size:12px;">
+                                {% for e in field.field.errors %}<li>{{ e }}</li>{% endfor %}
+                            </ul>
+                            {% endif %}
+                        {% endif %}
+                        {% if not field.is_readonly and field.field.help_text %}
+                        <div class="oms-help-text">{{ field.field.help_text }}</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+
+        </div>
+
+        <!-- RIGHT: Sidebar -->
+        <div class="oms-sidebar">
+
+            <!-- Customer Info -->
+            {% if original %}
+            <div class="oms-card">
+                <h2>👤 Customer</h2>
+                <div class="customer-avatar">{{ original.full_name|first|upper|default:"?" }}</div>
+                <div class="customer-name">{{ original.full_name|default:"Guest" }}</div>
+                <div class="customer-sub">{{ original.phone }}</div>
+                {% if original.email %}<div class="customer-sub">{{ original.email }}</div>{% endif %}
+
+                {% if customer_total_orders %}
+                <hr class="oms-divider">
+                <div class="oms-stat">
+                    <span>Total Orders</span>
+                    <span>{{ customer_total_orders }}</span>
+                </div>
+                <div class="oms-stat">
+                    <span>Lifetime Spend</span>
+                    <span>{{ customer_lifetime_spend }} ৳</span>
+                </div>
+                {% endif %}
+
+                {% if original.user %}
+                <hr class="oms-divider">
+                <a href="{% url 'admin:users_user_change' original.user.id %}" class="button" style="display:block; text-align:center; margin-top:8px; width:100%;">View Profile</a>
+                {% endif %}
+            </div>
+
+            <!-- Delivery Address -->
+            <div class="oms-card">
+                <h2>🏠 Delivery Address</h2>
+                <div style="font-size:14px; line-height:1.8; color:var(--text); font-weight:500;">
+                    {{ original.address }}<br>
+                    <span style="color:var(--text-light); font-weight:400;">{{ original.city }}{% if original.zip_code %}, {{ original.zip_code }}{% endif %}</span>
+                </div>
+                {% if original.billing_address %}
+                <hr class="oms-divider">
+                <div style="font-size:12px; font-weight:700; color:var(--text-light); text-transform:uppercase; letter-spacing:.05em; margin-bottom:8px;">💳 Billing</div>
+                <div style="font-size:14px; line-height:1.8; font-weight:500;">
+                    {{ original.billing_address }}<br>
+                    <span style="color:var(--text-light); font-weight:400;">{{ original.billing_city }}{% if original.billing_zip_code %}, {{ original.billing_zip_code }}{% endif %}</span>
+                </div>
+                {% endif %}
+                {% if original.delivery_note %}
+                <hr class="oms-divider">
+                <div style="font-size:12px; font-weight:700; color:var(--text-light); text-transform:uppercase; letter-spacing:.05em; margin-bottom:8px;">📝 Customer Note</div>
+                <div style="font-size:13px; color:var(--text); background:var(--bg-light); padding:10px 12px; border-radius:8px; border-left:3px solid var(--primary);">{{ original.delivery_note }}</div>
+                {% endif %}
+            </div>
+
+            <!-- Status Timeline -->
+            <div class="oms-card">
+                <h2>⏱️ Status History</h2>
                 {% if timeline %}
                 {% for event in timeline %}
                 <div class="timeline-item">
                     <div class="timeline-dot"></div>
-                    <div class="timeline-date">{{ event.created_at|date:"M j, g:i A" }}</div>
+                    <div class="timeline-time">{{ event.created_at|date:"d M Y, g:i A" }}</div>
                     <div class="timeline-status">{{ event.get_status_display }}</div>
-                    <div class="timeline-desc">{{ event.description|default:"" }} {% if event.created_by %}(by {{ event.created_by.username }}){% endif %}</div>
+                    {% if event.created_by %}<div class="timeline-by">by {{ event.created_by.username }}</div>{% endif %}
                 </div>
                 {% endfor %}
                 {% else %}
-                <p style="color:var(--text-muted);">No history recorded yet.</p>
-                {% endif %}
-            </div>
-        </div>
-
-        <!-- RIGHT COLUMN (Sidebar) -->
-        <div class="oms-col-sidebar">
-            <!-- Customer Card -->
-            <div class="oms-card">
-                <h2>Customer Info</h2>
-                {% if original %}
-                <div style="text-align:center; margin-bottom:15px;">
-                    <!-- Simple Avatar placeholder -->
-                    <div
-                        style="width:60px; height:60px; background:#E0E7FF; color:var(--primary); border-radius:50%; line-height:60px; font-size:24px; font-weight:bold; margin:0 auto;">
-                        {{ original.full_name|first|default:"U" }}
-                    </div>
-                    <div style="margin-top:10px; font-weight:600;">{{ original.full_name }}</div>
-                    <div style="font-size:13px; color:var(--text-muted);">{{ original.user.email }}</div>
-                    {% if customer_total_orders > 1 %}
-                    <div style="margin-top:5px;"><span
-                            style="background:#D1FAE5; color:#059669; font-size:10px; padding:2px 8px; border-radius:10px;">Returning
-                            Customer</span></div>
-                    {% else %}
-                    <div style="margin-top:5px;"><span
-                            style="background:#E0E7FF; color:#4F46E5; font-size:10px; padding:2px 8px; border-radius:10px;">New
-                            Customer</span></div>
-                    {% endif %}
-                </div>
-                <div class="oms-field-row">
-                    <span class="oms-label">User ID</span>
-                    {% if original.user %}
-                        <a href="{% url 'admin:users_user_change' original.user.id %}">#{{ original.user.id }}</a>
-                    {% else %}
-                        <span class="oms-value">Guest</span>
-                    {% endif %}
-                </div>
-                <div class="oms-field-row">
-                    <span class="oms-label">Phone</span>
-                    <span class="oms-value">{{ original.phone }}</span>
-                </div>
-                {% else %}
-                <p class="oms-meta">Customer info will appear after saving.</p>
-                {% endif %}
-                
-                {% if customer_total_orders %}
-                <div class="oms-field-row">
-                    <span class="oms-label">Lifetime Orders</span>
-                    <span class="oms-value">{{ customer_total_orders }}</span>
-                </div>
-                <div class="oms-field-row">
-                    <span class="oms-label">Lifetime Spend</span>
-                    <span class="oms-value">{{ customer_lifetime_spend }} BDT</span>
-                </div>
-                {% endif %}
-            </div>
-
-            <!-- Address Card -->
-            <div class="oms-card">
-                <h2>Addresses</h2>
-                {% if original %}
-                <div class="oms-section-title" style="margin-top:0;">Shipping Address</div>
-                <p style="font-size:14px; line-height:1.5;">
-                    {{ original.address }}<br>
-                    {{ original.city }}, {{ original.zip_code }}
-                </p>
-
-                {% if original.billing_address %}
-                <div class="oms-section-title">Billing Address</div>
-                <p style="font-size:14px; line-height:1.5;">
-                    {{ original.billing_address }}<br>
-                    {{ original.billing_city }}, {{ original.billing_zip_code }}
-                </p>
-                {% endif %}
-                {% else %}
-                <p class="oms-meta">Address details will appear after saving.</p>
-                {% endif %}
-            </div>
-
-            <!-- Admin Controls -->
-            <div class="oms-card">
-                <h2>Admin Controls</h2>
-                <div style="margin-bottom:15px;">
-                    <label class="oms-label">Change Status</label>
-                    {{ adminform.form.status }}
-                </div>
-                <div style="margin-bottom:15px;">
-                    <label class="oms-label">Internal Note</label>
-                    {{ adminform.form.internal_admin_note }}
-                </div>
-
-                <div class="oms-section-title">Risk Analysis</div>
-                <div class="oms-field-row">
-                    <span class="oms-label">IP Address</span>
-                    <span class="oms-value">{% if original %}{{ original.ip_address|default:"Unknown" }}{% else %}N/A{% endif %}</span>
-                </div>
-                <div class="oms-field-row">
-                    <span class="oms-label">High Risk?</span>
-                    <span class="oms-value">{{ adminform.form.is_high_risk }}</span>
-                </div>
-            </div>
-
-            <!-- 12. Analytics -->
-            <div class="oms-card">
-                <h2><i class="fas fa-chart-line"></i> 12. Analytics</h2>
-                {% if original %}
-                <div class="oms-field-row"><span class="oms-label">Value Cat.</span><span class="oms-value">{{ original.order_value_category }}</span></div>
-                <div class="oms-field-row"><span class="oms-label">High Risk</span><span class="oms-value">{{ adminform.form.is_high_risk }}</span></div>
-                <div class="oms-field-row"><span class="oms-label">Repeat Order</span><span class="oms-value">{% if original.is_repeat_order %}Yes{% else %}No{% endif %}</span></div>
-                {% else %}
-                <p class="oms-meta">Analytics will be available after saving.</p>
+                <p style="color:var(--text-light); font-size:13px; margin:0;">No history yet.</p>
                 {% endif %}
             </div>
 
             <!-- Documents -->
             <div class="oms-card">
-                <h2>Documents</h2>
-                {% if original %}
-                <div class="oms-field-row">
-                    <span class="oms-label">Invoice #</span>
-                    <span class="oms-value">{{ original.invoice_number }}</span>
+                <h2>📄 Documents</h2>
+                <div class="oms-stat">
+                    <span>Invoice #</span>
+                    <span style="font-size:13px;">{{ original.invoice_number|default:"Not generated" }}</span>
                 </div>
-                <a href="{% url 'admin_order_pdf' original.id %}" class="button"
-                    style="display:block; text-align:center; margin-top:10px;">Download Invoice PDF</a>
-                {% else %}
-                <p class="oms-meta">Invoices are generated after the order is saved.</p>
+                {% if original.credit_note_number %}
+                <div class="oms-stat">
+                    <span>Credit Note #</span>
+                    <span style="font-size:13px;">{{ original.credit_note_number }}</span>
+                </div>
                 {% endif %}
+                <a href="{% url 'admin_order_pdf' original.id %}" class="button" target="_blank" style="display:block; text-align:center; margin-top:12px; width:100%;">Download Invoice PDF</a>
             </div>
+            {% endif %}
 
-            <!-- 13. Support -->
-            <div class="oms-card">
-                <h2><i class="fas fa-headset"></i> 13. Support</h2>
-                <div class="oms-field-row"><span class="oms-label">Ticket</span><span class="oms-value">{% if original %}{{ original.support_ticket|default:"None" }}{% else %}None{% endif %}</span></div>
-            </div>
-
-            <!-- 14. Automation -->
-            <div class="oms-card">
-                <h2><i class="fas fa-robot"></i> 14. Automation</h2>
-                <div class="oms-field-row"><span class="oms-label">Email Sent</span><span class="oms-value">{{ adminform.form.is_confirmation_email_sent }}</span></div>
-                <div class="oms-field-row"><span class="oms-label">SMS Sent</span><span class="oms-value">{{ adminform.form.is_delivery_update_sent }}</span></div>
-                {% if original %}
-                <div style="font-size:10px; color:#777; margin-top:5px;">{{ original.automation_logs|default:"No logs"|truncatechars:100 }}</div>
-                {% endif %}
-            </div>
         </div>
-</div>
+        <!-- /sidebar -->
 
-{% block submit_buttons_bottom %}
-<div class="submit-row">
-    {% if show_save %}<input type="submit" value="{% translate 'Save' %}" class="default" name="_save">{% endif %}
-    {% if show_delete_link %}
-    {% url opts|admin_urlname:'delete' original.pk|admin_urlquote as delete_url %}
-    <p class="deletelink-box"><a href="{{ delete_url }}" class="deletelink">{% translate "Delete" %}</a></p>
-    {% endif %}
-    {% if show_save_as_new %}<input type="submit" value="{% translate 'Save as new' %}" name="_saveasnew">{% endif %}
-    {% if show_save_and_add_another %}<input type="submit" value="{% translate 'Save and add another' %}"
-        name="_addanother">{% endif %}
-    {% if show_save_and_continue %}<input type="submit" value="{% translate 'Save and continue editing' %}"
-        name="_continue">{% endif %}
-</div>
-{% endblock %}
+    </div>
+    <!-- /layout -->
 
-<!-- Render hidden fields to ensure data integrity -->
-{% for field in adminform.form.hidden_fields %}
-{{ field }}
-{% endfor %}
+    <!-- Submit Row -->
+    {% block submit_buttons_bottom %}
+    <div class="submit-row">
+        {% if show_save %}<input type="submit" value="{% translate 'Save' %}" class="default" name="_save">{% endif %}
+        {% if show_save_and_continue %}<input type="submit" value="{% translate 'Save and continue editing' %}" name="_continue">{% endif %}
+        {% if show_save_as_new %}<input type="submit" value="{% translate 'Save as new' %}" name="_saveasnew">{% endif %}
+        {% if show_save_and_add_another %}<input type="submit" value="{% translate 'Save and add another' %}" name="_addanother">{% endif %}
+        {% if show_delete_link %}
+        {% url opts|admin_urlname:'delete' original.pk|admin_urlquote as delete_url %}
+        <a href="{{ delete_url }}" class="deletelink">{% translate "Delete" %}</a>
+        {% endif %}
+    </div>
+    {% endblock %}
+
+    <!-- Hidden fields -->
+    {% for field in adminform.form.hidden_fields %}{{ field }}{% endfor %}
 
 </form>
 
-<!-- Change History Section -->
+<!-- ── Change History ── -->
 {% if change_history %}
 <div class="oms-card" style="margin-top:24px;">
-    <h2 style="font-size:16px; display:flex; align-items:center; gap:8px;">
-        <i class="fas fa-history"></i> Change History
-    </h2>
+    <h2>📋 Change History</h2>
     <table class="oms-table">
         <thead>
             <tr>
@@ -600,24 +719,15 @@
         <tbody>
             {% for entry in change_history %}
             <tr>
-                <td style="white-space:nowrap; color:var(--text-muted); font-size:13px;">
-                    {{ entry.action_time|date:"M j, Y g:i A" }}
-                </td>
-                <td style="font-weight:600; font-size:13px;">
-                    {{ entry.user.get_full_name|default:entry.user.username }}
-                </td>
+                <td style="color:var(--text-light); font-size:13px; font-weight:600;">{{ entry.action_time|date:"d M Y, g:i A" }}</td>
+                <td style="font-weight:700; font-size:14px;">{{ entry.user.get_full_name|default:entry.user.username }}</td>
                 <td>
-                    {% if entry.is_addition %}
-                        <span style="background:#D1FAE5; color:#059669; padding:2px 8px; border-radius:10px; font-size:12px; font-weight:600;">Created</span>
-                    {% elif entry.is_change %}
-                        <span style="background:#DBEAFE; color:#2563EB; padding:2px 8px; border-radius:10px; font-size:12px; font-weight:600;">Edited</span>
-                    {% elif entry.is_deletion %}
-                        <span style="background:#FEE2E2; color:#DC2626; padding:2px 8px; border-radius:10px; font-size:12px; font-weight:600;">Deleted</span>
+                    {% if entry.is_addition %}<span class="badge badge-green">Created</span>
+                    {% elif entry.is_change %}<span class="badge badge-blue">Edited</span>
+                    {% elif entry.is_deletion %}<span class="badge badge-red">Deleted</span>
                     {% endif %}
                 </td>
-                <td style="font-size:13px; color:var(--text-muted);">
-                    {{ entry.get_change_message }}
-                </td>
+                <td style="font-size:13px; color:var(--text-light);">{{ entry.get_change_message }}</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -625,5 +735,5 @@
 </div>
 {% endif %}
 
-</div>
+</div><!-- /oms-wrap -->
 {% endblock %}
