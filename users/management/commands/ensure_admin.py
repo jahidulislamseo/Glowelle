@@ -16,11 +16,10 @@ class Command(BaseCommand):
         user, created = User.objects.get_or_create(username=username)
         user.set_password(password)
         user.email = email
-        user.is_staff = True
+        user.role = 'admin'  # role=admin auto-sets is_staff=True via model save()
         user.is_superuser = True
         user.is_active = True
-        # Use update_fields to bypass any signals that might reset flags
-        user.save(update_fields=['password', 'email', 'is_staff', 'is_superuser', 'is_active'])
+        user.save()
 
         if created:
             self.stdout.write(self.style.SUCCESS(f'Superuser "{username}" created.'))
