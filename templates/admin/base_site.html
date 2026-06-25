@@ -1,0 +1,23 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block extrahead %}
+{{ block.super }}
+{% if site_settings.logo %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var logoUrl = "{{ site_settings.logo.url }}";
+    document.querySelectorAll('#jazzy-logo img, .brand-link img').forEach(function (img) {
+      img.src = logoUrl;
+    });
+  });
+</script>
+{% endif %}
+{% if site_settings.favicon %}
+<link rel="shortcut icon" href="{{ site_settings.favicon.url }}" type="image/png">
+<link rel="icon" href="{{ site_settings.favicon.url }}" sizes="32x32" type="image/png">
+{% elif site_settings.logo %}
+<link rel="shortcut icon" href="{{ site_settings.logo.url }}" type="image/png">
+<link rel="icon" href="{{ site_settings.logo.url }}" sizes="32x32" type="image/png">
+{% endif %}
+{% endblock %}

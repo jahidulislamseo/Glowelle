@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google" content="notranslate">
     <!-- SEO & Meta Tags -->
-    <title>{% if product %}{{ product.get_meta_title }} | GlowElle{% elif category %}{{ category.get_meta_title }} | GlowElle{% else %}{{ site_settings.site_title|default:"GlowElle" }} | Premium Organic Grocery{% endif %}</title>
+    <title>{% if product %}{{ product.get_meta_title }} | Nyveralife{% elif category %}{{ category.get_meta_title }} | Nyveralife{% else %}{{ site_settings.site_title|default:"Nyveralife" }} | Premium Organic Grocery{% endif %}</title>
     <meta name="description"
         content="{% if product %}{{ product.get_meta_description }}{% elif category %}{{ category.get_meta_description }}{% else %}{{ site_settings.meta_description|default:'Your one-stop shop for fresh organic fruits, vegetables, meat, and daily essentials.' }}{% endif %}">
     <link rel="canonical" href="{{ request.build_absolute_uri }}">
@@ -19,7 +19,7 @@
     {% endif %}
 
     <!-- Open Graph -->
-    <meta property="og:site_name" content="GlowElle">
+    <meta property="og:site_name" content="Nyveralife">
     <meta property="og:url" content="{{ request.build_absolute_uri }}">
     {% if product %}
     <meta property="og:title" content="{{ product.get_meta_title|default:product.title }}">
@@ -34,14 +34,14 @@
         content="{{ category.get_meta_description|default:'Shop our best organic products.' }}">
     <meta property="og:type" content="website">
     {% else %}
-    <meta property="og:title" content="GlowElle | Premium Organic Grocery">
+    <meta property="og:title" content="Nyveralife | Premium Organic Grocery">
     <meta property="og:description" content="Your one-stop shop for fresh organic fruits, vegetables, meat, and daily essentials.">
     <meta property="og:type" content="website">
     {% endif %}
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title"
-        content="{% if product %}{{ product.get_meta_title }}{% elif category %}{{ category.get_meta_title }}{% else %}GlowElle{% endif %}">
+        content="{% if product %}{{ product.get_meta_title }}{% elif category %}{{ category.get_meta_title }}{% else %}Nyveralife{% endif %}">
     <meta name="twitter:description"
         content="{% if product %}{{ product.get_meta_description }}{% elif category %}{{ category.get_meta_description }}{% else %}Your one-stop shop for fresh organic fruits, vegetables, meat, and daily essentials.{% endif %}">
     {% if product and product.image %}
@@ -69,14 +69,14 @@
     {
       "@context":"https://schema.org",
       "@type":"Organization",
-      "name":"{{ site_settings.site_title|default:'GlowElle' }}",
+      "name":"{{ site_settings.site_title|default:'Nyveralife' }}",
       "url":"{{ request.scheme }}://{{ request.get_host }}",
       "logo":"{% if site_settings.logo %}{{ request.scheme }}://{{ request.get_host }}{{ site_settings.logo.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo.png' %}{% endif %}",
       "contactPoint":{
         "@type":"ContactPoint",
-        "telephone":"{{ site_settings.support_phone|default:'+880 1234 567890' }}",
+        "telephone":"{{ site_settings.support_phone|default:'+8801600818139' }}",
         "contactType":"Customer Service",
-        "email":"{{ site_settings.support_email|default:'contact@glowellebd.com' }}"
+        "email":"{{ site_settings.support_email|default:'contact@nyveralife.com' }}"
       }
     }
     </script>
@@ -544,7 +544,7 @@
                         class="fixed inset-y-0 left-0 w-80 bg-white z-50 transform -translate-x-full transition-transform duration-300 ease-in-out shadow-2xl flex flex-col">
                         <div class="p-6 border-b bg-gradient-to-r from-pink-500 via-pink-600 to-pink-700 text-white">
                             <div class="flex items-center justify-between mb-4">
-                                <span class="font-bold text-2xl drop-shadow-lg">GlowElle</span>
+                                <span class="font-bold text-2xl drop-shadow-lg">Nyveralife</span>
                                 <button id="mobile-menu-close"
                                     class="p-2 hover:bg-white/20 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl">
                                     <i data-lucide="x" class="h-6 w-6"></i>
@@ -609,7 +609,7 @@
                                     class="block py-3 text-gray-600 hover:text-pink-600 transition-colors font-medium">My
                                     Account</a>
                                 <a href="{% url 'about' %}"
-                                    class="block py-3 text-gray-600 hover:text-pink-600 transition-colors font-medium">About GlowElle</a>
+                                    class="block py-3 text-gray-600 hover:text-pink-600 transition-colors font-medium">About Nyveralife</a>
                                 <a href="{% url 'contact' %}"
                                     class="block py-3 text-gray-600 hover:text-pink-600 transition-colors font-medium">Contact
                                     Support</a>
@@ -624,9 +624,9 @@
                     <a href="{% url 'home' %}" class="flex items-center gap-2">
                         {% if site_settings.logo %}
                         <img src="{{ site_settings.logo.url }}" alt="{{ site_settings.site_title }}"
-                            class="h-12 w-auto">
+                            class="h-16 w-auto">
                         {% else %}
-                        <img src="{% static 'images/logo.png' %}" alt="GlowElle" class="h-12 w-auto">
+                        <img src="{% static 'images/logo.png' %}" alt="Nyveralife" class="h-16 w-auto">
                         {% endif %}
                     </a>
                 </div>
@@ -756,9 +756,9 @@
                 <div class="col-span-2 lg:col-span-1 space-y-4 text-center lg:text-left">
                     <a href="{% url 'home' %}" class="inline-block">
                         {% if site_settings.logo %}
-                        <img src="{{ site_settings.logo.url }}" alt="{{ site_settings.site_title }}" class="h-10 w-auto mx-auto lg:mx-0">
+                        <img src="{{ site_settings.logo.url }}" alt="{{ site_settings.site_title }}" class="h-14 w-auto mx-auto lg:mx-0">
                         {% else %}
-                        <img src="{% static 'images/logo.png' %}" alt="GlowElle" class="h-10 w-auto mx-auto lg:mx-0">
+                        <img src="{% static 'images/logo.png' %}" alt="Nyveralife" class="h-14 w-auto mx-auto lg:mx-0">
                         {% endif %}
                     </a>
                     <p class="text-sm text-gray-500 max-w-xs mx-auto lg:mx-0">{{ site_settings.meta_description|default:"Your one-stop shop for skincare & beauty essentials." }}</p>
@@ -804,15 +804,15 @@
                     <ul class="space-y-3 text-sm text-gray-500">
                         <li class="flex items-start gap-2">
                             <i data-lucide="map-pin" class="h-4 w-4 text-pink-500 mt-0.5 flex-shrink-0"></i>
-                            <span>{{ site_settings.address|default:"Dhaka, Bangladesh" }}</span>
+                            <span>{{ site_settings.address|default:"Basaboo Madartake Chowrasta, Dhaka-1212, Bangladesh" }}</span>
                         </li>
                         <li class="flex items-center gap-2">
                             <i data-lucide="phone" class="h-4 w-4 text-pink-500 flex-shrink-0"></i>
-                            <a href="tel:{{ site_settings.support_phone }}" class="hover:text-pink-600 transition-colors">{{ site_settings.support_phone|default:"+880 1234 567890" }}</a>
+                            <a href="tel:{{ site_settings.support_phone }}" class="hover:text-pink-600 transition-colors">{{ site_settings.support_phone|default:"+8801600818139" }}</a>
                         </li>
                         <li class="flex items-center gap-2">
                             <i data-lucide="mail" class="h-4 w-4 text-pink-500 flex-shrink-0"></i>
-                            <a href="mailto:{{ site_settings.support_email }}" class="hover:text-pink-600 transition-colors break-all">{{ site_settings.support_email|default:"contact@glowellebd.com" }}</a>
+                            <a href="mailto:{{ site_settings.support_email }}" class="hover:text-pink-600 transition-colors break-all">{{ site_settings.support_email|default:"contact@nyveralife.com" }}</a>
                         </li>
                     </ul>
                 </div>
@@ -833,7 +833,7 @@
             </div>
 
             <div class="mt-10 pt-6 border-t text-center text-xs text-gray-400">
-                <p>&copy; 2025 GlowElle. All rights reserved. | Developed by <a href="https://jahidulislam.dev/" target="_blank" class="hover:text-pink-600 font-medium transition-colors">Jahidul Islam</a></p>
+                <p>&copy; 2025 Nyveralife. All rights reserved. | Developed by <a href="https://jahidulislam.dev/" target="_blank" class="hover:text-pink-600 font-medium transition-colors">Jahidul Islam</a></p>
             </div>
         </div>
     </footer>
@@ -1234,7 +1234,7 @@
     (function() {
         const bar = document.getElementById('cookie-consent');
         if (!bar) return;
-        if (!localStorage.getItem('glowelle_cookie_consent')) {
+        if (!localStorage.getItem('nyveralife_cookie_consent')) {
             setTimeout(() => {
                 bar.style.transform = 'translateY(0)';
             }, 2000);
@@ -1242,12 +1242,12 @@
     })();
 
     window.acceptCookies = function() {
-        localStorage.setItem('glowelle_cookie_consent', 'accepted');
+        localStorage.setItem('nyveralife_cookie_consent', 'accepted');
         const bar = document.getElementById('cookie-consent');
         if (bar) { bar.style.transform = 'translateY(100%)'; }
     };
     window.declineCookies = function() {
-        localStorage.setItem('glowelle_cookie_consent', 'declined');
+        localStorage.setItem('nyveralife_cookie_consent', 'declined');
         const bar = document.getElementById('cookie-consent');
         if (bar) { bar.style.transform = 'translateY(100%)'; }
     };
@@ -1256,13 +1256,13 @@
     // 2. EXIT INTENT POPUP
     // =============================================
     (function() {
-        if (sessionStorage.getItem('glowelle_exit_shown')) return;
+        if (sessionStorage.getItem('nyveralife_exit_shown')) return;
         let triggered = false;
 
         function showExitPopup() {
             if (triggered) return;
             triggered = true;
-            sessionStorage.setItem('glowelle_exit_shown', '1');
+            sessionStorage.setItem('nyveralife_exit_shown', '1');
 
             const popup = document.getElementById('exit-popup');
             const backdrop = popup.querySelector('.absolute');
@@ -1380,12 +1380,12 @@
     (function() {
         const reminder = document.getElementById('cart-reminder');
         if (!reminder) return;
-        if (sessionStorage.getItem('glowelle_cart_reminded')) return;
+        if (sessionStorage.getItem('nyveralife_cart_reminded')) return;
 
         let inactivityTimer;
 
         function showReminder() {
-            sessionStorage.setItem('glowelle_cart_reminded', '1');
+            sessionStorage.setItem('nyveralife_cart_reminded', '1');
             reminder.style.transform = 'translateX(0)';
             reminder.style.opacity = '1';
             if (typeof lucide !== 'undefined') lucide.createIcons();

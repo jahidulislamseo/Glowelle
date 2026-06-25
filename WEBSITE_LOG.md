@@ -1,7 +1,7 @@
-# GlowElle BD — Website Log
+# Nyveralife — Website Log
 **Last Updated:** 2026-06-17  
 **Project Type:** Django E-Commerce Platform  
-**Business:** অর্গানিক গ্রোসারি ও দৈনন্দিন পণ্য — Dhaka, Bangladesh
+**Business:** অর্গানিক গ্রোসারি ও দৈনন্দিন পণ্য — Basaboo Madartake Chowrasta, Dhaka-1212, Bangladesh
 
 ---
 

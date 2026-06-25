@@ -257,7 +257,7 @@
             <i data-lucide="message-circle" class="h-4 w-4 flex-shrink-0"></i>
             <span>Messenger</span>
           </a>
-          <a href="https://wa.me/8801234567890" target="_blank"
+          <a href="https://wa.me/8801600818139" target="_blank"
             class="flex items-center justify-center gap-2 bg-green-50 text-green-700 border border-green-100 font-semibold py-3 px-3 rounded-xl hover:bg-green-100 transition-all text-sm active:scale-95">
             <i data-lucide="phone" class="h-4 w-4 flex-shrink-0"></i>
             <span>WhatsApp</span>
@@ -573,7 +573,7 @@
       "mpn":"{{ product.slug|escapejs }}",
       "brand":{
         "@type":"Brand",
-        "name":"{{ product.brand.name|default:'GlowElle'|escapejs }}"
+        "name":"{{ product.brand.name|default:'Nyveralife'|escapejs }}"
       },
       "review":[
         {% for review in reviews|slice:":5" %}
@@ -608,7 +608,7 @@
         "availability":"{% if product.stock_quantity > 0 %}https://schema.org/InStock{% else %}https://schema.org/OutOfStock{% endif %}",
         "seller":{
           "@type":"Organization",
-          "name":"GlowElle"
+          "name":"Nyveralife"
         }
       }
     }

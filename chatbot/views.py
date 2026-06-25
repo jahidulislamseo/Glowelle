@@ -89,7 +89,7 @@ class OpenRouterSession:
             completion = self.client.chat.completions.create(
                 extra_headers={
                     "HTTP-Referer": "http://localhost:8000",
-                    "X-Title": "GlowElle",
+                    "X-Title": "Nyveralife",
                 },
                 model=self.model,
                 messages=self.history,
@@ -168,7 +168,7 @@ def create_order_from_chat(session_id, phone, address, chat_history):
             user = User.objects.filter(phone__contains=clean_phone).first()
         
         # Get user email or use a valid default
-        user_email = user.email if user and user.email else f"chatbot_{phone.replace('+', '').replace(' ', '')}@glowellebd.com"
+        user_email = user.email if user and user.email else f"chatbot_{phone.replace('+', '').replace(' ', '')}@nyveralife.com"
         user_name = user.get_full_name() if user and hasattr(user, 'get_full_name') else "Chat Customer"
         
         # Create order with all required fields
@@ -359,9 +359,9 @@ def get_product_context(query, intent='browsing'):
 
     # 6. Generate Context String
     if not unified_products:
-        return "❌ I couldn't find specific products matching your query. However, GlowElle sources the freshest organic items daily. Try asking for Rice, Fish, Meat, or Honey!", []
+        return "❌ I couldn't find specific products matching your query. However, Nyveralife sources the freshest organic items daily. Try asking for Rice, Fish, Meat, or Honey!", []
     
-    branding_ctx = "🌟 BRAND KNOWLEDGE: GlowElle sources directly from organic farms. 100% Chemical-free. Return-on-delivery if quality fails.\n"
+    branding_ctx = "🌟 BRAND KNOWLEDGE: Nyveralife sources directly from organic farms. 100% Chemical-free. Return-on-delivery if quality fails.\n"
     context = branding_ctx + "📦 Available Products:\n"
     for p in unified_products[:5]:
         context += f"\n🛒 **{p['title']}**\n   💰 Price: **{p['price']} BDT**"
@@ -431,8 +431,8 @@ def chatbot_response(request):
             chat = chat_client.start_chat(history=gemini_history)
         bot_settings = ChatbotSettings.objects.first()
         site_settings = SiteSettings.objects.first()
-        support_phone = site_settings.support_phone if site_settings and site_settings.support_phone else "+880 1609132361"
-        welcome_msg = bot_settings.welcome_message if bot_settings else "👋 Hi! Welcome to GlowElle!"
+        support_phone = site_settings.support_phone if site_settings and site_settings.support_phone else "+8801600818139"
+        welcome_msg = bot_settings.welcome_message if bot_settings else "👋 Hi! Welcome to Nyveralife!"
         fast_replies = {
             "hi": welcome_msg, "hello": welcome_msg, "saalam": "Walaikum Assalam!", "salam": "Walaikum Assalam!",
             "thanks": "You're welcome! 😊", "thank you": "My pleasure! ✨", "ok": "Got it! 👍", "bye": "Goodbye! 👋",
@@ -531,7 +531,7 @@ ORDERING RULES FOR LOGGED-IN USER:
                 if guest_address: user_context += f"\n- Address: {guest_address}"
                 user_context += "\nRULES: If info is present, DON'T ask again. Just confirm or ask for MISSING info."
         
-        sys_prompt = bot_settings.system_prompt if bot_settings else "You are 'GlowElle Assistant'."
+        sys_prompt = bot_settings.system_prompt if bot_settings else "You are 'Nyveralife Assistant'."
         promo_ctx = f"\n🔥 PROMO: {bot_settings.promo_message}" if bot_settings and bot_settings.is_promo_active else ""
         system_instructions = f"{sys_prompt}{promo_ctx}{user_context}{recommendation_context}{discount_context}\nRULES: 1. NO HALLUCINATIONS. 2. ORDERING: Need Name, Phone, Address. 3. TOKEN: ORDER_READY|Name|Phone|Address. DATA:\n{product_context}"
         try:

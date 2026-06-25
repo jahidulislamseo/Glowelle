@@ -1,9 +1,9 @@
 JAZZMIN_SETTINGS = {
     # title of the window (Will default to current_admin_site.site_title if absent or None)
-    "site_title": "GlowElle Admin",
+    "site_title": "Nyveralife Admin",
 
     # Title on the login screen (19 chars max) (defaults to current_admin_site.site_header if absent or None)
-    "site_header": "GlowElle BD",
+    "site_header": "Nyveralife",
 
     # Title on the brand (19 chars max) (defaults to current_admin_site.site_header if absent or None)
     "site_brand": "Admin",
@@ -24,10 +24,10 @@ JAZZMIN_SETTINGS = {
     "site_icon": "images/logo.png",
 
     # Welcome text on the login screen
-    "welcome_sign": "Welcome back to GlowElle Admin",
+    "welcome_sign": "Welcome back to Nyveralife Admin",
 
     # Copyright on the footer
-    "copyright": "GlowElle BD © 2025",
+    "copyright": "Nyveralife © 2025",
 
     # List of model admins to search from the search bar, search bar omitted if excluded
     # If you want to use a single search field you dont need to use a list, you can simply write "search_model": "auth.User"

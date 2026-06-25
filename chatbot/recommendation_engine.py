@@ -1,5 +1,5 @@
 """
-Product Recommendation Engine for GlowElle Chatbot
+Product Recommendation Engine for Nyveralife Chatbot
 Provides intelligent product suggestions based on user behavior and purchase history.
 """
 

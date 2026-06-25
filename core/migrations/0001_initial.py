@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
             name='SiteSettings',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('site_title', models.CharField(default='GlowElle', max_length=200)),
+                ('site_title', models.CharField(default='Nyveralife', max_length=200)),
                 ('meta_description', models.TextField(blank=True, help_text='SEO description for the homepage')),
                 ('ga4_tracking_id', models.CharField(blank=True, help_text='e.g., G-XXXXXXXXXX', max_length=50)),
                 ('search_console_code', models.CharField(blank=True, help_text='Google verification code', max_length=100)),

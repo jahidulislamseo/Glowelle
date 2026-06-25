@@ -2,7 +2,7 @@
   {
     "intent": "greeting",
     "variations": [
-      {"user": "hi", "bot": "Assalamualaikum! GlowElle এ স্বাগতম 😊 কি নিতে চান?"},
+      {"user": "hi", "bot": "Assalamualaikum! Nyveralife এ স্বাগতম 😊 কি নিতে চান?"},
       {"user": "salam", "bot": "Walaikum Assalam! কি সাহায্য করতে পারি?"},
       {"user": "hello bhai", "bot": "হ্যালো! বলুন, কি লাগবে?"},
       {"user": "assalamualaikum", "bot": "Walaikum Assalam! আজ কি নিবেন?"},
@@ -16,7 +16,7 @@
       {"user": "ki koro", "bot": "আপনার সেবায় আছি! কি লাগবে?"},
       {"user": "bhalo achen", "bot": "জি আলহামদুলিল্লাহ। আজ কি নিবেন?"},
       {"user": "how are you", "bot": "ভালো আছি! আপনি কি কিনতে চান?"},
-      {"user": "tumi ke", "bot": "আমি GlowElle এর সাপোর্ট টিম। কি সাহায্য করতে পারি?"}
+      {"user": "tumi ke", "bot": "আমি Nyveralife এর সাপোর্ট টিম। কি সাহায্য করতে পারি?"}
     ]
   },
   {
@@ -64,14 +64,14 @@
     "variations": [
       {"user": "product kharap", "bot": "দুঃখিত! ডেলিভারির সময়ই রিটার্ন করতে পারবেন। আমরা ১০০% ফ্রেশনেস গ্যারান্টি দিই।"},
       {"user": "late delivery", "bot": "আন্তরিকভাবে দুঃখিত। আপনার Order ID দিন, আমি দেখছি কি হয়েছে।"},
-      {"user": "wrong item", "bot": "এটা হওয়া উচিত ছিল না। আমাদের সাথে যোগাযোগ করুন: +880 1609132361"}
+      {"user": "wrong item", "bot": "এটা হওয়া উচিত ছিল না। আমাদের সাথে যোগাযোগ করুন: +8801600818139"}
     ]
   },
   {
     "intent": "human_support",
     "variations": [
-      {"user": "manush lagbe", "bot": "আমি আপনাকে আমাদের টিমের সাথে যুক্ত করছি। কল করুন: +880 1609132361"},
-      {"user": "agent dao", "bot": "সাপোর্ট টিম: +880 1609132361 (সকাল ৯টা - রাত ৯টা)"}
+      {"user": "manush lagbe", "bot": "আমি আপনাকে আমাদের টিমের সাথে যুক্ত করছি। কল করুন: +8801600818139"},
+      {"user": "agent dao", "bot": "সাপোর্ট টিম: +8801600818139 (সকাল ৯টা - রাত ৯টা)"}
     ]
   },
   {

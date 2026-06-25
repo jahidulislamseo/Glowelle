@@ -47,8 +47,8 @@ class Migration(migrations.Migration):
             name='ChatbotSettings',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('welcome_message', models.TextField(default='👋 Hi! Welcome to GlowElle! How can I help you today?', help_text='First message shown when the chat opens')),
-                ('system_prompt', models.TextField(default="You are 'GlowElle Assistant'. Be helpful, confident, and professional. Use product data provided. Guarantee 100% freshness.", help_text='Global instructions for the AI brain')),
+                ('welcome_message', models.TextField(default='👋 Hi! Welcome to Nyveralife! How can I help you today?', help_text='First message shown when the chat opens')),
+                ('system_prompt', models.TextField(default="You are 'Nyveralife Assistant'. Be helpful, confident, and professional. Use product data provided. Guarantee 100% freshness.", help_text='Global instructions for the AI brain')),
                 ('not_found_message', models.TextField(default="I couldn't find a specific answer for that. Would you like to talk to a human agent?", help_text='Fall-back message when no FAQ or product matches')),
                 ('working_hours_start', models.TimeField(default='09:00', help_text='Support start time (e.g., 09:00)')),
                 ('working_hours_end', models.TimeField(default='22:00', help_text='Support end time (e.g., 22:00)')),

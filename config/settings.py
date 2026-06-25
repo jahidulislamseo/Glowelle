@@ -1,5 +1,5 @@
 """
-Django settings for GlowElle BD project.
+Django settings for Nyveralife project.
 """
 
 from pathlib import Path
@@ -29,18 +29,21 @@ else:
     CACHES = {
         'default': {
             'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-            'LOCATION': 'glowelle-cache',
+            'LOCATION': 'nyveralife-cache',
             'TIMEOUT': 900,  # 15 minutes
         }
     }
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,.vercel.app,.now.sh,.onrender.com,glowelle.onrender.com,shop-2thz.onrender.com,shop-1-38i4.onrender.com').split(',')
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,195.35.21.8,nyveralife.com,www.nyveralife.com,.vercel.app,.now.sh,.onrender.com,nyveralife.onrender.com,shop-2thz.onrender.com,shop-1-38i4.onrender.com').split(',')
 
 # Required for Render's proxy
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://glowellebd.vercel.app',
-    'https://glowelle.onrender.com',
+    'http://195.35.21.8',
+    'https://nyveralife.com',
+    'https://www.nyveralife.com',
+    'https://nyveralifebd.vercel.app',
+    'https://nyveralife.onrender.com',
     'https://*.onrender.com',
     config('SITE_URL', default='http://localhost:8000'),
 ]
@@ -48,7 +51,9 @@ CSRF_TRUSTED_ORIGINS = [
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:8000",
-    "https://glowellebd.vercel.app",
+    "https://nyveralife.com",
+    "https://www.nyveralife.com",
+    "https://nyveralifebd.vercel.app",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -234,9 +239,9 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')  # Use Gmail App Password
-DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='GlowElle BD <noreply@glowellebd.com>')
-ADMIN_EMAIL = config('ADMIN_EMAIL', default=EMAIL_HOST_USER or 'admin@glowellebd.com')
-SITE_URL = config('SITE_URL', default='http://localhost:8000')
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='Nyveralife <info@nyveralife.com>')
+ADMIN_EMAIL = config('ADMIN_EMAIL', default=EMAIL_HOST_USER or 'info@nyveralife.com')
+SITE_URL = config('SITE_URL', default='https://nyveralife.com')
 
 LOGIN_REDIRECT_URL = 'dashboard'
 LOGIN_URL = 'login'

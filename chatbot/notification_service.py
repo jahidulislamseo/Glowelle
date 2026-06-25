@@ -1,5 +1,5 @@
 """
-Notification Service for GlowElle
+Notification Service for Nyveralife
 Handles SMS, Email, and WhatsApp notifications for order updates.
 """
 
@@ -70,7 +70,7 @@ class NotificationService:
         
         status_text = status_messages.get(order.status, order.get_status_display())
         
-        message = f"""🛒 GlowElle
+        message = f"""🛒 Nyveralife
 
 {status_text}
 
@@ -87,7 +87,7 @@ class NotificationService:
         elif order.status == 'pending':
             message += "📞 শীঘ্রই আমরা আপনার সাথে যোগাযোগ করব।\n"
         
-        message += f"\n📞 Support: {config('SUPPORT_PHONE', default='+880 1609132361')}"
+        message += f"\n📞 Support: {config('SUPPORT_PHONE', default='+8801600818139')}"
         
         return message
     
@@ -139,7 +139,7 @@ class NotificationService:
                 'cancelled': 'Order Cancelled'
             }
             
-            subject = f"GlowElle - {status_subjects.get(order.status, 'Order Update')} #{order.order_reference}"
+            subject = f"Nyveralife - {status_subjects.get(order.status, 'Order Update')} #{order.order_reference}"
             
             # Create HTML email
             html_message = f"""
@@ -158,7 +158,7 @@ class NotificationService:
             <body>
                 <div class="container">
                     <div class="header">
-                        <h1>🛒 GlowElle</h1>
+                        <h1>🛒 Nyveralife</h1>
                     </div>
                     <div class="content">
                         <h2>{self._get_order_message(order, status_change).split('\\n')[1]}</h2>
@@ -180,8 +180,8 @@ class NotificationService:
                         </ul>
                     </div>
                     <div class="footer">
-                        <p>Thank you for shopping with GlowElle!</p>
-                        <p>📞 Support: {config('SUPPORT_PHONE', default='+880 1609132361')}</p>
+                        <p>Thank you for shopping with Nyveralife!</p>
+                        <p>📞 Support: {config('SUPPORT_PHONE', default='+8801600818139')}</p>
                     </div>
                 </div>
             </body>

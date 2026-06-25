@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}GlowElle{% endblock %}</title>
+  <title>{% block title %}Nyveralife{% endblock %}</title>
   <style>
     * { margin:0; padding:0; box-sizing:border-box; }
     body { background-color:#fff0f6; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif; -webkit-font-smoothing:antialiased; }
@@ -78,7 +78,7 @@
 
       <!-- Header -->
       <div class="header">
-        <div class="logo-text">Glow<span>Elle</span></div>
+        <div class="logo-text">Nyvera<span>life</span></div>
         <div class="header-tagline">{% block tagline %}Your Trusted Online Shop{% endblock %}</div>
       </div>
 
@@ -89,9 +89,11 @@
 
       <!-- Footer -->
       <div class="footer">
-        <div class="footer-brand">GlowElle BD</div>
+        <div class="footer-brand">Nyveralife</div>
         <div class="footer-text">
-          সাহায্যের জন্য: <a href="mailto:{{ support_email }}" style="color:#e0186a;">{{ support_email }}</a> | {{ support_phone }}<br>
+          📧 <a href="mailto:info@nyveralife.com" style="color:#e0186a;">info@nyveralife.com</a> &nbsp;|&nbsp;
+          <a href="mailto:support@nyveralife.com" style="color:#e0186a;">support@nyveralife.com</a><br>
+          📞 {{ support_phone }}<br>
           এই email স্বয়ংক্রিয়ভাবে পাঠানো হয়েছে, reply করবেন না।
         </div>
         <div class="footer-links">
@@ -99,7 +101,7 @@
           <a href="{{ site_url }}/contact">Contact</a>
           <a href="{{ site_url }}/dashboard">Dashboard</a>
         </div>
-        <div class="footer-text">&copy; {% now "Y" %} GlowElle BD. All rights reserved.</div>
+        <div class="footer-text">&copy; {% now "Y" %} Nyveralife. All rights reserved.</div>
       </div>
 
     </div>

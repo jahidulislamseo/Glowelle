@@ -1,5 +1,5 @@
 """
-Chatbot Personality Customization for GlowElle
+Chatbot Personality Customization for Nyveralife
 Provides time-based greetings and festival-specific responses.
 """
 
@@ -84,7 +84,7 @@ class PersonalityEngine:
         # Then check greeting count
         if greeting_count == 0:
             time_greeting = PersonalityEngine.get_time_based_greeting()
-            return f"Assalamualaikum! GlowElle এ স্বাগতম 😊\n{time_greeting}"
+            return f"Assalamualaikum! Nyveralife এ স্বাগতম 😊\n{time_greeting}"
         elif greeting_count == 1:
             return "Alhamdulillah bhalo 😊 Apni ki nite chan?"
         else:

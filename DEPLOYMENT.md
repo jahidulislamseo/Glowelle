@@ -1,4 +1,4 @@
-# Render Deployment Guide for GlowElle BD
+# Render Deployment Guide for Nyveralife
 
 ## Prerequisites
 1. GitHub account with your code pushed to: https://github.com/jahidulislamseo/shop
@@ -20,7 +20,7 @@
 ### 3. Configure Web Service
 
 **Basic Settings:**
-- **Name**: `glowelle-bd` (or your preferred name)
+- **Name**: `nyveralife-bd` (or your preferred name)
 - **Region**: Choose closest to Bangladesh (Singapore recommended)
 - **Branch**: `main`
 - **Root Directory**: Leave empty
@@ -48,9 +48,9 @@ DISABLE_COLLECTSTATIC=1
 
 1. Go back to Render Dashboard
 2. Click "New +" → "PostgreSQL"
-3. **Name**: `glowelle-bd-db`
-4. **Database**: `glowellebd`
-5. **User**: `glowellebd_user`
+3. **Name**: `nyveralife-bd-db`
+4. **Database**: `nyveralifebd`
+5. **User**: `nyveralifebd_user`
 6. **Region**: Same as web service
 7. **PostgreSQL Version**: 15
 8. Click "Create Database"
@@ -87,12 +87,12 @@ python manage.py createsuperuser
 
 Your website will be available at:
 ```
-https://glowelle-bd.onrender.com
+https://nyveralife-bd.onrender.com
 ```
 
 Admin panel:
 ```
-https://glowelle-bd.onrender.com/manager-portal-631/
+https://nyveralife-bd.onrender.com/manager-portal-631/
 ```
 
 ## Important Notes
@@ -168,4 +168,4 @@ For issues:
 
 ---
 
-**Your GlowElle BD will be live in ~5-10 minutes after deployment starts!** 🚀
+**Your Nyveralife will be live in ~5-10 minutes after deployment starts!** 🚀

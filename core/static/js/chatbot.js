@@ -83,7 +83,7 @@
         setTimeout(() => {
             removeTypingIndicator();
             const locationMsg = "🚚 Same-day delivery available in Dhaka!";
-            addMessage(`👋 Hi! Welcome to GlowElle\nFresh daily essentials delivered to your door 🛒\n\n${locationMsg}\n\nHow can I help you today?`);
+            addMessage(`👋 Hi! Welcome to Nyveralife\nFresh daily essentials delivered to your door 🛒\n\n${locationMsg}\n\nHow can I help you today?`);
             addMessage("⭐ Trusted by 5,000+ happy customers\n✔ Freshness guaranteed");
             renderSuggestions([
                 { "text": "🔥 Popular Items", "action": "message" },

@@ -10,7 +10,7 @@ class OrderCreateForm(forms.ModelForm):
     email = forms.EmailField(label="Email Address", widget=forms.EmailInput(attrs={'class': 'block w-full pl-11 pr-4 py-4 text-base rounded-2xl border-none bg-gray-50 focus:bg-white focus:ring-2 focus:ring-green-500/20 transition-all font-semibold text-gray-900 placeholder:text-gray-300', 'placeholder': 'example@email.com'}))
     phone = forms.CharField(
         label="Phone Number", 
-        widget=forms.TextInput(attrs={'class': 'block w-full pl-11 pr-4 py-4 text-base rounded-2xl border-none bg-gray-50 focus:bg-white focus:ring-2 focus:ring-green-500/20 transition-all font-semibold text-gray-900 placeholder:text-gray-300', 'placeholder': '01XXXXXXXXX'})
+        widget=forms.TextInput(attrs={'class': 'block w-full pl-11 pr-4 py-4 text-base rounded-2xl border-none bg-gray-50 focus:bg-white focus:ring-2 focus:ring-green-500/20 transition-all font-semibold text-gray-900 placeholder:text-gray-300', 'placeholder': '01600818139'})
     )
     zip_code = forms.CharField(
         label="Zip/Postal Code", 

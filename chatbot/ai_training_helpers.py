@@ -52,7 +52,7 @@ def get_greeting_response(session_id, greeting_count):
     Returns appropriate greeting based on how many times user has greeted.
     """
     if greeting_count == 0:
-        return "Assalamualaikum! GlowElle এ স্বাগতম 😊 কি নিতে চান?"
+        return "Assalamualaikum! Nyveralife এ স্বাগতম 😊 কি নিতে চান?"
     elif greeting_count == 1:
         return "Alhamdulillah bhalo 😊 Apni ki nite chan?"
     else:

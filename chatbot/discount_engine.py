@@ -1,5 +1,5 @@
 """
-Smart Discount System for GlowElle
+Smart Discount System for Nyveralife
 Provides intelligent discount recommendations and automatic coupon application.
 """
 

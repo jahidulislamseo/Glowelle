@@ -1,4 +1,7 @@
+import os
+import shutil
 from django.db import models
+from django.conf import settings
 
 class SEOModel(models.Model):
     meta_title = models.CharField(max_length=255, blank=True, null=True)
@@ -14,7 +17,7 @@ class SEOModel(models.Model):
         if self.meta_title:
             return self.meta_title
         # Fallback to 'title' or 'name' attribute if available
-        return getattr(self, 'title', getattr(self, 'name', 'GlowElle'))
+        return getattr(self, 'title', getattr(self, 'name', 'Nyveralife'))
     
     def get_meta_description(self):
         """Return meta_description if set, otherwise fall back to description field"""
@@ -29,7 +32,7 @@ class SEOModel(models.Model):
         return 'Your one-stop shop for fresh organic fruits, vegetables, meat, and daily essentials.'
 
 class SiteSettings(models.Model):
-    site_title = models.CharField(max_length=200, default="GlowElle")
+    site_title = models.CharField(max_length=200, default="Nyveralife")
     meta_description = models.TextField(default="Your one-stop shop for fresh organic fruits, vegetables, meat, and daily essentials.", blank=True, help_text="SEO description for the homepage")
     
     # Analytics
@@ -60,10 +63,29 @@ class SiteSettings(models.Model):
         return "Website Configuration"
 
     def save(self, *args, **kwargs):
-        # Singleton pattern: ensure only one instance exists
         if not self.pk and SiteSettings.objects.exists():
             return
         super(SiteSettings, self).save(*args, **kwargs)
+        self._sync_logo_to_static()
+
+    def _sync_logo_to_static(self):
+        """Copy uploaded logo/favicon to static dirs so admin panel & favicon update automatically."""
+        destinations = [
+            settings.BASE_DIR / 'theme' / 'static' / 'images' / 'logo.png',
+            settings.BASE_DIR / 'staticfiles' / 'images' / 'logo.png',
+        ]
+        src = self.favicon or self.logo
+        if not src:
+            return
+        try:
+            src_path = os.path.join(settings.MEDIA_ROOT, src.name)
+            if not os.path.exists(src_path):
+                return
+            for dest in destinations:
+                os.makedirs(os.path.dirname(dest), exist_ok=True)
+                shutil.copy2(src_path, dest)
+        except Exception:
+            pass
 
 class ErrorLog(models.Model):
     LEVEL_CHOICES = [

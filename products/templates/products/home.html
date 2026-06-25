@@ -70,8 +70,72 @@
         <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1600"
             alt="Premium beauty collection" class="object-cover w-full h-full">
         {% endif %}
-        <!-- Dark gradient overlay for text readability - better for mobile -->
+        <!-- Dark gradient overlay for text readability -->
         <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20 md:bg-gradient-to-r md:from-black/70 md:via-black/40 md:to-transparent"></div>
+
+        <!-- Slide Text Content -->
+        {% if slider.title or slider.subtitle %}
+        <div class="absolute inset-0 z-10 flex items-end md:items-center pb-8 md:pb-0">
+            <div class="container mx-auto px-4 md:px-6 lg:px-12">
+                <div class="max-w-2xl text-white">
+                    <div class="inline-flex items-center gap-2 bg-white/15 border border-white/30 text-white px-3 py-1.5 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-bold backdrop-blur mb-4 md:mb-6">
+                        <span class="h-2 w-2 md:h-2.5 md:w-2.5 rounded-full bg-pink-400 animate-pulse"></span>
+                        Premium Beauty & Cosmetics
+                    </div>
+
+                    {% if slider.title %}
+                    <h1 class="text-2xl md:text-4xl lg:text-5xl xl:text-7xl font-extrabold leading-tight drop-shadow-lg">
+                        {{ slider.title }}
+                    </h1>
+                    {% endif %}
+
+                    {% if slider.subtitle %}
+                    <p class="mt-4 md:mt-6 text-sm md:text-lg text-white/90 leading-relaxed max-w-xl drop-shadow">
+                        {{ slider.subtitle }}
+                    </p>
+                    {% endif %}
+
+                    <div class="mt-6 md:mt-8 flex flex-col sm:flex-row gap-3 md:gap-4">
+                        <a href="{% if slider.link_url %}{{ slider.link_url }}{% else %}{% url 'shop' %}{% endif %}"
+                            class="btn-primary inline-flex items-center justify-center h-12 md:h-14 px-7 md:px-9 text-base md:text-lg font-extrabold rounded-full shadow-xl hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300">
+                            Shop Now
+                            <i data-lucide="shopping-bag" class="ml-2 h-4 w-4 md:h-5 md:w-5"></i>
+                        </a>
+                        <a href="#featured"
+                            class="inline-flex items-center justify-center h-12 md:h-14 px-7 md:px-9 text-base md:text-lg font-extrabold text-white bg-white/20 border border-white/40 rounded-full hover:bg-white/30 hover:scale-105 transition-all duration-300 backdrop-blur shadow-md">
+                            View Offers
+                            <i data-lucide="arrow-right" class="ml-2 h-4 w-4 md:h-5 md:w-5"></i>
+                        </a>
+                    </div>
+
+                    <!-- Stats -->
+                    <div class="mt-8 md:mt-10 flex flex-wrap gap-3 md:gap-6">
+                        <div class="flex items-center gap-2 md:gap-3 bg-white/10 backdrop-blur border border-white/20 px-3 py-2 md:px-5 md:py-3 rounded-xl md:rounded-2xl">
+                            <i data-lucide="star" class="h-4 w-4 md:h-5 md:w-5 text-yellow-400 fill-yellow-400"></i>
+                            <div>
+                                <p class="text-lg md:text-xl font-extrabold">4.9</p>
+                                <p class="text-[10px] md:text-xs text-white/70 font-semibold">Rating</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 md:gap-3 bg-white/10 backdrop-blur border border-white/20 px-3 py-2 md:px-5 md:py-3 rounded-xl md:rounded-2xl">
+                            <i data-lucide="shield-check" class="h-4 w-4 md:h-5 md:w-5 text-green-400"></i>
+                            <div>
+                                <p class="text-lg md:text-xl font-extrabold">100%</p>
+                                <p class="text-[10px] md:text-xs text-white/70 font-semibold">Genuine</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 md:gap-3 bg-white/10 backdrop-blur border border-white/20 px-3 py-2 md:px-5 md:py-3 rounded-xl md:rounded-2xl">
+                            <i data-lucide="truck" class="h-4 w-4 md:h-5 md:w-5 text-pink-300"></i>
+                            <div>
+                                <p class="text-lg md:text-xl font-extrabold">Fast</p>
+                                <p class="text-[10px] md:text-xs text-white/70 font-semibold">Delivery</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
     {% empty %}
     <div class="slide absolute inset-0 opacity-100">
@@ -81,7 +145,8 @@
     </div>
     {% endfor %}
 
-    <!-- Text Content Overlay -->
+    <!-- Default Text Overlay (shown only when there are no sliders) -->
+    {% if not sliders %}
     <div class="absolute inset-0 z-10 flex items-end md:items-center pb-8 md:pb-0">
         <div class="container mx-auto px-4 md:px-6 lg:px-12">
             <div class="max-w-2xl text-white">
@@ -89,16 +154,13 @@
                     <span class="h-2 w-2 md:h-2.5 md:w-2.5 rounded-full bg-pink-400 animate-pulse"></span>
                     Premium Beauty & Cosmetics
                 </div>
-
                 <h1 class="text-2xl md:text-4xl lg:text-5xl xl:text-7xl font-extrabold leading-tight drop-shadow-lg">
                     Radiant skin for a
                     <span class="block text-pink-300">better everyday.</span>
                 </h1>
-
                 <p class="mt-4 md:mt-6 text-sm md:text-lg text-white/90 leading-relaxed max-w-xl drop-shadow">
                     Premium skincare, makeup, and cosmetic essentials from trusted global brands delivered straight to your doorstep.
                 </p>
-
                 <div class="mt-6 md:mt-8 flex flex-col sm:flex-row gap-3 md:gap-4">
                     <a href="{% url 'shop' %}"
                         class="btn-primary inline-flex items-center justify-center h-12 md:h-14 px-7 md:px-9 text-base md:text-lg font-extrabold rounded-full shadow-xl hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300">
@@ -111,8 +173,6 @@
                         <i data-lucide="arrow-right" class="ml-2 h-4 w-4 md:h-5 md:w-5"></i>
                     </a>
                 </div>
-
-                <!-- Stats - better mobile layout -->
                 <div class="mt-8 md:mt-10 flex flex-wrap gap-3 md:gap-6">
                     <div class="flex items-center gap-2 md:gap-3 bg-white/10 backdrop-blur border border-white/20 px-3 py-2 md:px-5 md:py-3 rounded-xl md:rounded-2xl">
                         <i data-lucide="star" class="h-4 w-4 md:h-5 md:w-5 text-yellow-400 fill-yellow-400"></i>
@@ -139,6 +199,7 @@
             </div>
         </div>
     </div>
+    {% endif %}
 
     <!-- Slide Badges (top right) -->
     <div class="absolute top-4 right-4 md:top-6 md:right-6 z-20 flex flex-col gap-2">
@@ -1001,7 +1062,7 @@
                     </div>
                     <h2 class="text-3xl md:text-5xl font-bold mb-4 leading-tight">Shop on the Go!</h2>
                     <p class="text-pink-100 text-lg mb-8 max-w-md">
-                        Download the GlowElle app for a better shopping experience. Get exclusive deals, track
+                        Download the Nyveralife app for a better shopping experience. Get exclusive deals, track
                         orders, and more.
                     </p>
                     <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
@@ -1037,7 +1098,7 @@
                         <!-- Overlay -->
                         <div
                             class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-6 text-white text-center">
-                            <p class="font-bold text-xl">GlowElle</p>
+                            <p class="font-bold text-xl">Nyveralife</p>
                             <p class="text-sm opacity-80">Freshness in your pocket</p>
                         </div>
                     </div>
@@ -1141,7 +1202,7 @@
 
 <script>
 (function() {
-    const POPUP_KEY = 'glowelle_promo_shown';
+    const POPUP_KEY = 'nyveralife_promo_shown';
     const POPUP_COOLDOWN = 24 * 60 * 60 * 1000; // 24 hours
 
     function shouldShowPopup() {

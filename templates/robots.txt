@@ -4,4 +4,4 @@ Disallow: /cart/
 Disallow: /checkout/
 Allow: /
 
-Sitemap: https://glowellebd.com/sitemap.xml
+Sitemap: https://nyveralife.com/sitemap.xml

@@ -5,8 +5,9 @@ from django.conf import settings
 
 SITE_URL = getattr(settings, 'SITE_URL', 'http://localhost:8000')
 LOGO_URL = f"{SITE_URL}/static/images/logo.png"
-SUPPORT_PHONE = "+880 1609132361"
-SUPPORT_EMAIL = getattr(settings, 'DEFAULT_FROM_EMAIL', 'support@glowellebd.com')
+SUPPORT_PHONE = "+8801600818139"
+SUPPORT_EMAIL = "info@nyveralife.com"
+SUPPORT_EMAIL_2 = "support@nyveralife.com"
 
 
 def send_template_email(subject, template, context, recipient_list, from_email=None):
@@ -14,6 +15,7 @@ def send_template_email(subject, template, context, recipient_list, from_email=N
     context.setdefault('logo_url', LOGO_URL)
     context.setdefault('support_phone', SUPPORT_PHONE)
     context.setdefault('support_email', SUPPORT_EMAIL)
+    context.setdefault('support_email_2', SUPPORT_EMAIL_2)
 
     if isinstance(recipient_list, str):
         recipient_list = [recipient_list]
@@ -38,7 +40,7 @@ def send_template_email(subject, template, context, recipient_list, from_email=N
 
 def send_welcome_email(user):
     send_template_email(
-        subject="GlowElle-তে স্বাগতম! 🎉",
+        subject="Nyveralife-তে স্বাগতম! 🎉",
         template="emails/welcome.html",
         context={'user': user},
         recipient_list=user.email,
@@ -69,7 +71,7 @@ def send_order_status_email(order):
 
 def send_otp_email(user, otp_code):
     send_template_email(
-        subject="আপনার GlowElle OTP কোড",
+        subject="আপনার Nyveralife OTP কোড",
         template="emails/otp_verification.html",
         context={'user': user, 'otp_code': otp_code},
         recipient_list=user.email,

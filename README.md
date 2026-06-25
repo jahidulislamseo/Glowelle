@@ -1,6 +1,6 @@
-# GlowElle - Django E-commerce Platform
+# Nyveralife - Django E-commerce Platform
 
-A modern, feature-rich e-commerce platform built with Django for selling organic groceries and daily essentials in Dhaka, Bangladesh.
+A modern, feature-rich e-commerce platform built with Django for selling organic groceries and daily essentials in Basaboo Madartake Chowrasta, Dhaka-1212, Bangladesh.
 
 ## Features
 

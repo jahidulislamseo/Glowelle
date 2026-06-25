@@ -1,5 +1,5 @@
 """
-Advanced Order Management for GlowElle Chatbot
+Advanced Order Management for Nyveralife Chatbot
 Handles order modification, cancellation, and repeat orders.
 """
 

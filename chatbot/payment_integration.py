@@ -1,5 +1,5 @@
 """
-Payment Integration for GlowElle
+Payment Integration for Nyveralife
 Supports bKash, Nagad, and SSL Commerz payment gateways.
 """
 
