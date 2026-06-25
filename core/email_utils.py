@@ -121,7 +121,7 @@ def send_return_refund_email(order):
 def send_admin_new_order_email(order):
     admin_email = getattr(settings, 'ADMIN_EMAIL', settings.DEFAULT_FROM_EMAIL)
     send_template_email(
-        subject=f"[নতুন অর্ডার] #{order.order_reference or order.id} - ৳{order.total}",
+        subject=f"[New Order] #{order.order_reference or order.id} - ৳{order.total}",
         template="emails/admin_new_order.html",
         context={'order': order},
         recipient_list=admin_email,
@@ -131,7 +131,7 @@ def send_admin_new_order_email(order):
 def send_admin_contact_email(contact_message):
     admin_email = getattr(settings, 'ADMIN_EMAIL', settings.DEFAULT_FROM_EMAIL)
     send_template_email(
-        subject=f"[Contact Form] {contact_message.name} থেকে নতুন বার্তা",
+        subject=f"[Contact Form] New message from {contact_message.name}",
         template="emails/admin_contact_message.html",
         context={'msg': contact_message},
         recipient_list=admin_email,
@@ -141,7 +141,7 @@ def send_admin_contact_email(contact_message):
 def send_admin_new_ticket_email(ticket):
     admin_email = getattr(settings, 'ADMIN_EMAIL', settings.DEFAULT_FROM_EMAIL)
     send_template_email(
-        subject=f"[নতুন Ticket #{ticket.id}] {ticket.subject}",
+        subject=f"[New Ticket #{ticket.id}] {ticket.subject}",
         template="emails/admin_new_ticket.html",
         context={'ticket': ticket},
         recipient_list=admin_email,
@@ -151,7 +151,7 @@ def send_admin_new_ticket_email(ticket):
 def send_admin_low_stock_email(products):
     admin_email = getattr(settings, 'ADMIN_EMAIL', settings.DEFAULT_FROM_EMAIL)
     send_template_email(
-        subject=f"[Low Stock Alert] {len(products)} টি পণ্যের স্টক কম",
+        subject=f"[Low Stock Alert] {len(products)} products are running low",
         template="emails/admin_low_stock.html",
         context={'products': products},
         recipient_list=admin_email,

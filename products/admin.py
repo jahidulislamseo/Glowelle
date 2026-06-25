@@ -85,8 +85,8 @@ class ProductAdmin(ChangeHistoryMixin, admin.ModelAdmin):
         product = Product.objects.get(pk=product_id)
         product.chatbot_priority = not product.chatbot_priority
         product.save()
-        status = "✅ চালু" if product.chatbot_priority else "❌ বন্ধ"
-        self.message_user(request, f'"{product.title}" — Chatbot Priority {status} করা হয়েছে।')
+        status = "✅ Enabled" if product.chatbot_priority else "❌ Disabled"
+        self.message_user(request, f'"{product.title}" — Chatbot Priority {status}.')
         return redirect(request.META.get('HTTP_REFERER', reverse('admin:products_product_changelist')))
 
     def chatbot_priority_badge(self, obj):
@@ -123,13 +123,13 @@ class ProductAdmin(ChangeHistoryMixin, admin.ModelAdmin):
 
     def enable_chatbot_priority(self, request, queryset):
         updated = queryset.update(chatbot_priority=True)
-        self.message_user(request, f"{updated} products chatbot priority চালু করা হয়েছে।")
-    enable_chatbot_priority.short_description = "✅ Chatbot Priority চালু করো"
+        self.message_user(request, f"{updated} products chatbot priority enabled.")
+    enable_chatbot_priority.short_description = "✅ Enable Chatbot Priority"
 
     def disable_chatbot_priority(self, request, queryset):
         updated = queryset.update(chatbot_priority=False)
-        self.message_user(request, f"{updated} products chatbot priority বন্ধ করা হয়েছে।")
-    disable_chatbot_priority.short_description = "❌ Chatbot Priority বন্ধ করো"
+        self.message_user(request, f"{updated} products chatbot priority disabled.")
+    disable_chatbot_priority.short_description = "❌ Disable Chatbot Priority"
     
     fieldsets = (
         ('General Information', {

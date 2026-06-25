@@ -227,7 +227,7 @@
             <a href="?tab=errors&resolved=1" {% if resolved_filter == '1' %}class="active"{% endif %}>Resolved</a>
             {% if total %}
             <button type="submit" name="clear_all" value="1" class="clear-btn"
-                    onclick="return confirm('সব error log মুছে ফেলবেন?')">
+                    onclick="return confirm('Are you sure you want to clear all error logs?')">
                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6M9 6V4h6v2"/></svg>
                 Clear All
             </button>
@@ -256,7 +256,7 @@
                             <div class="msg-text">{{ err.message|truncatechars:110 }}</div>
                             {% if err.traceback %}
                             <details>
-                                <summary>Traceback দেখুন</summary>
+                                <summary>View Traceback</summary>
                                 <pre>{{ err.traceback }}</pre>
                             </details>
                             {% endif %}
@@ -285,7 +285,7 @@
             {% else %}
             <div class="empty-state">
                 <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" fill="none" stroke="#94a3b8" stroke-width="1.5" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                <p>কোনো error নেই!</p>
+                <p>No errors found!</p>
             </div>
             {% endif %}
         </div>

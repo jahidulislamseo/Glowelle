@@ -21,7 +21,7 @@ class UserAdmin(ChangeHistoryMixin, BaseUserAdmin):
         (_('Groups & Advanced Permissions'), {
             'fields': ('groups', 'user_permissions'),
             'classes': ('collapse',),
-            'description': 'Advanced: শুধু দরকার হলে Groups বা নির্দিষ্ট Permission যোগ করুন।',
+            'description': 'Advanced: Only add Groups or specific Permissions when necessary.',
         }),
         (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
     )

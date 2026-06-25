@@ -1187,18 +1187,41 @@
     </div>
 
     <!-- 4. Social Proof Toast -->
-    <div id="social-toast" class="fixed bottom-32 md:bottom-12 left-4 z-40 pointer-events-none"
-        style="transform:translateX(-110%); transition:transform 0.5s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s ease; opacity:0;">
-        <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-3 flex items-center gap-3 max-w-[260px] pointer-events-auto">
-            <div id="toast-avatar" class="h-10 w-10 rounded-full bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0"></div>
-            <div class="flex-1 min-w-0">
-                <p id="toast-name" class="text-xs font-bold text-gray-800"></p>
-                <p id="toast-action" class="text-xs text-gray-500 leading-tight mt-0.5"></p>
-                <p id="toast-time" class="text-[10px] text-pink-500 font-semibold mt-0.5"></p>
+    <div id="social-toast"
+        class="fixed z-50 pointer-events-none"
+        style="bottom: 90px; left: 12px; right: 12px; max-width: 320px; transform: translateY(20px) scale(0.95); transition: transform 0.45s cubic-bezier(0.34,1.56,0.64,1), opacity 0.35s ease; opacity: 0;">
+        <div class="bg-white rounded-2xl pointer-events-auto overflow-hidden"
+            style="box-shadow: 0 8px 32px rgba(236,72,153,0.13), 0 2px 8px rgba(0,0,0,0.08); border: 1px solid rgba(236,72,153,0.1);">
+            <!-- Pink top accent bar -->
+            <div style="height: 3px; background: linear-gradient(90deg, #f9a8d4, #ec4899, #be185d);"></div>
+            <div class="flex items-center gap-3 p-3">
+                <!-- Avatar -->
+                <div id="toast-avatar"
+                    class="flex-shrink-0 h-11 w-11 rounded-full flex items-center justify-center text-white font-bold text-base"
+                    style="background: linear-gradient(135deg, #f472b6, #ec4899); box-shadow: 0 3px 10px rgba(236,72,153,0.35);">
+                </div>
+                <!-- Text -->
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-1.5 mb-0.5">
+                        <p id="toast-name" class="text-sm font-bold text-gray-800 truncate"></p>
+                        <span class="h-1.5 w-1.5 rounded-full bg-green-400 flex-shrink-0 animate-pulse"></span>
+                    </div>
+                    <p id="toast-action" class="text-xs text-gray-500 leading-snug"></p>
+                    <p id="toast-time" class="text-[10px] font-semibold mt-1" style="color: #ec4899;">🕐 <span id="toast-time-text"></span></p>
+                </div>
+                <!-- Close btn -->
+                <button id="toast-close"
+                    class="flex-shrink-0 h-6 w-6 rounded-full flex items-center justify-center text-gray-300 hover:text-gray-500 hover:bg-gray-100 transition-colors"
+                    style="font-size: 14px; line-height: 1;">✕</button>
             </div>
-            <span class="h-2 w-2 rounded-full bg-green-400 flex-shrink-0 animate-pulse"></span>
         </div>
     </div>
+
+    <style>
+    @media (min-width: 768px) {
+        #social-toast { left: 16px; right: auto; bottom: 56px; }
+    }
+    </style>
 
     <!-- 5. Cart Abandonment Reminder -->
     {% if cart|length > 0 %}
@@ -1345,7 +1368,13 @@
         const toast = document.getElementById('social-toast');
         if (!toast) return;
 
-        let index = 0;
+        let index = Math.floor(Math.random() * proofs.length);
+        let hideTimer = null;
+
+        function hideToast() {
+            toast.style.transform = 'translateY(20px) scale(0.95)';
+            toast.style.opacity = '0';
+        }
 
         function showToast() {
             const p = proofs[index % proofs.length];
@@ -1354,24 +1383,31 @@
             document.getElementById('toast-avatar').textContent = p.avatar;
             document.getElementById('toast-name').textContent = p.name;
             document.getElementById('toast-action').textContent = p.action;
-            document.getElementById('toast-time').textContent = p.time;
+            document.getElementById('toast-time-text').textContent = p.time;
 
             // Slide in
-            toast.style.transform = 'translateX(0)';
+            toast.style.transform = 'translateY(0) scale(1)';
             toast.style.opacity = '1';
 
-            // Slide out after 4s
-            setTimeout(() => {
-                toast.style.transform = 'translateX(-110%)';
-                toast.style.opacity = '0';
-            }, 4000);
+            // Auto hide after 5s
+            clearTimeout(hideTimer);
+            hideTimer = setTimeout(hideToast, 5000);
         }
 
-        // Start after 12s, repeat every 9s
+        // Close button
+        const closeBtn = document.getElementById('toast-close');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function() {
+                clearTimeout(hideTimer);
+                hideToast();
+            });
+        }
+
+        // Start after 8s, repeat every 10s
         setTimeout(() => {
             showToast();
-            setInterval(showToast, 9000);
-        }, 12000);
+            setInterval(showToast, 10000);
+        }, 8000);
     })();
 
     // =============================================
