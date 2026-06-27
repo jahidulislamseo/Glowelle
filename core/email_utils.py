@@ -47,6 +47,20 @@ def send_welcome_email(user):
     )
 
 
+def send_account_credentials_email(user, temp_password):
+    login_url = f"{SITE_URL}/accounts/login/"
+    send_template_email(
+        subject="আপনার Nyveralife Account তৈরি হয়েছে - Login তথ্য",
+        template="emails/admin_created_account.html",
+        context={
+            'user': user,
+            'temp_password': temp_password,
+            'login_url': login_url,
+        },
+        recipient_list=user.email,
+    )
+
+
 def send_order_confirmation_email(order):
     recipient = order.user.email if order.user else order.email
     customer_name = (order.user.first_name or order.user.username) if order.user else order.full_name

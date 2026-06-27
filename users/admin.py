@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from django.db.models import Sum, Count, Q
 from .models import User, Address, Wallet, SupportTicket
 from core.admin_mixins import ChangeHistoryMixin
+from core.email_utils import send_account_credentials_email
 
 @admin.register(User)
 class UserAdmin(ChangeHistoryMixin, BaseUserAdmin):
@@ -11,7 +12,7 @@ class UserAdmin(ChangeHistoryMixin, BaseUserAdmin):
     list_filter = ('is_active', 'is_staff', 'date_joined')
     search_fields = ('email', 'username', 'first_name', 'last_name')
     ordering = ('-date_joined',)
-    
+
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
         (_('Personal info'), {'fields': ('first_name', 'last_name', 'email', 'image')}),
@@ -25,6 +26,13 @@ class UserAdmin(ChangeHistoryMixin, BaseUserAdmin):
         }),
         (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
     )
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        if not change and obj.email:
+            raw_password = form.cleaned_data.get('password1', '')
+            if raw_password:
+                send_account_credentials_email(obj, raw_password)
 
     def get_order_count(self, obj):
         return getattr(obj, 'orders_count', 0)

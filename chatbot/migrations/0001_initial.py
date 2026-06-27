@@ -8,6 +8,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
+        ('core', '0008_delete_chatbotfaq_delete_chatbotintent_and_more'),
     ]
 
     operations = [

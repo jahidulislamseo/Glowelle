@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from products.models import Category, Product
+from products.models import Category, Product, ProductImage
 from django.utils.text import slugify
 
 class Command(BaseCommand):
@@ -34,10 +34,10 @@ class Command(BaseCommand):
                 'category_slug': 'fruits',
                 'price': 120,
                 'original_price': 150,
-                'image': 'https://cdn.sanity.io/images/8x2x085c/production/5d707e6707651943e84a450b3701331050834617-600x400.jpg',
+                'image': 'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=800&q=80',
                 'images': [
-                    'https://cdn.sanity.io/images/8x2x085c/production/5d707e6707651943e84a450b3701331050834617-600x400.jpg',
-                    'https://cdn.sanity.io/images/8x2x085c/production/d82603e98276411174065116a531544693035076-600x400.jpg'
+                    'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=800&q=80',
+                    'https://images.unsplash.com/photo-1587334274328-64186a80aeee?w=800&q=80'
                 ],
                 'description': 'Fresh organic bananas, rich in potassium.',
                 'rating': 4.5,
@@ -77,14 +77,22 @@ class Command(BaseCommand):
 
         for p_data in products_data:
             cat_slug = p_data.pop('category_slug')
+            extra_images = p_data.pop('images', [])
             category = Category.objects.get(slug=cat_slug)
             
-            Product.objects.update_or_create(
+            product, created = Product.objects.update_or_create(
                 slug=p_data['slug'],
                 defaults={
                     **p_data,
                     'category': category
                 }
             )
+
+            for img_url in extra_images:
+                ProductImage.objects.get_or_create(
+                    product=product,
+                    image=img_url,
+                    defaults={'alt_text': product.title}
+                )
 
         self.stdout.write(f'Seeded {len(products_data)} products.')

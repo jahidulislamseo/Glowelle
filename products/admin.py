@@ -161,7 +161,7 @@ class StockLogAdmin(admin.ModelAdmin):
         return False
 
     def has_delete_permission(self, request, obj=None):
-        return False
+        return True
 
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):

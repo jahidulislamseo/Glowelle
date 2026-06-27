@@ -70,8 +70,7 @@
         <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1600"
             alt="Premium beauty collection" class="object-cover w-full h-full">
         {% endif %}
-        <!-- Dark gradient overlay for text readability -->
-        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20 md:bg-gradient-to-r md:from-black/70 md:via-black/40 md:to-transparent"></div>
+
 
         <!-- Slide Text Content -->
         {% if slider.title or slider.subtitle %}
@@ -826,13 +825,13 @@
 <!-- On Sale / Best Value Section -->
 <section class="py-20 bg-pink-50 ">
     <div class="container mx-auto px-4">
-        <div class="flex justify-between items-end mb-12">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 md:mb-12">
             <div>
-                <h2 class="text-3xl font-bold mb-2">Beauty Deals</h2>
-                <p class="text-gray-500">Save big on premium skincare & cosmetics</p>
+                <h2 class="text-2xl md:text-3xl font-black text-gray-900 mb-1">Beauty Deals</h2>
+                <p class="text-xs md:text-sm text-gray-500">Save big on premium skincare & cosmetics</p>
             </div>
-            <a href="{% url 'shop' %}" class="text-pink-600 font-medium hover:underline flex items-center">
-                View All Offers <i data-lucide="arrow-right" class="ml-1 h-4 w-4"></i>
+            <a href="{% url 'shop' %}" class="inline-flex items-center text-xs md:text-sm font-bold text-pink-700 bg-white hover:bg-pink-100 border border-pink-200 px-4 py-2 rounded-full transition-all shadow-sm w-fit active:scale-95">
+                View All Offers <i data-lucide="arrow-right" class="ml-1.5 h-3.5 w-3.5"></i>
             </a>
         </div>
 
@@ -904,44 +903,47 @@
     </div>
 
     <!-- Trust & Certification Section -->
-    <section class="py-12 bg-pink-50 border-t border-b border-pink-100">
-        <div class="container mx-auto px-4">
-            <div
-                class="flex flex-wrap justify-around items-center gap-8 opacity-80 grayscale hover:grayscale-0 transition-all duration-700">
-                <div class="flex items-center gap-3">
-                    <div class="bg-white p-3 rounded-full shadow-sm">
-                        <i data-lucide="flask-conical" class="h-8 w-8 text-pink-600"></i>
+    <section class="py-10 bg-gradient-to-b from-pink-50/50 to-pink-50 border-t border-b border-pink-100/60">
+        <div class="container mx-auto px-4 max-w-6xl">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                <!-- Card 1 -->
+                <div class="bg-white/80 backdrop-blur-sm p-4 rounded-2xl border border-pink-100/40 flex flex-col items-center text-center gap-3 hover:shadow-md hover:border-pink-200 transition-all duration-300 group">
+                    <div class="bg-pink-50 p-3 rounded-full text-pink-600 group-hover:scale-110 transition-transform duration-300">
+                        <i data-lucide="flask-conical" class="h-6 w-6"></i>
                     </div>
-                    <div class="text-left">
-                        <p class="font-bold text-gray-900 text-sm">Dermatologist Tested</p>
-                        <p class="text-xs text-gray-500">Clinically Safe for All Skin</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3">
-                    <div class="bg-white p-3 rounded-full shadow-sm">
-                        <i data-lucide="shield-check" class="h-8 w-8 text-pink-600"></i>
-                    </div>
-                    <div class="text-left">
-                        <p class="font-bold text-gray-900 text-sm">Secure Payment</p>
-                        <p class="text-xs text-gray-500">SSL Encrypted Checkout</p>
+                    <div>
+                        <p class="font-bold text-gray-900 text-xs sm:text-sm">Dermatologist Tested</p>
+                        <p class="text-[10px] text-gray-500 mt-1">Clinically Safe for All Skin</p>
                     </div>
                 </div>
-                <div class="flex items-center gap-3">
-                    <div class="bg-white p-3 rounded-full shadow-sm">
-                        <i data-lucide="heart" class="h-8 w-8 text-pink-600"></i>
+                <!-- Card 2 -->
+                <div class="bg-white/80 backdrop-blur-sm p-4 rounded-2xl border border-pink-100/40 flex flex-col items-center text-center gap-3 hover:shadow-md hover:border-pink-200 transition-all duration-300 group">
+                    <div class="bg-pink-50 p-3 rounded-full text-pink-600 group-hover:scale-110 transition-transform duration-300">
+                        <i data-lucide="shield-check" class="h-6 w-6"></i>
                     </div>
-                    <div class="text-left">
-                        <p class="font-bold text-gray-900 text-sm">Cruelty Free</p>
-                        <p class="text-xs text-gray-500">No Animal Testing</p>
+                    <div>
+                        <p class="font-bold text-gray-900 text-xs sm:text-sm">Secure Payment</p>
+                        <p class="text-[10px] text-gray-500 mt-1">SSL Encrypted Checkout</p>
                     </div>
                 </div>
-                <div class="flex items-center gap-3">
-                    <div class="bg-white p-3 rounded-full shadow-sm">
-                        <i data-lucide="award" class="h-8 w-8 text-pink-600"></i>
+                <!-- Card 3 -->
+                <div class="bg-white/80 backdrop-blur-sm p-4 rounded-2xl border border-pink-100/40 flex flex-col items-center text-center gap-3 hover:shadow-md hover:border-pink-200 transition-all duration-300 group">
+                    <div class="bg-pink-50 p-3 rounded-full text-pink-600 group-hover:scale-110 transition-transform duration-300">
+                        <i data-lucide="heart" class="h-6 w-6"></i>
                     </div>
-                    <div class="text-left">
-                        <p class="font-bold text-gray-900 text-sm">100% Genuine</p>
-                        <p class="text-xs text-gray-500">Globally Trusted Brands</p>
+                    <div>
+                        <p class="font-bold text-gray-900 text-xs sm:text-sm">Cruelty Free</p>
+                        <p class="text-[10px] text-gray-500 mt-1">No Animal Testing</p>
+                    </div>
+                </div>
+                <!-- Card 4 -->
+                <div class="bg-white/80 backdrop-blur-sm p-4 rounded-2xl border border-pink-100/40 flex flex-col items-center text-center gap-3 hover:shadow-md hover:border-pink-200 transition-all duration-300 group">
+                    <div class="bg-pink-50 p-3 rounded-full text-pink-600 group-hover:scale-110 transition-transform duration-300">
+                        <i data-lucide="award" class="h-6 w-6"></i>
+                    </div>
+                    <div>
+                        <p class="font-bold text-gray-900 text-xs sm:text-sm">100% Genuine</p>
+                        <p class="text-[10px] text-gray-500 mt-1">Globally Trusted Brands</p>
                     </div>
                 </div>
             </div>

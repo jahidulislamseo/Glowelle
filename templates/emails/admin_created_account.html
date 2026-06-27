@@ -1,0 +1,82 @@
+{% extends "emails/base_email.html" %}
+{% block title %}আপনার Account তৈরি হয়েছে - Nyveralife{% endblock %}
+{% block tagline %}Welcome to Nyveralife ✨{% endblock %}
+
+{% block content %}
+<p class="greeting">হ্যালো {{ user.first_name|default:user.username }},</p>
+<p class="intro-text">
+  আমাদের Admin আপনার জন্য <strong>Nyveralife</strong>-তে একটি account তৈরি করেছেন।
+  নিচে আপনার login তথ্য দেওয়া হলো — প্রথমবার login করার পর অবশ্যই password পরিবর্তন করুন।
+</p>
+
+<!-- Credential Card -->
+<div style="background:linear-gradient(135deg,#fff0f6,#ffe0ef);border:2px solid #e0186a;border-radius:20px;padding:28px;margin:24px 0;">
+  <div style="text-align:center;margin-bottom:20px;">
+    <div style="font-size:42px;">🔐</div>
+    <div style="font-size:17px;font-weight:800;color:#9b1049;margin-top:8px;">আপনার Login তথ্য</div>
+  </div>
+
+  <div class="card-row" style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px dashed #ffc0de;">
+    <span class="card-label" style="font-size:12px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:0.8px;">ওয়েবসাইট</span>
+    <a href="{{ site_url }}" style="font-size:15px;font-weight:700;color:#e0186a;text-decoration:none;">{{ site_url }}</a>
+  </div>
+  <div class="card-row" style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px dashed #ffc0de;">
+    <span class="card-label" style="font-size:12px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:0.8px;">Username</span>
+    <span class="card-value" style="font-size:15px;font-weight:700;color:#111827;font-family:monospace;background:#fff;padding:4px 12px;border-radius:8px;border:1px solid #ffe0ef;">{{ user.username }}</span>
+  </div>
+  <div class="card-row" style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px dashed #ffc0de;">
+    <span class="card-label" style="font-size:12px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:0.8px;">Email</span>
+    <span class="card-value" style="font-size:15px;font-weight:700;color:#111827;">{{ user.email }}</span>
+  </div>
+  <div class="card-row" style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;">
+    <span class="card-label" style="font-size:12px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:0.8px;">Password</span>
+    <span class="card-value" style="font-size:16px;font-weight:900;color:#e0186a;font-family:monospace;background:#fff;padding:4px 14px;border-radius:8px;border:2px solid #e0186a;letter-spacing:2px;">{{ temp_password }}</span>
+  </div>
+</div>
+
+<!-- Login Button -->
+<div class="btn-center">
+  <a href="{{ login_url }}" class="btn">🚀 এখনই Login করুন</a>
+</div>
+
+<!-- Warning Box -->
+<div style="background:#fef9c3;border:1px solid #fbbf24;border-radius:12px;padding:16px 20px;margin:20px 0;display:flex;align-items:flex-start;gap:10px;">
+  <span style="font-size:20px;">⚠️</span>
+  <div>
+    <div style="font-size:14px;font-weight:700;color:#854d0e;margin-bottom:4px;">গুরুত্বপূর্ণ নিরাপত্তা বার্তা</div>
+    <div style="font-size:13px;color:#713f12;line-height:1.6;">
+      Login করার পর <strong>অবশ্যই</strong> আপনার password পরিবর্তন করুন।
+      এই password কাউকে শেয়ার করবেন না।
+    </div>
+  </div>
+</div>
+
+<!-- Steps -->
+<div style="margin:24px 0;">
+  <div style="font-size:14px;font-weight:700;color:#9b1049;margin-bottom:14px;">🗺️ শুরু করার ধাপ:</div>
+  <div style="display:flex;flex-direction:column;gap:10px;">
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:#fff8f9;border-radius:10px;border:1px solid #ffe0ef;">
+      <span style="background:#e0186a;color:#fff;border-radius:50%;width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;flex-shrink:0;">১</span>
+      <span style="font-size:14px;color:#374151;">উপরের <strong>Login</strong> বাটনে ক্লিক করুন</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:#fff8f9;border-radius:10px;border:1px solid #ffe0ef;">
+      <span style="background:#e0186a;color:#fff;border-radius:50%;width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;flex-shrink:0;">২</span>
+      <span style="font-size:14px;color:#374151;">Username ও Password দিয়ে sign in করুন</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:#fff8f9;border-radius:10px;border:1px solid #ffe0ef;">
+      <span style="background:#e0186a;color:#fff;border-radius:50%;width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;flex-shrink:0;">৩</span>
+      <span style="font-size:14px;color:#374151;">Profile এ গিয়ে password পরিবর্তন করুন</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:#fff8f9;border-radius:10px;border:1px solid #ffe0ef;">
+      <span style="background:#e0186a;color:#fff;border-radius:50%;width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;flex-shrink:0;">৪</span>
+      <span style="font-size:14px;color:#374151;">কেনাকাটা শুরু করুন! 🛒</span>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+<p style="font-size:13px;color:#9ca3af;text-align:center;">
+  সমস্যা হলে আমাদের সাথে যোগাযোগ করুন: <strong>{{ support_phone }}</strong><br>
+  অথবা email করুন: <a href="mailto:{{ support_email }}" style="color:#e0186a;">{{ support_email }}</a>
+</p>
+{% endblock %}
