@@ -66,6 +66,13 @@
         <span class="absolute top-3 left-3 bg-pink-600 text-white text-[11px] font-bold px-2.5 py-1 rounded-full z-20 animate-float shadow">New</span>
         {% endif %}
 
+        {% if product.discount_percent %}
+        <div class="absolute top-3 right-3 z-20 flex flex-col items-center justify-center w-14 h-14 rounded-full bg-red-500 text-white shadow-lg">
+          <span class="text-[11px] font-semibold leading-none">সেভ</span>
+          <span class="text-lg font-black leading-tight">{{ product.discount_percent }}%</span>
+        </div>
+        {% endif %}
+
         <!-- Slider Container -->
         <div id="image-slider-container"
           class="flex h-full transition-transform duration-500 ease-in-out"
@@ -154,30 +161,33 @@
       </div>
 
       <!-- Price -->
-      <div class="flex items-end gap-3 bg-pink-50/60 border border-pink-100 rounded-xl px-4 py-3">
-        <span class="text-3xl sm:text-4xl font-black text-pink-600">৳{{ product.price }}</span>
-        {% if product.original_price %}
-        <div class="flex flex-col mb-0.5">
+      <div class="bg-pink-50/60 border border-pink-100 rounded-xl px-4 py-3">
+        <div class="flex items-center gap-3 flex-wrap">
+          <span class="text-3xl sm:text-4xl font-black text-pink-600">৳{{ product.price }}</span>
+          {% if product.original_price %}
           <span class="text-base sm:text-xl text-gray-400 line-through">৳{{ product.original_price }}</span>
+          {% endif %}
           {% if product.discount_percent %}
-          <span class="text-xs text-green-600 font-bold">{{ product.discount_percent }}% OFF</span>
+          <span class="inline-flex items-center gap-1 bg-green-500 text-white text-sm font-bold px-3 py-1 rounded-full shadow-sm">
+            <i data-lucide="tag" class="h-3.5 w-3.5"></i>
+            {{ product.discount_percent }}% ছাড়
+          </span>
           {% endif %}
         </div>
+        {% if product.savings_amount %}
+        <p class="text-xs text-green-700 font-medium mt-1.5">
+          🎉 আপনি ৳{{ product.savings_amount }} টাকা সাশ্রয় করছেন!
+        </p>
         {% endif %}
       </div>
 
       <!-- Short Description -->
       <div class="prose prose-sm text-gray-600 prose-text">
         {% if product.short_description %}
-        {{ product.short_description|markdownify }}
+        {{ product.short_description|safe }}
         {% else %}
-        {{ product.description|markdownify|truncatewords_html:50 }}
+        {{ product.description|safe|truncatewords_html:50 }}
         {% endif %}
-        <ul class="list-disc pl-4 mt-2 space-y-1 text-sm">
-          <li>Dermatologist Tested &amp; Skin Safe</li>
-          <li>100% Genuine &amp; Authenticated</li>
-          <li>Secure &amp; Damage-free Packaging</li>
-        </ul>
       </div>
 
       <!-- Quantity + Add to Cart (full buttons on desktop, hidden sticky bar on mobile) -->
@@ -361,7 +371,7 @@
             পণ্যের বিস্তারিত
           </h3>
           <div class="prose prose-green prose-sm sm:prose-lg max-w-none text-gray-600 leading-relaxed">
-            {{ product.description|markdownify }}
+            {{ product.description|safe }}
           </div>
         </div>
       </div>

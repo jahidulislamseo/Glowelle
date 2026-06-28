@@ -5,6 +5,8 @@ from django.shortcuts import redirect
 from .models import Category, Product, Review, Wishlist, Brand, ProductVariant, StockLog, ProductImage, ProductVideo
 from import_export.admin import ImportExportModelAdmin
 from core.admin_mixins import ChangeHistoryMixin
+from django_summernote.admin import SummernoteModelAdmin
+from django_summernote.widgets import SummernoteWidget
 
 @admin.register(Brand)
 class BrandAdmin(ChangeHistoryMixin, admin.ModelAdmin):
@@ -57,7 +59,7 @@ class LowStockFilter(admin.SimpleListFilter):
             return queryset.filter(stock_quantity=0)
 
 @admin.register(Product)
-class ProductAdmin(ChangeHistoryMixin, admin.ModelAdmin):
+class ProductAdmin(ChangeHistoryMixin, SummernoteModelAdmin):
     list_display = ['title', 'price', 'in_stock', 'stock_quantity', 'category', 'brand', 'display_image', 'rating', 'chatbot_priority_badge']
     list_display_links = ['title']
     list_filter = ['category', 'brand', LowStockFilter, 'in_stock', 'is_new', 'is_best_seller', 'chatbot_priority']
@@ -65,6 +67,8 @@ class ProductAdmin(ChangeHistoryMixin, admin.ModelAdmin):
     prepopulated_fields = {'slug': ('title',)}
     inlines = [ProductImageInline, ProductVideoInline, ProductVariantInline]
     actions = ['make_out_of_stock', 'add_stock_10', 'enable_chatbot_priority', 'disable_chatbot_priority']
+
+    summernote_fields = ('description', 'short_description')
 
     # Optimization
     list_select_related = ['category', 'brand']

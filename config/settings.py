@@ -96,6 +96,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'markdownify.apps.MarkdownifyConfig',
+    'django_summernote',
     'cloudinary',
     'cloudinary_storage',
     
@@ -116,6 +117,24 @@ MARKDOWNIFY = {
 }
 
 TAILWIND_APP_NAME = 'theme'
+
+SUMMERNOTE_CONFIG = {
+    'summernote': {
+        'width': '100%',
+        'height': '400px',
+        'lang': 'bn-BD',
+        'toolbar': [
+            ['style', ['bold', 'italic', 'underline', 'clear']],
+            ['font', ['strikethrough']],
+            ['para', ['ul', 'ol', 'paragraph']],
+            ['height', ['height']],
+            ['insert', ['link', 'picture', 'hr']],
+            ['view', ['fullscreen', 'codeview']],
+        ],
+    },
+    'attachment_require_authentication': True,
+    'disable_attachment': False,
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

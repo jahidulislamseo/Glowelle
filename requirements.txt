@@ -44,6 +44,7 @@ djangorestframework
 django-cors-headers
 django-filter
 django-markdownify
+django-summernote
 pymongo[srv]>=4.6.1
 dnspython>=2.5.0
 openai

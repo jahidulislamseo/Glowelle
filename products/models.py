@@ -110,6 +110,18 @@ class Product(SEOModel):
         return reverse('product_detail', args=[self.slug])
 
     @property
+    def discount_percent(self):
+        if self.original_price and self.original_price > self.price:
+            return round((self.original_price - self.price) / self.original_price * 100)
+        return None
+
+    @property
+    def savings_amount(self):
+        if self.original_price and self.original_price > self.price:
+            return int(self.original_price - self.price)
+        return None
+
+    @property
     def display_image_url(self):
         if not self.image:
             return DEFAULT_PRODUCT_IMAGE_URL

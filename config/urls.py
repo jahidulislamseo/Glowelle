@@ -63,6 +63,7 @@ urlpatterns = [
     # AI Chatbot
     path('chatbot-test/', TemplateView.as_view(template_name='chatbot_test.html'), name='chatbot_test'),
     path('', include('chatbot.urls')),
+    path('summernote/', include('django_summernote.urls')),
 
     # Admin API
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
