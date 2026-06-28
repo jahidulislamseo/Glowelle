@@ -118,12 +118,11 @@ MARKDOWNIFY = {
 
 TAILWIND_APP_NAME = 'theme'
 
-SUMMERNOTE_THEME = 'bs4'
 SUMMERNOTE_CONFIG = {
-    'iframe': False,
+    'iframe': True,
     'summernote': {
         'width': '100%',
-        'height': '400px',
+        'height': '380px',
         'toolbar': [
             ['style', ['bold', 'italic', 'underline', 'clear']],
             ['font', ['strikethrough']],
