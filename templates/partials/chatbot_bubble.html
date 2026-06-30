@@ -1,4 +1,4 @@
-<div id="chatbot-container" class="fixed bottom-20 md:bottom-8 right-4 md:right-6 z-[9999] flex flex-col items-end">
+<div id="chatbot-container" class="hidden fixed bottom-20 md:bottom-8 right-4 md:right-6 z-[9999] flex flex-col items-end">
     <!-- Chat Window -->
     <div id="chatbot-window"
         class="hidden w-80 sm:w-96 bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl border border-white/20 overflow-hidden flex-col transition-all duration-300 transform scale-95 opacity-0 origin-bottom-right mb-4">
@@ -21,6 +21,23 @@
                 class="hover:bg-white/10 w-8 h-8 rounded-full transition-colors flex items-center justify-center">
                 <i class="fas fa-times"></i>
             </button>
+        </div>
+
+        <!-- Live Chat Channels Sub-header -->
+        <div class="bg-gray-50/90 backdrop-blur-sm border-b border-gray-100 px-4 py-2 flex items-center justify-between text-xs text-gray-500">
+            <span class="flex items-center gap-1 font-medium"><span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-ping"></span> Live Agents:</span>
+            <div class="flex items-center space-x-3">
+                {% if site_settings.support_phone %}
+                <a href="https://wa.me/{{ site_settings.support_phone|cut:'+' }}" target="_blank" rel="noopener"
+                    class="flex items-center text-green-600 hover:text-green-700 font-bold transition-colors">
+                    <i class="fab fa-whatsapp mr-1 text-sm"></i> WhatsApp
+                </a>
+                {% endif %}
+                <a href="https://m.me/{{ site_settings.messenger_username }}" target="_blank" rel="noopener"
+                    class="flex items-center text-blue-600 hover:text-blue-700 font-bold transition-colors">
+                    <i class="fab fa-facebook-messenger mr-1 text-sm"></i> Messenger
+                </a>
+            </div>
         </div>
 
         <!-- Messages Area -->

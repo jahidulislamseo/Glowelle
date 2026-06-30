@@ -7,9 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google" content="notranslate">
     <!-- SEO & Meta Tags -->
-    <title>{% if product %}{{ product.get_meta_title }} | Nyveralife{% elif category %}{{ category.get_meta_title }} | Nyveralife{% else %}{{ site_settings.site_title|default:"Nyveralife" }} | Premium Organic Grocery{% endif %}</title>
+    <title>{% if product %}{{ product.get_meta_title }} | Nyveralife{% elif category %}{{ category.get_meta_title }} | Nyveralife{% else %}{{ site_settings.site_title|default:"Nyveralife" }} | Premium Organic Skincare & Cosmetics{% endif %}</title>
     <meta name="description"
-        content="{% if product %}{{ product.get_meta_description }}{% elif category %}{{ category.get_meta_description }}{% else %}{{ site_settings.meta_description|default:'Your one-stop shop for fresh organic fruits, vegetables, meat, and daily essentials.' }}{% endif %}">
+        content="{% if product %}{{ product.get_meta_description }}{% elif category %}{{ category.get_meta_description }}{% else %}{{ site_settings.meta_description|default:'Your premium destination for organic skincare, cosmetics, and beauty essentials.' }}{% endif %}">
     <link rel="canonical" href="{{ request.build_absolute_uri }}">
 
     {% if product and product.meta_keywords %}
@@ -31,11 +31,11 @@
     {% elif category %}
     <meta property="og:title" content="{{ category.get_meta_title|default:category.name }}">
     <meta property="og:description"
-        content="{{ category.get_meta_description|default:'Shop our best organic products.' }}">
+        content="{{ category.get_meta_description|default:'Shop our best organic skincare and cosmetics.' }}">
     <meta property="og:type" content="website">
     {% else %}
-    <meta property="og:title" content="Nyveralife | Premium Organic Grocery">
-    <meta property="og:description" content="Your one-stop shop for fresh organic fruits, vegetables, meat, and daily essentials.">
+    <meta property="og:title" content="Nyveralife | Premium Organic Skincare & Cosmetics">
+    <meta property="og:description" content="Your premium destination for organic skincare, cosmetics, and beauty essentials.">
     <meta property="og:type" content="website">
     {% endif %}
     <!-- Twitter Card -->
@@ -1140,23 +1140,41 @@
          MARKETING FEATURES
          ============================================= -->
 
-    <!-- 1. WhatsApp Floating Button -->
-    {% if site_settings.support_phone %}
-    <a href="https://wa.me/{{ site_settings.support_phone|cut:'+' }}" target="_blank" rel="noopener"
-        id="whatsapp-btn"
-        title="WhatsApp এ যোগাযোগ করুন"
-        class="fixed bottom-36 md:bottom-28 right-4 md:right-6 z-40 flex items-center justify-center h-13 w-13 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 group"
-        style="height:52px;width:52px;">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 fill-white" viewBox="0 0 24 24">
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-            <path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.555 4.118 1.528 5.845L0 24l6.335-1.508A11.937 11.937 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.799 9.799 0 01-5.003-1.367l-.36-.213-3.76.895.952-3.658-.234-.374A9.786 9.786 0 012.182 12C2.182 6.58 6.58 2.182 12 2.182 17.42 2.182 21.818 6.58 21.818 12c0 5.42-4.398 9.818-9.818 9.818z"/>
-        </svg>
-        <!-- Tooltip -->
-        <span class="absolute right-full mr-3 bg-gray-900 text-white text-xs font-semibold px-3 py-1.5 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-            WhatsApp করুন
-        </span>
-    </a>
-    {% endif %}
+    <!-- Social Contact Floating Buttons Container -->
+    <div class="fixed bottom-20 md:bottom-8 right-[22px] md:right-[30px] z-40 flex flex-col items-center gap-3">
+        <!-- Messenger Floating Button -->
+        <a href="https://m.me/{{ site_settings.messenger_username }}" target="_blank" rel="noopener"
+            id="messenger-btn"
+            title="Messenger এ যোগাযোগ করুন"
+            class="flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 group"
+            style="height:52px;width:52px;">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 fill-white" viewBox="0 0 24 24">
+                <path d="M12 0C5.373 0 0 4.974 0 11.111c0 3.498 1.594 6.621 4.094 8.718v4.062a.455.455 0 00.706.381l4.544-2.52c.854.238 1.761.37 2.656.37 6.627 0 12-4.975 12-11.112S18.627 0 12 0zm1.26 15.023l-3.056-3.26-5.962 3.26 6.556-6.978 3.122 3.26 5.895-3.26-6.555 6.978z"/>
+            </svg>
+            <!-- Tooltip -->
+            <span class="absolute right-full mr-3 bg-gray-900 text-white text-xs font-semibold px-3 py-1.5 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                Messenger করুন
+            </span>
+        </a>
+
+        <!-- WhatsApp Floating Button -->
+        {% if site_settings.support_phone %}
+        <a href="https://wa.me/{{ site_settings.support_phone|cut:'+' }}" target="_blank" rel="noopener"
+            id="whatsapp-btn"
+            title="WhatsApp এ যোগাযোগ করুন"
+            class="flex items-center justify-center bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 group"
+            style="height:52px;width:52px;">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 fill-white" viewBox="0 0 24 24">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                <path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.555 4.118 1.528 5.845L0 24l6.335-1.508A11.937 11.937 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.799 9.799 0 01-5.003-1.367l-.36-.213-3.76.895.952-3.658-.234-.374A9.786 9.786 0 012.182 12C2.182 6.58 6.58 2.182 12 2.182 17.42 2.182 21.818 6.58 21.818 12c0 5.42-4.398 9.818-9.818 9.818z"/>
+            </svg>
+            <!-- Tooltip -->
+            <span class="absolute right-full mr-3 bg-gray-900 text-white text-xs font-semibold px-3 py-1.5 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                WhatsApp করুন
+            </span>
+        </a>
+        {% endif %}
+    </div>
 
     <!-- 2. Cookie Consent Bar -->
     <div id="cookie-consent" class="fixed bottom-0 left-0 right-0 z-[80] translate-y-full transition-transform duration-500">

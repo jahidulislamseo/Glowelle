@@ -59,6 +59,29 @@ class SiteSettings(models.Model):
         verbose_name = "Site Settings"
         verbose_name_plural = "Site Settings"
 
+    @property
+    def messenger_username(self):
+        """Parse facebook_url to get the profile ID/username for m.me link."""
+        url = self.facebook_url
+        if not url:
+            url = "https://www.facebook.com/people/Nyvera-Life/61591039641335/"
+        
+        # Clean URL
+        url = url.strip().rstrip('/')
+        
+        # If it has people/Name/ID format
+        if '/people/' in url:
+            parts = url.split('/')
+            if parts[-1].isdigit():
+                return parts[-1]
+                
+        # Standard username URL
+        parts = url.split('/')
+        last_part = parts[-1]
+        if '?' in last_part:
+            last_part = last_part.split('?')[0]
+        return last_part
+
     def __str__(self):
         return "Website Configuration"
 

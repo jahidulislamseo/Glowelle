@@ -359,9 +359,9 @@ def get_product_context(query, intent='browsing'):
 
     # 6. Generate Context String
     if not unified_products:
-        return "❌ I couldn't find specific products matching your query. However, Nyveralife sources the freshest organic items daily. Try asking for Rice, Fish, Meat, or Honey!", []
+        return "❌ I couldn't find specific products matching your query. Try asking for Serum, Moisturizer, Face Wash, or Sunscreen!", []
     
-    branding_ctx = "🌟 BRAND KNOWLEDGE: Nyveralife sources directly from organic farms. 100% Chemical-free. Return-on-delivery if quality fails.\n"
+    branding_ctx = "🌟 BRAND KNOWLEDGE: Nyveralife offers premium organic skincare and cosmetics. 100% genuine and chemical-free products. Easy returns if quality fails.\n"
     context = branding_ctx + "📦 Available Products:\n"
     for p in unified_products[:5]:
         context += f"\n🛒 **{p['title']}**\n   💰 Price: **{p['price']} BDT**"
@@ -445,6 +445,23 @@ def chatbot_response(request):
         if clean_msg in fast_replies or clean_msg == 'back to menu':
             response_text = fast_replies.get(clean_msg, fast_replies['menu'])
             save_chat_interaction(session_id, user_message, response_text)
+            if clean_msg == 'human':
+                custom_suggestions = []
+                if site_settings and site_settings.support_phone:
+                    clean_phone = site_settings.support_phone.replace('+', '').replace(' ', '').replace('-', '')
+                    custom_suggestions.append({
+                        "text": "🟢 Chat on WhatsApp",
+                        "action": "link",
+                        "url": f"https://wa.me/{clean_phone}"
+                    })
+                fb_username = site_settings.messenger_username if site_settings else "61591039641335"
+                custom_suggestions.append({
+                    "text": "🔵 Chat on Messenger",
+                    "action": "link",
+                    "url": f"https://m.me/{fb_username}"
+                })
+                custom_suggestions.append({"text": "⬅ Back to Menu", "action": "message"})
+                return JsonResponse({"response": response_text, "status": "success", "suggestions": custom_suggestions})
             return JsonResponse({"response": response_text, "status": "success", "suggestions": get_random_suggestions()})
         faq_answer = check_faq(user_message)
         if faq_answer:
@@ -479,6 +496,23 @@ def chatbot_response(request):
         if training_resp:
             save_conversation_memory(session_id, user_message, training_resp, intent, preferences=user_prefs)
             save_chat_interaction(session_id, user_message, training_resp)
+            if intent == 'human_support':
+                custom_suggestions = []
+                if site_settings and site_settings.support_phone:
+                    clean_phone = site_settings.support_phone.replace('+', '').replace(' ', '').replace('-', '')
+                    custom_suggestions.append({
+                        "text": "🟢 Chat on WhatsApp",
+                        "action": "link",
+                        "url": f"https://wa.me/{clean_phone}"
+                    })
+                fb_username = site_settings.messenger_username if site_settings else "61591039641335"
+                custom_suggestions.append({
+                    "text": "🔵 Chat on Messenger",
+                    "action": "link",
+                    "url": f"https://m.me/{fb_username}"
+                })
+                custom_suggestions.append({"text": "⬅ Back to Menu", "action": "message"})
+                return JsonResponse({"response": training_resp, "status": "success", "suggestions": custom_suggestions})
             return JsonResponse({"response": training_resp, "status": "success", "suggestions": get_random_suggestions()})
         
         # Handle order tracking

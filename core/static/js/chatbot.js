@@ -83,11 +83,11 @@
         setTimeout(() => {
             removeTypingIndicator();
             const locationMsg = "🚚 Same-day delivery available in Dhaka!";
-            addMessage(`👋 Hi! Welcome to Nyveralife\nFresh daily essentials delivered to your door 🛒\n\n${locationMsg}\n\nHow can I help you today?`);
-            addMessage("⭐ Trusted by 5,000+ happy customers\n✔ Freshness guaranteed");
+            addMessage(`👋 Hi! Welcome to Nyveralife\nPremium organic skincare & beauty essentials delivered to your door 🛒\n\n${locationMsg}\n\nHow can I help you today?`);
+            addMessage("⭐ Trusted by 5,000+ happy customers\n✔ 100% Original Products");
             renderSuggestions([
                 { "text": "🔥 Popular Items", "action": "message" },
-                { "text": "🐟 Fresh Fish", "action": "message" },
+                { "text": "🧴 Moisturizer", "action": "message" },
                 { "text": "🚚 Delivery Time", "action": "message" },
                 { "text": "📦 Track Order", "action": "message" },
                 { "text": "🙋 Talk to a Human", "action": "message" }
@@ -121,7 +121,7 @@
                     addMessage("😊 Need help choosing? I can suggest today’s best items.");
                     renderSuggestions([
                         { "text": "🔥 Popular Items", "action": "message" },
-                        { "text": "🐟 Fresh Fish", "action": "message" },
+                        { "text": "🧴 Moisturizer", "action": "message" },
                         { "text": "⬅ Back to Menu", "action": "message" }
                     ]);
                 }
@@ -334,6 +334,9 @@
             // Simple text message
             chatbotInput.value = item.text || item;
             chatbotForm.dispatchEvent(new Event('submit'));
+        } else if (action === 'link') {
+            // External/direct support channels link
+            window.open(item.url, '_blank');
         }
     }
 
